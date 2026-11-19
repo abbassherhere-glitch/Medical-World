@@ -31,6 +31,7 @@ const popularGuides = await liveLinks(profession.popularGuides);
           <div class="hero__picker">
             <StatePicker
               id="hero"
+              section="schools"
               professions={professions.map((p) => ({ slug: p.id, name: p.data.name }))}
             />
           </div>

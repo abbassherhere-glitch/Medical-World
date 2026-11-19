@@ -1,7 +1,7 @@
 /**
- * Sends the "Find schools" picker straight to the chosen state page,
- * for example /dental-hygienist/texas/. Without JavaScript the form is
- * submitted to its normal `action` address instead.
+ * Sends the state picker straight to the chosen state page, for example
+ * /dental-hygienist/texas/#schools. With no state chosen, or without
+ * JavaScript, the form goes to its normal `action` address instead.
  */
 for (const form of document.querySelectorAll<HTMLFormElement>('form[data-state-picker]')) {
   form.addEventListener('submit', (event) => {
