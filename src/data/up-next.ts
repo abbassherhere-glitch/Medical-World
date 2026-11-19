@@ -13,7 +13,7 @@ export function upNext(page: string, profession: string, name: string): Step[] {
     become: { label: `How to become a ${lower}`, href: `${p}/how-to-become/`, text: 'The usual steps from training to a license.' },
     states: { label: 'Pay in each state', href: `${p}/#states`, text: 'A page for every state and DC, with local pay and licensing.' },
     licensing: { label: 'Licensing by state', href: `${p}/licensing/`, text: 'How licensing works, and the rules in each state.' },
-    schools: { label: 'Schools by state', href: `${p}/schools/`, text: 'Accredited programs in each state.' },
+    schools: { label: 'Schools by state', href: `${p}/schools/`, text: 'Colleges in each state that reported awards, with national totals.' },
     exam: { label: 'The national board exam', href: `${p}/board-exam/`, text: 'What the national written exam is.' },
     overview: { label: `${name} overview`, href: `${p}/`, text: 'Pay, training and licensing at a glance.' },
   } satisfies Record<string, Step>;

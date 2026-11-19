@@ -1,0 +1,37 @@
+---
+/**
+ * A link to another website: opens in a new tab, safely
+ * (rel="nofollow noopener"), with a visible icon and a note for screen
+ * readers saying it is an external website that opens in a new tab.
+ */
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+<a class:list={['external', className]} href={href} target="_blank" rel="nofollow noopener"
+  ><slot /><span class="visually-hidden"> (external website, opens in a new tab)</span><svg
+    class="external__icon"
+    aria-hidden="true"
+    focusable="false"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg
+  ></a
+>
+
+<style>
+  .external__icon {
+    display: inline-block;
+    margin-left: 0.3em;
+    vertical-align: baseline;
+  }
+</style>

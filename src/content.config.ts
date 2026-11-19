@@ -147,23 +147,11 @@ const stateGuides = defineCollection({
       intro: z.string(),
       steps: z.array(z.object({ title: z.string(), text: z.string() })),
     }),
-    schools: z.object({
-      heading: z.string(),
-      columns: z.array(z.string()),
-      rows: z.array(
-        z.object({
-          name: z.string(),
-          href: z.string().optional(),
-          city: z.string(),
-          award: z.string(),
-          length: z.string(),
-          sponsored: z.boolean().default(false),
-        }),
-      ),
-      note: z.string(),
-    }),
+    /** The schools list itself comes from the IPEDS data; only its heading is set here. */
+    schools: z.object({ heading: z.string() }),
     /** Sources other than the wage survey, which is added automatically. */
     otherSources: z.array(z.string()),
+    /** Side panel. `note` (about paid listings) shows only when showSponsoredListings is on. */
     compare: z.object({ heading: z.string(), text: z.string(), button: link, note: z.string() }),
     nationalGuides: z.array(link),
   }),

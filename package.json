@@ -18,7 +18,8 @@
     "test": "node --test \"scripts/**/*.test.ts\" \"src/**/*.test.ts\"",
     "check-links": "node scripts/site/check-links.ts",
     "placeholders": "node scripts/site/placeholders.ts",
-    "import-outlook": "node scripts/import-pay/import-outlook.ts"
+    "import-outlook": "node scripts/import-pay/import-outlook.ts",
+    "import-schools": "node scripts/import-pay/import-schools.ts"
   },
   "dependencies": {
     "astro": "^7.4.13"

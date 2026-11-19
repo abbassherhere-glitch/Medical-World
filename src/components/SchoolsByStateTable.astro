@@ -1,0 +1,37 @@
+---
+/**
+ * Colleges and awards in each state, from the IPEDS completions file. Each
+ * state links to the schools section of its page once that page is published.
+ */
+import ScrollTable from './ScrollTable.astro';
+import SmartLink from './SmartLink.astro';
+import { slugify } from '../data/states';
+import { countFormat, schoolTotals, type SchoolsData } from '../lib/schools';
+
+interface Props {
+  profession: string;
+  data: SchoolsData;
+  /** Every state and DC with its postal abbreviation, from the pay data. */
+  states: { name: string; abbr: string }[];
+}
+
+const { profession, data, states } = Astro.props;
+const year = data.source.awardYear;
+const rows = states
+  .map((s) => ({ ...s, ...schoolTotals(data.schools.filter((c) => c.state === s.abbr)) }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<ScrollTable caption={`Colleges reporting dental hygiene awards in each state, ${year}`} columns={['State', 'Colleges with awards', `Awards in ${year}`]} minWidth={400}>
+  {
+    rows.map((r) => (
+      <tr>
+        <th scope="row">
+          <SmartLink href={`/${profession}/${slugify(r.name)}/#schools`}>{r.name}</SmartLink>
+        </th>
+        <td>{countFormat.format(r.colleges)}</td>
+        <td>{countFormat.format(r.awards)}</td>
+      </tr>
+    ))
+  }
+</ScrollTable>

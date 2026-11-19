@@ -1,0 +1,103 @@
+---
+/**
+ * The colleges in one state that reported dental hygiene awards, from the
+ * IPEDS completions file. Shows only what the file says. Colleges with 0
+ * awards are listed separately, below the table.
+ */
+import ScrollTable from './ScrollTable.astro';
+import ExternalLink from './ExternalLink.astro';
+import SponsoredLabel from './SponsoredLabel.astro';
+import {
+  controlLabel,
+  countFormat,
+  levelsWithAwards,
+  schoolsSourceLine,
+  stateSchoolsSummary,
+  totalAwards,
+  websiteHref,
+  withAwards,
+  withoutAwards,
+  type School,
+  type SchoolsData,
+} from '../lib/schools';
+
+interface Props {
+  id: string;
+  heading: string;
+  /** For example "Texas" or "the District of Columbia". */
+  place: string;
+  data: SchoolsData;
+  schools: School[];
+}
+
+const { id, heading, place, data, schools } = Astro.props;
+const year = data.source.awardYear;
+const listed = withAwards(schools);
+const zero = withoutAwards(schools);
+const summary = stateSchoolsSummary(place, schools, year);
+const capitalizedType = (s: School) => {
+  const label = controlLabel(s.control);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+---
+
+<section class="stack" aria-labelledby={id}>
+  <h2 id={id} class="section-title" tabindex="-1">{heading}</h2>
+  <p>{summary}</p>
+  {
+    listed.length > 0 && (
+      <ScrollTable
+        caption={`Colleges in ${place} that reported dental hygiene awards for ${year}, most awards first`}
+        columns={['College', 'City', 'Type', 'Awards offered', `Awards in ${year}`]}
+        minWidth={640}
+      >
+        {listed.map((school) => {
+          const href = websiteHref(school.website);
+          return (
+            <tr>
+              <th scope="row">
+                {href ? <ExternalLink href={href}>{school.name}</ExternalLink> : school.name}
+                <SponsoredLabel />
+              </th>
+              <td>{school.city}</td>
+              <td>{capitalizedType(school)}</td>
+              <td>{levelsWithAwards(school).join('; ')}</td>
+              <td class="num">{countFormat.format(totalAwards(school))}</td>
+            </tr>
+          );
+        })}
+      </ScrollTable>
+    )
+  }
+  {
+    zero.length > 0 && (
+      <p class="zero">
+        <strong>Also reported the program, with no awards in {year}:</strong>{' '}
+        {zero.map((s, i) => (
+          <>
+            {i > 0 && '; '}
+            {s.name} ({s.city})
+          </>
+        ))}
+        .
+      </p>
+    )
+  }
+  <p class="note">
+    This list shows colleges that reported dental hygiene awards to the US Department of Education for {year}. It is not a list
+    of accredited programs. Before applying, check a program's accreditation with the Commission on Dental Accreditation (CODA)
+    [CODA PROGRAM SEARCH, OFFICIAL LINK] and its approval with the state dental board.
+  </p>
+  <p class="note">Source: {schoolsSourceLine(data)}.</p>
+</section>
+
+<style>
+  .num {
+    font-weight: var(--weight-bold);
+  }
+
+  .zero {
+    font-size: var(--text-md);
+    line-height: 1.6;
+  }
+</style>

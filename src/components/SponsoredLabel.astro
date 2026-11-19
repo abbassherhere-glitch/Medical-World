@@ -1,0 +1,25 @@
+---
+/**
+ * The "Sponsored" label for a paid school listing. Not used while
+ * `showSponsoredListings` in src/settings.ts is false; kept for when paid
+ * listings start. Any paid listing must show this label.
+ */
+import { settings } from '../settings';
+---
+
+{settings.showSponsoredListings && <span class="sponsored">Sponsored</span>}
+
+<style>
+  .sponsored {
+    display: inline-block;
+    margin-left: var(--space-2);
+    padding: 2px 8px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    color: var(--color-text);
+    background: var(--color-tint);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    vertical-align: middle;
+  }
+</style>

@@ -15,7 +15,7 @@ lastUpdated: "[DATE]"
 
 ## Sponsored listings
 
-Some schools pay to appear in our school lists. These listings are marked "Sponsored". Payment does not change the facts we publish about any school.
+There are no paid listings in our school lists at present. If a school pays to appear in them in future, its listing will be marked "Sponsored". Payment will not change the facts we publish about any school.
 
 ## Cookies and personal data
 
