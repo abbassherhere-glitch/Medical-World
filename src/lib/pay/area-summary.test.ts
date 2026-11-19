@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  areaHighlights,
   areaQuestions,
   areaRank,
   areaRankSentence,
@@ -123,4 +124,22 @@ test('a run of comparisons names the area once, then says "It is"', () => {
   const kansasFirst = compareAll('Topeka, KS', 90000, [kansas], us);
   assert.match(kansasFirst[0]!, /no statewide median for Kansas/);
   assert.match(kansasFirst[1]!, /^The median salary in Topeka, KS is \$8,100 a year \(8.3%\) lower than the US median/);
+});
+
+test('at-a-glance points are worked out from the figures', () => {
+  const points = areaHighlights({
+    place: 'High, TX',
+    area: areas[0]!,
+    states: [{ state: texas, areas }],
+    national: us,
+    plural: 'dental hygienists',
+    nationalRank: { rank: 1, of: 10 },
+    higher: undefined,
+    lower: { name: 'Mid A, TX', states: ['TX'] },
+  });
+  assert.ok(points.includes('High, TX is the highest paying area that includes Texas.'));
+  assert.ok(points.includes('The median salary in High, TX is well above the statewide median in Texas, by more than 10%.'));
+  assert.ok(points.includes('The median salary in High, TX is well above the US median, by more than 10%.'));
+  assert.ok(points.includes('High, TX is in the top quarter of US metropolitan areas by median salary.'));
+  assert.ok(points.includes('The nearest area by pay is in the same state.'));
 });

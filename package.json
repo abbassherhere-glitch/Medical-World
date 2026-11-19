@@ -13,10 +13,11 @@
     "check": "astro check",
     "lint": "eslint .",
     "wording": "node scripts/check-wording.mjs",
-    "verify": "npm run wording && npm run check && npm run lint && npm test && npm run build && npm run check-links",
+    "verify": "npm run wording && npm run check && npm run lint && npm test && npm run build && npm run check-links && npm run check-area-text",
     "import-pay": "node scripts/import-pay/import.ts",
     "test": "node --test \"scripts/**/*.test.ts\" \"src/**/*.test.ts\"",
     "check-links": "node scripts/site/check-links.ts",
+    "check-area-text": "node scripts/site/check-area-text.ts",
     "placeholders": "node scripts/site/placeholders.ts",
     "import-outlook": "node scripts/import-pay/import-outlook.ts",
     "import-schools": "node scripts/import-pay/import-schools.ts"

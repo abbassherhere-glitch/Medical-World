@@ -8,6 +8,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import GuideLayout from '../../../layouts/GuideLayout.astro';
 import TableOfContents from '../../../components/TableOfContents.astro';
+import KeyTakeaways from '../../../components/KeyTakeaways.astro';
 import StatGrid from '../../../components/StatGrid.astro';
 import PayRangeBar from '../../../components/PayRangeBar.astro';
 import SourceLine from '../../../components/SourceLine.astro';
@@ -39,6 +40,7 @@ import { salaryLead, salaryTitle } from '../../../lib/pay/salary-wording';
 import {
   areaQuestions,
   areaRank,
+  areaHighlights,
   areaRankSentence,
   compareAll,
   nextHigherAndLower,
@@ -83,6 +85,17 @@ const nationalRank = areaRank(metros, area.code);
 const { higher, lower } = nextHigherAndLower(metros, area.code);
 
 const comparisons = compareAll(short, median, states, pay.national);
+const statesOf = (code: string) => metros.find((a) => a.code === code)?.states ?? [];
+const highlights = areaHighlights({
+  place: short,
+  area,
+  states: states.map((state) => ({ state, areas: areasInState(pay, state.abbr) })),
+  national: pay.national,
+  plural,
+  nationalRank,
+  higher: higher ? { name: higher.name, states: statesOf(higher.code) } : undefined,
+  lower: lower ? { name: lower.name, states: statesOf(lower.code) } : undefined,
+});
 const rankSentence = areaRankSentence(short, stateRanks, nationalRank);
 const questions = areaQuestions({ place: short, area, states, national: pay.national, stateRanks, nationalRank, plural, survey });
 
@@ -163,6 +176,7 @@ const calculatorState = states.find((s) => s.abbr === area.primaryState) ?? firs
     <SourceLine data={pay} />
   </section>
 
+  {highlights.length > 0 && <KeyTakeaways items={highlights} />}
   <TableOfContents items={contents} />
 
   <PayPeriodsTable id="pay-periods" place={short} figures={f} source={source} />

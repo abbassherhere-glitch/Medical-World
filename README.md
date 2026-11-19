@@ -19,6 +19,8 @@ a placeholder waiting for a real value.
 | Site name, address, company name, indexing switch, advert switch, "Useful organizations" switch, sponsored listings switch | `src/settings.ts` |
 | Page text | `src/content/` |
 | Which state pages are published | `src/content/state-pages/dental-hygienist.json` |
+| Which metropolitan area salary pages are published | `src/content/area-pages/dental-hygienist.json` |
+| Short names of metropolitan areas (for titles) | `src/data/area-names.json` |
 | Text shared by every state page (with `{state}` where the name goes) | `src/content/state-guides/dental-hygienist.json` |
 | Overview page text | `overview` in `src/content/professions/dental-hygienist.json` |
 | "How to become one" page text | `src/content/become-guides/dental-hygienist.json` |
@@ -327,6 +329,49 @@ list: if a state is missing, misspelled or listed twice, the build stops and
 says which one. Territories (Puerto Rico, Guam, the US Virgin Islands) do
 not have pages; their figures stay in the data file.
 
+## Salary pages for metropolitan areas
+
+Every metropolitan area in the pay data that has a published annual median,
+in the 50 states and DC, has its own salary page, for example
+`/dental-hygienist/salary/houston-pasadena-the-woodlands-tx/`. There are 377.
+The address is made from the official area name. An area that crosses state
+lines has one page. Nonmetropolitan (rural) areas have no pages; they stay as
+rows in the state tables. San Juan-Bayamon-Caguas, PR has no page, because
+territories have no pages on this site.
+
+`/dental-hygienist/salary/areas/` lists every area by state with its median.
+
+**Short names.** Titles and headings use a short name, such as "Houston, TX".
+They are kept in `src/data/area-names.json`, next to each official name. Each
+short name is the first principal city, as written in the official name, plus
+the state part. City names with a hyphen (Winston-Salem, Wilkes-Barre,
+Nashville-Davidson) and consolidated city names (Athens-Clarke County,
+Augusta-Richmond County, Macon-Bibb County, Lexington-Fayette) are kept whole.
+To change one, edit `short` there; never change `name`. The build stops if
+two areas share a short name or a name does not match the pay data.
+
+**Switching an area page on or off.** `src/content/area-pages/dental-hygienist.json`
+lists every area page with a switch, in the same way as the state pages:
+
+```json
+{ "area": "Houston-Pasadena-The Woodlands, TX", "published": false },
+```
+
+When it is `false`, the page is not built, is left out of `sitemap.xml` and
+search, and every link to it (state tables, the areas list, other area
+pages and the calculator) disappears or shows as plain text. If an area is
+missing, misspelled or listed twice, the build stops and says which one.
+
+**Checking the pages are not copies.** After a build, run:
+
+```bash
+npm run check-area-text
+```
+
+It takes each area page's main text, replaces every name with "NAME" and
+every figure with "#", and fails if any two pages are then identical. It
+also prints the most similar pair. It runs on every pull request.
+
 ## Switching a guide link on or off
 
 Some guides are planned but not written yet, such as "Dental hygiene school
@@ -373,7 +418,7 @@ Only the main content of each page is searched (not menus, bylines or advert
 areas). The search page itself is never indexed by search engines and is not
 in the sitemap, even after launch.
 
-## The pay calculator
+## The salary calculator
 
 `/dental-hygienist/salary/calculator/` lets visitors choose a state (and an
 area in it), switch between pay per hour, week, month and year, and compare
