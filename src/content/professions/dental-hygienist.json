@@ -61,7 +61,7 @@
     {
       "icon": "school",
       "title": "Schools by state",
-      "text": "Accredited programs near you, with length and entry requirements.",
+      "text": "Colleges in each state that reported dental hygiene awards, from the US Department of Education.",
       "linkText": "Find a school",
       "href": "/dental-hygienist/schools/"
     },
@@ -82,7 +82,7 @@
   ],
   "stateGrid": {
     "heading": "Dental hygienist guides by state",
-    "intro": "Each state page covers local pay, the licensing steps and accredited schools.",
+    "intro": "Each state page covers local pay, the licensing steps and the colleges that reported dental hygiene awards.",
     "states": [
       "California",
       "Texas",
@@ -160,7 +160,7 @@
     "figuresHeading": "Dental hygienists in numbers",
     "guidesHeading": "Our dental hygienist guides",
     "statesHeading": "Dental hygienist guides by state",
-    "statesIntro": "Each state page covers local pay, how the state compares with its neighbors, the licensing steps and accredited schools.",
+    "statesIntro": "Each state page covers local pay, how the state compares with its neighbors, the licensing steps and the colleges that reported dental hygiene awards.",
     "payHeading": "What dental hygienists earn",
     "otherSources": [
       "US Bureau of Labor Statistics, Occupational Outlook Handbook: Dental Hygienists (job numbers, job growth, entry requirement and licensing)"

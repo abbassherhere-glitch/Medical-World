@@ -22,7 +22,10 @@ export function withoutAwards(schools: School[]): School[] {
 
 /** The award levels with at least one award, for example "Associate's degree (26)". */
 export function levelsWithAwards(school: School): string[] {
-  return school.levels.filter((l) => l.awards > 0).map((l) => l.name);
+  return school.levels
+    .filter((l) => l.awards > 0)
+    .sort((a, b) => levelOrder(a.code) - levelOrder(b.code))
+    .map((l) => l.name);
 }
 
 /** Every award level with awards across these colleges, in the file's order, with totals. */
@@ -37,7 +40,19 @@ export function levelTotals(schools: School[]): { code: number; name: string; aw
       map.set(l.code, entry);
     }
   }
-  return [...map.values()].sort((a, b) => a.code - b.code);
+  return [...map.values()].sort((a, b) => levelOrder(a.code) - levelOrder(b.code));
+}
+
+/**
+ * IPEDS award level codes from shortest to longest: certificates under 12
+ * weeks (20), 12 weeks to 1 year (21), 1 to 2 years (2), associate's (3),
+ * 2 to 4 years (4), bachelor's (5), postbaccalaureate (6), master's (7),
+ * post-master's (8), doctor's (17 to 19).
+ */
+export function levelOrder(code: number): number {
+  const order = [20, 21, 1, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19];
+  const i = order.indexOf(code);
+  return i === -1 ? 100 + code : i;
 }
 
 export function controlTotals(schools: School[]): { control: Control; colleges: number; awards: number }[] {
@@ -99,3 +114,22 @@ export function websiteHref(website: string): string | undefined {
 }
 
 export { count as countFormat };
+
+/** Colleges with awards and total awards, for any group of colleges. */
+export function schoolTotals(schools: School[]): { colleges: number; awards: number; zero: number } {
+  const active = withAwards(schools);
+  return {
+    colleges: active.length,
+    awards: active.reduce((sum, s) => sum + totalAwards(s), 0),
+    zero: withoutAwards(schools).length,
+  };
+}
+
+/** For example "354 colleges in the US reported 8,802 dental hygiene awards for 2023-24." */
+export function nationalSchoolsSummary(schools: School[], year: string): string {
+  const t = schoolTotals(schools);
+  const places = new Set(withAwards(schools).map((s) => s.state));
+  const states = [...places].filter((p) => p !== 'DC').length;
+  const where = `${count.format(states)} ${states === 1 ? 'state' : 'states'}${places.has('DC') ? ' and DC' : ''}`;
+  return `${count.format(t.colleges)} colleges in ${where} reported ${count.format(t.awards)} dental hygiene awards for ${year}.`;
+}

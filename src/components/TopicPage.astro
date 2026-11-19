@@ -2,7 +2,7 @@
 /**
  * Shared layout for a profession's index pages (Schools by state,
  * Licensing, Board exam): heading, a few real sentences, any extra content,
- * the grid of state pages and the sources.
+ * the grid of state pages (or a "states" slot in its place) and the sources.
  */
 import GuideLayout from '../layouts/GuideLayout.astro';
 import StateGrid from './StateGrid.astro';
@@ -67,7 +67,7 @@ const { slug, profession, byline, activeMenu, topic, section, related, pickerHea
 
   <section class="stack" aria-labelledby="state-grid">
     <h2 id="state-grid" class="section-title" tabindex="-1">{topic.statesHeading}</h2>
-    <StateGrid profession={slug} states={STATES_AND_DC} section={section} />
+    {Astro.slots.has('states') ? <slot name="states" /> : <StateGrid profession={slug} states={STATES_AND_DC} section={section} />}
   </section>
 
   <AdSlot size="inline" id={`${activeMenu}-content-1`} />

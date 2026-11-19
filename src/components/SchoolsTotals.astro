@@ -1,0 +1,88 @@
+---
+/**
+ * National totals from the IPEDS completions file: colleges, awards, and the
+ * split by award level and by type of college. Shows only what the file says.
+ */
+import ScrollTable from './ScrollTable.astro';
+import {
+  controlTotals,
+  countFormat,
+  levelTotals,
+  nationalSchoolsSummary,
+  schoolTotals,
+  type SchoolsData,
+} from '../lib/schools';
+
+interface Props {
+  data: SchoolsData;
+  /** Prefix for heading ids, so two professions can share a page. */
+  idPrefix: string;
+  /** Heading level for the two small tables. */
+  level?: 'h2' | 'h3';
+}
+
+const { data, idPrefix, level = 'h2' } = Astro.props;
+const Heading = level;
+const year = data.source.awardYear;
+const totals = schoolTotals(data.schools);
+const levels = levelTotals(data.schools);
+const controls = controlTotals(data.schools);
+const pct = (n: number) => {
+  const share = (n / totals.awards) * 100;
+  return share > 0 && share < 0.5 ? 'Under 1%' : `${Math.round(share)}%`;
+};
+---
+
+<div class="stack">
+  <p class="lead">{nationalSchoolsSummary(data.schools, year)}</p>
+  {
+    totals.zero > 0 && (
+      <p>
+        Another {countFormat.format(totals.zero)} {totals.zero === 1 ? 'college' : 'colleges'} reported the program with no awards
+        in {year}. They are listed separately on each state page.
+      </p>
+    )
+  }
+
+  <Heading id={`${idPrefix}-levels`} class="section-subtitle">Awards by level, {year}</Heading>
+  <ScrollTable caption={`Dental hygiene awards by level, ${year}`} columns={['Award level', 'Colleges', 'Awards', 'Share of awards']} minWidth={440}>
+    {
+      levels.map((l) => (
+        <tr>
+          <th scope="row">{l.name}</th>
+          <td>{countFormat.format(l.colleges)}</td>
+          <td>{countFormat.format(l.awards)}</td>
+          <td>{pct(l.awards)}</td>
+        </tr>
+      ))
+    }
+  </ScrollTable>
+  <p class="note">A college that offers more than one award level is counted once for each level, so the colleges column adds up to more than the total.</p>
+
+  <Heading id={`${idPrefix}-types`} class="section-subtitle">Awards by type of college, {year}</Heading>
+  <ScrollTable caption={`Dental hygiene awards by type of college, ${year}`} columns={['Type of college', 'Colleges', 'Awards', 'Share of awards']} minWidth={440}>
+    {
+      controls.map((c) => (
+        <tr>
+          <th scope="row">{c.control}</th>
+          <td>{countFormat.format(c.colleges)}</td>
+          <td>{countFormat.format(c.awards)}</td>
+          <td>{pct(c.awards)}</td>
+        </tr>
+      ))
+    }
+  </ScrollTable>
+  <p class="note">Shares are rounded, so they may not add up to exactly 100%. Colleges with no awards in {year} are not counted in these tables.</p>
+</div>
+
+<style>
+  .lead {
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .section-subtitle {
+    font-size: var(--text-lg);
+    margin-top: var(--space-3);
+  }
+</style>

@@ -1,11 +1,17 @@
 ---
-/** Schools: for every profession with pages, a grid of states opening each state page at its schools. */
+/**
+ * Schools: for every profession with pages, the national totals of colleges
+ * reporting awards (IPEDS) and a grid of states opening each state page at
+ * its schools section.
+ */
 import { getCollection } from 'astro:content';
 import HubLayout from '../layouts/HubLayout.astro';
 import StateGrid from '../components/StateGrid.astro';
+import SchoolsTotals from '../components/SchoolsTotals.astro';
 import { professionsWithPages } from '../data/professions';
 import { liveLinks } from '../data/routes';
 import { STATES_AND_DC } from '../data/states';
+import { getSchools, schoolsSourceLine } from '../lib/schools';
 
 const topicPages = await getCollection('topicPages');
 const professions = await Promise.all(
@@ -14,6 +20,7 @@ const professions = await Promise.all(
     data: p.data,
     // The first paragraph of the profession's own "Schools by state" page.
     intro: topicPages.find((t) => t.data.profession.id === p.id)?.data.schools.intro[0],
+    schools: getSchools(p.id),
     links: await liveLinks([{ href: `/${p.id}/schools/`, label: `${p.data.name} schools by state` }]),
   })),
 );
@@ -21,9 +28,9 @@ const professions = await Promise.all(
 
 <HubLayout
   title="Healthcare schools by state"
-  description={`Find accredited training programs in your state for ${professions.map((p) => p.data.namePlural).join(', ')}.`}
+  description={`How many colleges in each state reported awards for ${professions.map((p) => p.data.namePlural).join(', ')}, from the US Department of Education.`}
   heading="Schools"
-  intro="Choose a profession and your state to see accredited programs there."
+  intro="Choose a profession and your state to see the colleges there that reported awards to the US Department of Education."
 >
   {
     professions.map((p) => (
@@ -32,6 +39,16 @@ const professions = await Promise.all(
           {p.data.name} schools
         </h2>
         {p.intro && <p>{p.intro}</p>}
+        {p.schools && (
+          <>
+            <SchoolsTotals data={p.schools} idPrefix={p.slug} level="h3" />
+            <p class="note">
+              These are colleges that reported awards, not a list of accredited programs. Check accreditation and state approval before
+              applying.
+            </p>
+            <p class="note">Source: {schoolsSourceLine(p.schools)}.</p>
+          </>
+        )}
         <ul class="hub-links">
           {p.links.map((l) => (
             <li>

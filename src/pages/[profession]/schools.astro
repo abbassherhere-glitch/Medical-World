@@ -2,6 +2,11 @@
 /** Schools by state for a profession, for example /dental-hygienist/schools/. */
 import { getCollection, getEntry } from 'astro:content';
 import TopicPage from '../../components/TopicPage.astro';
+import SchoolsTotals from '../../components/SchoolsTotals.astro';
+import SchoolsByStateTable from '../../components/SchoolsByStateTable.astro';
+import { getSchools, schoolsSourceLine } from '../../lib/schools';
+import { getPayData } from '../../lib/pay';
+import { STATES_AND_DC } from '../../data/states';
 
 export async function getStaticPaths() {
   const pages = await getCollection('topicPages');
@@ -10,15 +15,35 @@ export async function getStaticPaths() {
 
 const { page } = Astro.props;
 const profession = await getEntry(page.profession);
+const slug = page.profession.id;
+
+// Colleges that reported awards (IPEDS); only what the file says.
+const schools = getSchools(slug);
+const states = getPayData(slug)
+  .states.filter((s) => STATES_AND_DC.includes(s.name))
+  .map((s) => ({ name: s.name, abbr: s.abbr }));
+const topic = schools ? { ...page.schools, sources: [schoolsSourceLine(schools), ...page.schools.sources] } : page.schools;
 ---
 
 <TopicPage
-  slug={page.profession.id}
+  slug={slug}
   profession={profession.data}
   byline={page.byline}
   activeMenu="schools"
-  topic={page.schools}
+  topic={topic}
   section="schools"
   related={page.related}
   pickerHeading="Schools in your state"
-/>
+>
+  {
+    schools && (
+      <section class="stack" aria-labelledby="us-totals">
+        <h2 id="us-totals" class="section-title">
+          Colleges and awards in the US, {schools.source.awardYear}
+        </h2>
+        <SchoolsTotals data={schools} idPrefix="us" level="h3" />
+      </section>
+    )
+  }
+  {schools && <SchoolsByStateTable slot="states" profession={slug} data={schools} states={states} />}
+</TopicPage>

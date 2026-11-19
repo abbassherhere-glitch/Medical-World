@@ -11,7 +11,7 @@ lastUpdated: "[DATE]"
 
 ## What we cover
 
-We start with dental hygienists and will add more healthcare professions over time. Each guide covers training routes, accredited schools, state licensing rules and pay.
+We start with dental hygienists and will add more healthcare professions over time. Each guide covers training routes, schools, state licensing rules and pay.
 
 ## Who we are
 
