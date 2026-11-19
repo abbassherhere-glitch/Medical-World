@@ -12,6 +12,7 @@ import SourcesBox from '../../components/SourcesBox.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
+import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import {
   areasInState,
   byMedianDescending,
@@ -126,6 +127,7 @@ const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
   { label: data.pay.heading, id: 'pay' },
+  ...(local ? [{ label: 'Pay per hour, week, month and year', id: 'pay-periods' }] : []),
   { label: data.cityPay.heading, id: 'pay-by-city' },
   { label: compareHeading, id: 'nearby' },
   { label: data.licensing.heading, id: 'licensing' },
@@ -167,6 +169,8 @@ const contents = [
     <p class="pay__summary">{comparison} {rankSentence}</p>
     <SourceLine data={pay} />
   </section>
+
+  {local && <PayPeriodsTable id="pay-periods" place={where} figures={local} source={`${pay.release.publisher}, ${release}`} />}
 
   <ImageSlot {...data.image} />
 

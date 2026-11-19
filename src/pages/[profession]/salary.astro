@@ -8,6 +8,7 @@ import StatGrid from '../../components/StatGrid.astro';
 import PayRangeBar from '../../components/PayRangeBar.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
 import PayByStateTable from '../../components/PayByStateTable.astro';
+import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
@@ -92,6 +93,7 @@ const faqs = data.faqs.map((faq) => ({
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
+  { label: 'Pay per hour, week, month and year', id: 'pay-periods' },
   { label: data.payByState.heading, id: 'pay-by-state' },
   { label: data.factors.heading, id: 'what-affects-pay' },
   { label: 'Common questions', id: 'common-questions' },
@@ -126,6 +128,7 @@ const contents = [
   </section>
 
   <KeyTakeaways items={takeaways} />
+  <PayPeriodsTable id="pay-periods" place="the United States" figures={national} source={`${pay.release.publisher}, ${release}`} />
   <TableOfContents items={contents} />
   <ImageSlot {...data.image} />
 

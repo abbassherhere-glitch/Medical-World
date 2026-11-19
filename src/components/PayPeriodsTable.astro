@@ -1,0 +1,50 @@
+---
+/**
+ * "Pay per hour, week, month and year" for the median, the lowest 10% and
+ * the top 10%. Weekly and monthly figures are calculated from the official
+ * annual figure; the note under the table says how.
+ */
+import ScrollTable from './ScrollTable.astro';
+import { PERIOD_NOTE, PERIODS, PERIOD_LABELS, formatPeriodAmount, payFor } from '../lib/pay/periods';
+import type { PayFigures, PayPercentiles } from '../lib/pay/types';
+
+interface Props {
+  /** A unique id for the heading on this page. */
+  id: string;
+  /** For example "Texas" or "the United States". */
+  place: string;
+  figures: PayFigures | undefined;
+  source: string;
+}
+
+const { id, place, figures, source } = Astro.props;
+const rows: { label: string; key: keyof PayPercentiles }[] = [
+  { label: 'Lowest 10%', key: 'p10' },
+  { label: 'Median', key: 'median' },
+  { label: 'Top 10%', key: 'p90' },
+];
+const columns = ['Pay level', ...PERIODS.map((p) => `${PERIOD_LABELS[p]}${p === 'week' || p === 'month' ? '*' : ''}`)];
+---
+
+<section class="stack periods" aria-labelledby={id}>
+  <h2 id={id} class="section-title">Pay per hour, week, month and year</h2>
+  <ScrollTable caption={`Pay per hour, week, month and year in ${place}`} columns={columns} minWidth={520}>
+    {
+      rows.map((row) => (
+        <tr>
+          <th scope="row">{row.label}</th>
+          {PERIODS.map((period) => (
+            <td class:list={{ strong: row.key === 'median' }}>{formatPeriodAmount(payFor(figures, row.key, period), period)}</td>
+          ))}
+        </tr>
+      ))
+    }
+  </ScrollTable>
+  <p class="note">* {PERIOD_NOTE} Source: {source}.</p>
+</section>
+
+<style>
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+</style>
