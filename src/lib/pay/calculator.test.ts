@@ -121,3 +121,47 @@ test('a snapshot for a place with no figures says so, with no range bar', () => 
   assert.equal(snap.bar, undefined);
   assert.match(snap.barText, /not available/);
 });
+
+import { buildCalculatorOutlook, outlookSnapshot, unpackOutlook } from './calculator.ts';
+import type { OutlookData } from '../outlook/types.ts';
+
+const outlookData: OutlookData = {
+  occupation: { code: '', title: '' },
+  source: { name: 'Projections source', baseYear: 2024, projectedYear: 2034, fileRead: '', importedOn: '' },
+  national: { baseJobs: 221600, projectedJobs: 237200, percentChange: 7, openings: 15300 },
+  places: [
+    { code: '48', name: 'Texas', figures: { baseJobs: 15550, projectedJobs: 18950, percentChange: 21.8, openings: 1370 } },
+    { code: '05', name: 'Arkansas', figures: { baseJobs: 1810, projectedJobs: 2170, percentChange: 20.1, openings: 160 } },
+  ],
+  notInFile: [],
+};
+const years = { base: 2024, projected: 2034 };
+
+test('the calculator outlook holds only published states, packed small', () => {
+  const o = buildCalculatorOutlook(outlookData, [
+    { name: 'Texas', slug: 'texas' },
+    { name: 'Kansas', slug: 'kansas' },
+  ]);
+  assert.deepEqual(o.states, { texas: [15550, 18950, 21.8, 1370] });
+  assert.deepEqual(unpackOutlook(o.national), outlookData.national);
+  const byState: Record<string, (number | null)[] | undefined> = o.states;
+  assert.equal(unpackOutlook(byState.kansas), undefined, 'Kansas is not in this sample file');
+});
+
+test('the outlook snapshot compares with the US, or with the first place in points', () => {
+  const us = outlookData.national;
+  const tx = outlookData.places[0]!.figures;
+  const ar = outlookData.places[1]!.figures;
+  const a = outlookSnapshot(tx, 'Texas', years, { figures: us, name: 'the US', isNation: true });
+  assert.deepEqual(a, {
+    heading: 'Job outlook for Texas, 2024 to 2034',
+    jobs: '15,550 to 18,950',
+    growth: '+21.8%',
+    openings: '1,370',
+    comparedWith: 'Faster than the US (+7%)',
+  });
+  assert.equal(outlookSnapshot(ar, 'Arkansas', years, { figures: tx, name: 'Texas', isNation: false }).comparedWith, '1.7 percentage points lower than Texas');
+  assert.equal(outlookSnapshot({ ...tx, percentChange: -1.7 }, 'X', years, { figures: us, name: 'the US', isNation: true }).comparedWith, 'Falling, while the US grows +7%');
+  assert.equal(outlookSnapshot(undefined, 'Guam', years, { figures: us, name: 'the US', isNation: true }).growth, 'Not available');
+  assert.equal(outlookSnapshot(us, '', years, undefined).comparedWith, '–');
+});

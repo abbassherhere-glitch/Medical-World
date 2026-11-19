@@ -5,8 +5,11 @@
  * result can be shared) and announced to screen readers.
  */
 import {
+  outlookSnapshot,
   readChoices,
   snapshot,
+  unpackOutlook,
+  type OutlookSnapshot,
   unpackFigures,
   writeChoices,
   type CalculatorData,
@@ -23,11 +26,26 @@ interface Place {
 
 const $ = <T extends Element>(selector: string, root: ParentNode = document) => root.querySelector<T>(selector);
 
-function fillCard(card: HTMLElement, name: string, snap: Snapshot, period: Period, comparedLabel: string) {
+function fillCard(
+  card: HTMLElement,
+  name: string,
+  snap: Snapshot,
+  period: Period,
+  comparedLabel: string,
+  outlook?: { snap: OutlookSnapshot; comparedLabel: string },
+) {
   const set = (field: string, text: string) => {
     const el = $<HTMLElement>(`[data-field="${field}"]`, card);
     if (el) el.textContent = text;
   };
+  if (outlook) {
+    set('outlook-heading', outlook.snap.heading);
+    set('outlook-jobs', outlook.snap.jobs);
+    set('outlook-growth', outlook.snap.growth);
+    set('outlook-openings', outlook.snap.openings);
+    set('outlook-compared-label', outlook.comparedLabel);
+    set('outlook-compared', outlook.snap.comparedWith);
+  }
   set('name', name);
   set('period', PERIOD_LABELS[period]);
   for (const row of snap.rows) set(row.key, row.value);
@@ -82,6 +100,16 @@ export async function startCalculator(): Promise<void> {
     return;
   }
   const national = unpackFigures(data.national);
+  const outlook = data.outlook;
+  const outlookYears = outlook ? { base: outlook.baseYear, projected: outlook.projectedYear } : undefined;
+  const nationalOutlook = unpackOutlook(outlook?.national);
+  // Projections are published for whole states, so an area shows its state's outlook.
+  const outlookFor = (stateSlug: string | undefined) => {
+    if (!outlook) return undefined;
+    const state = data.states.find((s) => s.slug === stateSlug);
+    if (!state) return { figures: nationalOutlook, scope: '' };
+    return { figures: unpackOutlook(outlook.states[state.slug]), scope: state.name };
+  };
 
   const place = (stateSlug: string | undefined, areaCode: string | undefined): Place => {
     const state = data.states.find((s) => s.slug === stateSlug);
@@ -119,15 +147,34 @@ export async function startCalculator(): Promise<void> {
     notice.hidden = notes.length === 0;
     const a = place(choices.state, choices.area);
     const aSnap = snapshot(a.figures, choices.state ? national : undefined, 'the national median', choices.period);
-    fillCard(cardA, a.name, aSnap, choices.period, 'Median compared with the US');
+    const aOut = outlookFor(choices.state);
+    const aOutSnap =
+      aOut && outlookYears
+        ? outlookSnapshot(aOut.figures, aOut.scope, outlookYears, choices.state ? { figures: nationalOutlook, name: 'the US', isNation: true } : undefined)
+        : undefined;
+    fillCard(cardA, a.name, aSnap, choices.period, 'Median compared with the US', aOutSnap ? { snap: aOutSnap, comparedLabel: 'Growth compared with the US' } : undefined);
 
     let message = `${a.name}: median ${aSnap.rows[2]!.value} ${PERIOD_LABELS[choices.period].toLowerCase()}.`;
     if (choices.state) message += ` ${aSnap.comparedWith}.`;
+    if (aOutSnap) message += ` Projected job growth ${aOutSnap.growth}.`;
 
     if (choices.compareState) {
       const b = place(choices.compareState, choices.compareArea);
       const bSnap = snapshot(b.figures, a.figures, a.name, choices.period);
-      fillCard(cardB, b.name, bSnap, choices.period, `Median compared with ${a.name}`);
+      const bOut = outlookFor(choices.compareState);
+      const aLabel = aOut?.scope || 'the US';
+      const bOutSnap =
+        bOut && outlookYears
+          ? outlookSnapshot(bOut.figures, bOut.scope, outlookYears, { figures: aOut?.figures, name: aLabel, isNation: !choices.state })
+          : undefined;
+      fillCard(
+        cardB,
+        b.name,
+        bSnap,
+        choices.period,
+        `Median compared with ${a.name}`,
+        bOutSnap ? { snap: bOutSnap, comparedLabel: `Growth compared with ${aLabel}` } : undefined,
+      );
       message += ` ${b.name}: median ${bSnap.rows[2]!.value}, ${bSnap.comparedWith}.`;
     } else {
       cardB.setAttribute('data-empty', '');
