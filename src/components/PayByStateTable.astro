@@ -22,7 +22,7 @@ const rows = byMedianDescending(states);
 const unpublished = states.filter((s) => !s.published).map((s) => s.name);
 ---
 
-<ScrollTable caption={`${name} pay by state, highest median first`} columns={['State', 'Lowest 10%', 'Median', 'Top 10%', 'Jobs']} minWidth={600}>
+<ScrollTable caption={`${name} salary by state, highest median first`} columns={['State', 'Lowest 10%', 'Median', 'Top 10%', 'Jobs']} minWidth={600}>
   {
     rows.map((state) => (
       <tr>

@@ -12,6 +12,8 @@ interface Props {
   title: string;
   description: string;
   heading: string;
+  /** Optional line directly under the heading, for example an official area name. */
+  subheading?: string;
   profession: { name: string; menu: { key: string; label: string; href: string }[] };
   activeMenu: string;
   breadcrumb: { label: string; href?: string }[];
@@ -23,7 +25,7 @@ interface Props {
   };
 }
 
-const { title, description, heading, profession, activeMenu, breadcrumb, byline } = Astro.props;
+const { title, description, heading, subheading, profession, activeMenu, breadcrumb, byline } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -34,6 +36,7 @@ const { title, description, heading, profession, activeMenu, breadcrumb, byline 
       <Breadcrumb items={breadcrumb} />
       <header class="guide__header">
         <h1>{heading}</h1>
+        {subheading && <p class="guide__subheading">{subheading}</p>}
         <Byline {...byline} />
       </header>
       <slot />
@@ -71,6 +74,12 @@ const { title, description, heading, profession, activeMenu, breadcrumb, byline 
     flex-direction: column;
     gap: var(--space-3);
     margin-top: calc(-1 * var(--space-4));
+  }
+
+  .guide__subheading {
+    margin-top: calc(-1 * var(--space-2));
+    color: var(--color-text-secondary);
+    font-size: var(--text-lg);
   }
 
   .guide__aside {

@@ -24,6 +24,7 @@ import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
 import UpNext from '../../components/UpNext.astro';
 import { upNext } from '../../data/up-next';
 import { stateQuestions } from '../../lib/pay/state-questions';
+import { salaryLead, salaryTitle } from '../../lib/pay/salary-wording';
 import {
   areasInState,
   byMedianDescending,
@@ -41,6 +42,7 @@ import {
 import { areaSummary, capitalize, ordinal, compareWithNational, placeName, rankByMedian, rankInWords, rankOf } from '../../lib/pay/summary';
 import { fillState } from '../../lib/publishing';
 import { getPublishedStatePages } from '../../data/state-pages';
+import { getPublishedAreaPages } from '../../data/area-pages';
 import { bordersOf } from '../../data/borders';
 import { slugify } from '../../data/states';
 
@@ -77,6 +79,8 @@ const comparison =
   compareWithNational(state, local, national) ??
   `The ${pay.release.referencePeriod} survey has no statewide pay figures for ${plural} in ${where}.`;
 const areas = areasInState(pay, statePay.abbr);
+// Metropolitan areas with their own salary page; nonmetropolitan areas stay as plain rows.
+const areaPath = new Map((await getPublishedAreaPages(professionSlug)).map((p) => [p.area.code, p.path]));
 const areaSentence = areaSummary(state, areas);
 const areaMedians = areas.map((a) => numeric(a.figures.annual.median)).filter((m): m is number => m !== undefined);
 
@@ -108,7 +112,7 @@ const topStates = rankByMedian(allStates)
   .slice(0, 3)
   .map((r) => allStates.find((s) => s.name === r.name)!);
 const compareRows = neighbors.length > 0 ? neighbors : topStates;
-const compareHeading = neighbors.length > 0 ? 'Pay in nearby states' : `How ${where} compares`;
+const compareHeading = neighbors.length > 0 ? 'Salary in nearby states' : `How ${where} compares`;
 const compareIntro =
   neighbors.length > 0
     ? `Median pay in the states that border ${where}.`
@@ -119,20 +123,27 @@ const stateMedian = numeric(local?.annual.median);
 const usMedian = numeric(national.annual.median);
 let title: string;
 let description: string;
+// The first sentence answers the question: what is the salary here?
+let lead: string;
+const coverage = 'Salary by area, job outlook, colleges and licensing.';
 if (stateMedian !== undefined) {
   const diff = usMedian !== undefined ? (stateMedian - usMedian) / usMedian : undefined;
-  title = `Dental hygienist pay in ${where}: ${formatAnnual(stateMedian)} median, license and schools`;
-  description = `${capitalize(plural)} in ${where} earn a median of ${formatAnnual(stateMedian)} a year (${formatHourly(local?.hourly.median)} an hour)${
+  title = salaryTitle(profession.data.name, where, local);
+  description = `The median ${profession.data.name.toLowerCase()} salary in ${where} is ${formatAnnual(stateMedian)} a year (${formatHourly(local?.hourly.median)} an hour)${
     diff !== undefined && diff !== 0 ? `, ${formatPercent(diff)} ${diff > 0 ? 'above' : 'below'} the US median` : ''
-  }. Pay by area, licensing steps and schools.`;
+  }. ${coverage}`;
+  lead = salaryLead(plural, where, local, `${pay.release.publisher}, ${release}`)!;
 } else if (areaMedians.length > 0) {
   const [min, max] = [Math.min(...areaMedians), Math.max(...areaMedians)];
-  title = `Dental hygienist pay in ${where}: area medians ${formatAnnual(min)} to ${formatAnnual(max)}`;
-  description = `There is no statewide median for ${plural} in ${where} in ${survey}, but area medians run from ${formatAnnual(min)} to ${formatAnnual(max)} a year. Licensing steps and schools.`;
+  title = `${profession.data.name} salary in ${where}: area medians ${formatAnnual(min)} to ${formatAnnual(max)}`;
+  description = `There is no statewide ${profession.data.name.toLowerCase()} salary for ${where} in ${survey}, but area medians run from ${formatAnnual(min)} to ${formatAnnual(max)} a year. ${coverage}`;
+  lead = `The ${pay.release.publisher} publishes no statewide salary figure for ${plural} in ${where} in ${survey}. In the ${areaMedians.length === 1 ? 'one area' : `${areaMedians.length} areas`} that include ${where}, median salaries range from ${formatAnnual(min)} to ${formatAnnual(max)} a year.`;
 } else {
-  title = `Dental hygienist pay in ${where}: license and schools`;
-  description = `${capitalize(plural)} in ${where}: the US median is ${formatAnnual(usMedian)} a year. Licensing steps and schools.`;
+  title = `${profession.data.name} salary in ${where}`;
+  description = `${capitalize(plural)} in ${where}: there is no published salary figure for the state in ${survey}; the US median is ${formatAnnual(usMedian)} a year. ${coverage}`;
+  lead = `The ${pay.release.publisher} publishes no salary figure for ${plural} in ${where} in ${survey}. The US median is ${formatAnnual(usMedian)} a year.`;
 }
+const leadMore = `This page also covers the job outlook, colleges and licensing in ${where}.`;
 
 // Colleges that reported dental hygiene awards (IPEDS); only what the file says.
 const schoolsData = getSchools(professionSlug);
@@ -223,6 +234,7 @@ const contents = [
   ]}
   byline={data.byline}
 >
+  <p class="lead">{lead} {leadMore}</p>
   <KeyTakeaways items={takeaways} />
   <TableOfContents items={contents} />
 
@@ -255,13 +267,15 @@ const contents = [
     {
       areas.length > 0 ? (
         <ScrollTable
-          caption={`${profession.data.name} pay by area in ${where}, highest median first`}
+          caption={`${profession.data.name} salary by area in ${where}, highest median first`}
           columns={['Area', 'Median per year', 'Median per hour', 'Jobs']}
           minWidth={560}
         >
           {areas.map((area) => (
             <tr>
-              <th scope="row">{area.name}</th>
+              <th scope="row">
+                {areaPath.has(area.code) ? <SmartLink href={areaPath.get(area.code)!}>{area.name}</SmartLink> : area.name}
+              </th>
               <td class="strong">{formatAnnual(area.figures.annual.median)}</td>
               <td>{formatHourly(area.figures.hourly.median)}</td>
               <td>{formatJobs(area.figures.employment)}</td>
@@ -368,8 +382,8 @@ const contents = [
     <CalculatorLink
       profession={professionSlug}
       state={slugify(state)}
-      heading="Pay calculator"
-      text={`See pay in ${where} per hour, week, month or year, and compare it with another state.`}
+      heading="Salary calculator"
+      text={`See the salary in ${where} per hour, week, month or year, and compare it with another state.`}
       label={`Compare ${state}`}
     />
     <UsefulOrganizations id="state" />

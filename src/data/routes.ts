@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import { getPublishedStatePages } from './state-pages';
+import { getPublishedAreaPages } from './area-pages';
 import { linkIsLive, switchedOffGuides } from '../lib/links';
 
 /**
@@ -10,13 +11,14 @@ import { linkIsLive, switchedOffGuides } from '../lib/links';
  * The 404 page is left out on purpose.
  */
 export async function getPublicRoutes(): Promise<string[]> {
-  const [professions, salaryGuides, becomeGuides, topicPages, statePages, pages] = await Promise.all([
+  const [professions, salaryGuides, becomeGuides, topicPages, statePages, pages, areaPages] = await Promise.all([
     getCollection('professions'),
     getCollection('salaryGuides'),
     getCollection('becomeGuides'),
     getCollection('topicPages'),
     getPublishedStatePages(),
     getCollection('pages'),
+    getPublishedAreaPages(),
   ]);
 
   return [
@@ -29,9 +31,12 @@ export async function getPublicRoutes(): Promise<string[]> {
     ...professions.filter((p) => p.data.overview).map((p) => `/${p.id}/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/calculator/`),
+    ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/areas/`),
     ...becomeGuides.map((g) => `/${g.data.profession.id}/how-to-become/`),
     ...topicPages.flatMap((t) => ['schools', 'licensing', 'board-exam'].map((page) => `/${t.data.profession.id}/${page}/`)),
     ...statePages.map((p) => p.path),
+    // Salary pages for metropolitan areas, as switched on in src/content/area-pages/.
+    ...areaPages.map((p) => p.path),
     ...pages.map((p) => `/${p.id}/`),
   ];
 }

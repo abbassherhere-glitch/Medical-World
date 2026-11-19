@@ -1,0 +1,163 @@
+---
+/**
+ * Every metropolitan area with its own salary page, listed by state with its
+ * median, for example /dental-hygienist/salary/areas/. An area that crosses
+ * state lines is listed under each of its states.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../../layouts/GuideLayout.astro';
+import ScrollTable from '../../../components/ScrollTable.astro';
+import SmartLink from '../../../components/SmartLink.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import SourcesBox from '../../../components/SourcesBox.astro';
+import UpNext from '../../../components/UpNext.astro';
+import LinkPanel from '../../../components/LinkPanel.astro';
+import { upNext } from '../../../data/up-next';
+import { getPublishedAreaPages } from '../../../data/area-pages';
+import { slugify } from '../../../data/states';
+import { formatAnnual, formatHourly, getPayData, releaseName, statesAndDc, surveyPhrase } from '../../../lib/pay';
+import { placeName } from '../../../lib/pay/summary';
+import { rankAreas } from '../../../lib/pay/area-summary';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('salaryGuides');
+  return guides.map((g) => ({ params: { profession: g.data.profession.id }, props: { guide: g.data } }));
+}
+
+const { guide } = Astro.props;
+const slug = guide.profession.id;
+const profession = await getEntry(guide.profession);
+const name = profession.data.name;
+const plural = profession.data.namePlural;
+const pay = getPayData(slug);
+const release = releaseName(pay);
+const source = `${pay.release.publisher}, ${release}`;
+
+const pages = await getPublishedAreaPages(slug);
+const ranked = rankAreas(pages.map((p) => p.area));
+const shortByCode = new Map(pages.map((p) => [p.area.code, p.short]));
+const top = ranked[0];
+const bottom = ranked[ranked.length - 1];
+
+// Each state and DC with the metropolitan area pages that include it, highest median first.
+const states = statesAndDc(pay)
+  .map((state) => ({
+    state,
+    areas: pages
+      .filter((p) => p.area.states.includes(state.abbr))
+      .sort((a, b) => (b.area.figures.annual.median as number) - (a.area.figures.annual.median as number) || a.area.name.localeCompare(b.area.name)),
+  }))
+  .filter((s) => s.areas.length > 0)
+  .sort((a, b) => a.state.name.localeCompare(b.state.name));
+
+const count = new Intl.NumberFormat('en-US').format(pages.length);
+const title = `${name} salary by metropolitan area: ${count} areas`;
+const description = `The median ${name.toLowerCase()} salary in each of ${count} US metropolitan areas, listed by state${
+  top && bottom ? `, from ${formatAnnual(bottom.median)} to ${formatAnnual(top.median)} a year` : ''
+} (${release}).`;
+const lead =
+  top && bottom
+    ? `${surveyPhrase(pay).replace(/^the/, 'The')} publishes a median salary for ${plural} in ${count} metropolitan areas in the 50 states and DC. Medians run from ${formatAnnual(bottom.median)} a year in ${shortByCode.get(bottom.code)} to ${formatAnnual(top.median)} in ${shortByCode.get(top.code)} (${source}).`
+    : '';
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  heading={`${name} salary by metropolitan area`}
+  profession={profession.data}
+  activeMenu="salary"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: name, href: `/${slug}/` },
+    { label: 'Salary', href: `/${slug}/salary/` },
+    { label: 'Metropolitan areas' },
+  ]}
+  byline={guide.byline}
+>
+  {lead && <p class="lead">{lead}</p>}
+  <p>
+    Each area has its own page with the salary range, pay per month and week, and how it compares with its state and the US. An area that
+    crosses a state line is listed under each of its states. Rural (nonmetropolitan) areas are shown on the state pages.
+  </p>
+
+  <nav class="jump" aria-label="Jump to a state">
+    <ul>
+      {
+        states.map(({ state }) => (
+          <li>
+            <a href={`#${slugify(state.name)}`}>{state.name}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <AdSlot size="inline" id="areas-content-1" />
+
+  {
+    states.map(({ state, areas }) => (
+      <section class="stack" aria-labelledby={slugify(state.name)}>
+        <h2 id={slugify(state.name)} class="section-title" tabindex="-1">
+          {state.name}
+        </h2>
+        <ScrollTable
+          caption={`${name} salary in metropolitan areas that include ${placeName(state.name)}, highest median first`}
+          columns={['Area', 'Median per year', 'Median per hour']}
+          minWidth={460}
+        >
+          {areas.map((p) => (
+            <tr>
+              <th scope="row">
+                <SmartLink href={p.path}>{p.area.name}</SmartLink>
+              </th>
+              <td class="strong">{formatAnnual(p.area.figures.annual.median)}</td>
+              <td>{formatHourly(p.area.figures.hourly.median)}</td>
+            </tr>
+          ))}
+        </ScrollTable>
+        <p class="more">
+          <SmartLink href={`/${slug}/${slugify(state.name)}/`}>
+            {name} salary in {placeName(state.name)}
+          </SmartLink>
+        </p>
+      </section>
+    ))
+  }
+
+  <SourcesBox items={[source]} />
+  <UpNext steps={upNext('salary', slug, name)} />
+
+  <Fragment slot="aside">
+    <AdSlot size="sidebar" id="areas-side-1" />
+    <LinkPanel
+      heading="Related guides"
+      links={[
+        { label: `${name} salary in the US`, href: `/${slug}/salary/` },
+        { label: `${name} salary calculator`, href: `/${slug}/salary/calculator/` },
+      ]}
+    />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .jump ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0 var(--space-4);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .jump a,
+  .more :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+</style>

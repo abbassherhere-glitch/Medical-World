@@ -95,8 +95,6 @@ const salaryGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/salary-guides' }),
   schema: z.object({
     profession: reference('professions'),
-    title: z.string(),
-    description: z.string(),
     heading: z.string(),
     breadcrumb: z.string(),
     byline,
@@ -166,6 +164,15 @@ const statePages = defineCollection({
   schema: z.object({
     profession: reference('professions'),
     pages: z.array(z.object({ state: z.string(), published: z.boolean() })),
+  }),
+});
+
+/** Which metropolitan area salary pages are published (see README). */
+const areaPages = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/area-pages' }),
+  schema: z.object({
+    profession: reference('professions'),
+    pages: z.array(z.object({ area: z.string(), published: z.boolean() })),
   }),
 });
 
@@ -249,4 +256,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, guideLinks, topicPages, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, areaPages, becomeGuides, guideLinks, topicPages, pages };

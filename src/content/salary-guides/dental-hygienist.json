@@ -1,7 +1,5 @@
 {
   "profession": "dental-hygienist",
-  "title": "Dental hygienist salary in the US: national and state pay",
-  "description": "What dental hygienists earn in the United States: median yearly and hourly pay, the pay range, and pay by state, from US Bureau of Labor Statistics figures.",
   "heading": "Dental hygienist salary in the United States",
   "breadcrumb": "Salary",
   "byline": {
@@ -23,11 +21,11 @@
     "placeholder": "Photo of a dental hygienist at work [YOUR IMAGE]"
   },
   "payByState": {
-    "heading": "Pay by state",
-    "intro": "Pay varies widely between states. The table lists every state and the District of Columbia, from the highest median pay to the lowest."
+    "heading": "Salary by state",
+    "intro": "Salaries vary widely between states. The table lists every state and the District of Columbia, from the highest median salary to the lowest."
   },
   "factors": {
-    "heading": "What affects your pay",
+    "heading": "What affects your salary",
     "items": [
       {
         "title": "Where you work.",
@@ -70,7 +68,7 @@
   },
   "related": [
     {
-      "label": "Dental hygienist pay calculator",
+      "label": "Dental hygienist salary calculator",
       "href": "/dental-hygienist/salary/calculator/"
     },
     {

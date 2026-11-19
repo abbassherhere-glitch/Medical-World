@@ -29,7 +29,8 @@ export interface CalculatorData {
   release: string;
   national: PackedFigures;
   states: CalculatorState[];
-  areas: Record<string, { name: string; figures: PackedFigures }>;
+  /** `page` is the area's own salary page, when it has one. */
+  areas: Record<string, { name: string; figures: PackedFigures; page?: string }>;
   /** Job outlook from the state projections, if available. */
   outlook?: CalculatorOutlook;
 }
@@ -65,6 +66,7 @@ export function buildCalculatorData(
   pay: PayData,
   published: { name: string; slug: string }[],
   release: string,
+  areaPages: Map<string, string> = new Map(),
 ): CalculatorData {
   const areas: CalculatorData['areas'] = {};
   const states = published.map(({ name, slug }) => {
@@ -73,7 +75,10 @@ export function buildCalculatorData(
     const inState = pay.areas
       .filter((a) => a.states.includes(state.abbr))
       .sort((a, b) => a.name.localeCompare(b.name));
-    for (const area of inState) areas[area.code] = { name: area.name, figures: packFigures(area.figures) };
+    for (const area of inState) {
+      const page = areaPages.get(area.code);
+      areas[area.code] = { name: area.name, figures: packFigures(area.figures), ...(page ? { page } : {}) };
+    }
     const entry: CalculatorState = { slug, name, areas: inState.map((a) => a.code) };
     if (state.figures) entry.figures = packFigures(state.figures);
     return entry;

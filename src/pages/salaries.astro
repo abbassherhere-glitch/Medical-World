@@ -6,14 +6,17 @@ import PayByStateTable from '../components/PayByStateTable.astro';
 import { professionsWithPages } from '../data/professions';
 import { liveLinks } from '../data/routes';
 import { formatAnnual, getPayData, releaseName } from '../lib/pay';
+import { salaryLead } from '../lib/pay/salary-wording';
 
 const professions = await Promise.all(
   (await professionsWithPages()).map(async (p) => ({
     slug: p.id,
     data: p.data,
+    pay: getPayData(p.id),
     links: await liveLinks([
       { href: `/${p.id}/salary/`, label: `Read the ${p.data.name.toLowerCase()} salary guide` },
-      { href: `/${p.id}/salary/calculator/`, label: 'Open the pay calculator' },
+      { href: `/${p.id}/salary/calculator/`, label: 'Open the salary calculator' },
+      { href: `/${p.id}/salary/areas/`, label: 'See the salary in every metropolitan area' },
     ]),
   })),
 );
@@ -25,11 +28,11 @@ const firstPay = first ? getPayData(first.slug) : undefined;
   title="Healthcare salaries by state"
   description={
     first && firstPay
-      ? `Official pay figures for healthcare jobs, state by state. ${first.data.name}: ${formatAnnual(firstPay.national.annual.median)} median a year (${releaseName(firstPay)}).`
-      : 'Official pay figures for healthcare jobs, state by state.'
+      ? `Official salary figures for healthcare jobs, state by state. ${first.data.name}: ${formatAnnual(firstPay.national.annual.median)} median salary a year (${releaseName(firstPay)}).`
+      : 'Official salary figures for healthcare jobs, state by state.'
   }
   heading="Salaries"
-  intro="Official pay figures for each profession, nationally and in every state, from the US Bureau of Labor Statistics wage survey."
+  intro="Official salary figures for each profession, nationally, in every state and in each metropolitan area, from the US Bureau of Labor Statistics wage survey."
 >
   {
     professions.map((p) => (
@@ -37,6 +40,7 @@ const firstPay = first ? getPayData(first.slug) : undefined;
         <h2 id={`salary-${p.slug}`} class="hub-section__title">
           {p.data.name}
         </h2>
+        {p.pay && <p>{salaryLead(p.data.namePlural, 'the US', p.pay.national, `${p.pay.release.publisher}, ${releaseName(p.pay)}`)}</p>}
         <NationalFigures profession={p.slug} outlook={p.data.outlook} />
         {p.links.length > 0 && (
           <ul class="hub-links">
@@ -47,7 +51,7 @@ const firstPay = first ? getPayData(first.slug) : undefined;
             ))}
           </ul>
         )}
-        <h3 class="table-title">Pay by state</h3>
+        <h3 class="table-title">Salary by state</h3>
         <PayByStateTable profession={p.slug} name={p.data.name} plural={p.data.namePlural} />
       </section>
     ))

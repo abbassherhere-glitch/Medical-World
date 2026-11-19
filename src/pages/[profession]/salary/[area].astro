@@ -1,0 +1,337 @@
+---
+/**
+ * Salary page for one metropolitan area, for example
+ * /dental-hygienist/salary/houston-pasadena-the-woodlands-tx/. Everything on
+ * it is worked out from the official pay figures (and, in "Working in", the
+ * statewide job projections), so each page says something specific.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../../layouts/GuideLayout.astro';
+import TableOfContents from '../../../components/TableOfContents.astro';
+import KeyTakeaways from '../../../components/KeyTakeaways.astro';
+import StatGrid from '../../../components/StatGrid.astro';
+import PayRangeBar from '../../../components/PayRangeBar.astro';
+import SourceLine from '../../../components/SourceLine.astro';
+import PayPeriodsTable from '../../../components/PayPeriodsTable.astro';
+import ScrollTable from '../../../components/ScrollTable.astro';
+import SmartLink from '../../../components/SmartLink.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import FaqList from '../../../components/FaqList.astro';
+import SourcesBox from '../../../components/SourcesBox.astro';
+import UpNext from '../../../components/UpNext.astro';
+import CalculatorLink from '../../../components/CalculatorLink.astro';
+import LinkPanel from '../../../components/LinkPanel.astro';
+import { upNext } from '../../../data/up-next';
+import { getPublishedAreaPages } from '../../../data/area-pages';
+import { slugify } from '../../../data/states';
+import {
+  areasInState,
+  formatAnnual,
+  formatHourly,
+  formatJobs,
+  formatPercent,
+  getPayData,
+  numeric,
+  releaseName,
+  surveyPhrase,
+} from '../../../lib/pay';
+import { placeName } from '../../../lib/pay/summary';
+import { salaryLead, salaryTitle } from '../../../lib/pay/salary-wording';
+import {
+  areaQuestions,
+  areaRank,
+  areaHighlights,
+  areaRankSentence,
+  compareAll,
+  nextHigherAndLower,
+} from '../../../lib/pay/area-summary';
+import { findOutlookPlace, getOutlook, projectionYears } from '../../../lib/outlook';
+
+export async function getStaticPaths() {
+  const [guides, pages] = await Promise.all([getCollection('salaryGuides'), getPublishedAreaPages()]);
+  return pages
+    .filter((page) => guides.some((g) => g.data.profession.id === page.profession))
+    .map((page) => ({ params: { profession: page.profession, area: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const slug = page.profession;
+const guide = (await getCollection('salaryGuides')).find((g) => g.data.profession.id === slug)!.data;
+const profession = await getEntry('professions', slug);
+if (!profession) throw new Error(`Unknown profession "${slug}".`);
+const name = profession.data.name;
+const plural = profession.data.namePlural;
+
+const pay = getPayData(slug);
+const release = releaseName(pay);
+const survey = surveyPhrase(pay);
+const source = `${pay.release.publisher}, ${release}`;
+const area = page.area;
+const short = page.short;
+const f = area.figures;
+const median = numeric(f.annual.median);
+const usMedian = numeric(pay.national.annual.median);
+
+// Every published area page, to link to and to rank against.
+const livePages = await getPublishedAreaPages(slug);
+const pathByCode = new Map(livePages.map((p) => [p.area.code, p.path]));
+const shortByCode = new Map(livePages.map((p) => [p.area.code, p.short]));
+const metros = pay.areas.filter((a) => a.kind === 'metro' && livePages.some((p) => p.area.code === a.code));
+
+// The states the area lies in, in the official order.
+const states = area.states.map((abbr) => pay.states.find((s) => s.abbr === abbr)!);
+const stateRanks = states.map((state) => ({ state, rank: areaRank(areasInState(pay, state.abbr), area.code) }));
+const nationalRank = areaRank(metros, area.code);
+const { higher, lower } = nextHigherAndLower(metros, area.code);
+
+const comparisons = compareAll(short, median, states, pay.national);
+const statesOf = (code: string) => metros.find((a) => a.code === code)?.states ?? [];
+const highlights = areaHighlights({
+  place: short,
+  area,
+  states: states.map((state) => ({ state, areas: areasInState(pay, state.abbr) })),
+  national: pay.national,
+  plural,
+  nationalRank,
+  higher: higher ? { name: higher.name, states: statesOf(higher.code) } : undefined,
+  lower: lower ? { name: lower.name, states: statesOf(lower.code) } : undefined,
+});
+const rankSentence = areaRankSentence(short, stateRanks, nationalRank);
+const questions = areaQuestions({ place: short, area, states, national: pay.national, stateRanks, nationalRank, plural, survey });
+
+const lead = salaryLead(plural, short, f, source)!;
+const title = salaryTitle(name, short, f);
+const usDiff = median !== undefined && usMedian !== undefined ? (median - usMedian) / usMedian : undefined;
+const description = `The median ${name.toLowerCase()} salary in the ${area.name} metropolitan area is ${formatAnnual(median)} a year${
+  numeric(f.hourly.median) !== undefined ? ` (${formatHourly(f.hourly.median)} an hour)` : ''
+}${usDiff !== undefined && usDiff !== 0 ? `, ${formatPercent(usDiff)} ${usDiff > 0 ? 'above' : 'below'} the US median` : ''}. Salary range, pay per month and how it ranks.`;
+
+// Statewide job outlook, clearly labelled as a figure for the whole state.
+const outlook = getOutlook(slug);
+const years = outlook ? projectionYears(outlook) : '';
+const working = states.map((state) => {
+  const place = outlook ? findOutlookPlace(outlook, state.name) : undefined;
+  const growth = place?.figures.percentChange;
+  const where = placeName(state.name);
+  return {
+    state,
+    where,
+    href: `/${slug}/${slugify(state.name)}/`,
+    growth:
+      outlook && growth !== null && growth !== undefined
+        ? `${state.kind === 'district' ? 'Across the District' : 'Statewide'}, jobs for ${plural} in ${where} are projected to ${
+            growth > 0 ? `grow by ${growth}%` : growth < 0 ? `fall by ${Math.abs(growth)}%` : 'stay the same (0% change)'
+          } from ${years} (${outlook.source.name}). This is a figure for the whole ${state.kind === 'district' ? 'District' : 'state'}, not for ${short}.`
+        : `There is no published statewide job projection for ${where}.`,
+  };
+});
+
+const otherHeading = (state: (typeof states)[number]) => `Other areas in ${placeName(state.name)}`;
+const contents = [
+  { label: `Salary in ${short}`, id: 'salary' },
+  { label: 'Pay per hour, week, month and year', id: 'pay-periods' },
+  { label: `How ${short} compares`, id: 'compares' },
+  ...states.map((s) => ({ label: otherHeading(s), id: `other-${s.abbr.toLowerCase()}` })),
+  { label: working.length === 1 ? `Working in ${working[0]!.where}` : 'Working in these states', id: 'working' },
+  ...(questions.length ? [{ label: 'Common questions', id: 'common-questions' }] : []),
+];
+const sources = [source, ...(outlook ? [`${outlook.source.name} (statewide job outlook)`] : [])];
+const firstState = states[0]!;
+// The calculator lists each area under the state the official file names first.
+const calculatorState = states.find((s) => s.abbr === area.primaryState) ?? firstState;
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  heading={`${name} salary in ${short}`}
+  subheading={`${area.name} metropolitan area`}
+  profession={profession.data}
+  activeMenu="salary"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: name, href: `/${slug}/` },
+    { label: 'Salary', href: `/${slug}/salary/` },
+    { label: short },
+  ]}
+  byline={guide.byline}
+>
+  <p class="lead">{lead}</p>
+
+  <section class="panel panel--tint stack" aria-labelledby="salary">
+    <h2 id="salary" class="section-title">Salary in {short}</h2>
+    <StatGrid
+      size="small"
+      items={[
+        { label: 'Median per year', value: formatAnnual(f.annual.median) },
+        { label: 'Median per hour', value: formatHourly(f.hourly.median) },
+        { label: 'Lowest 10% earn less than', value: formatAnnual(f.annual.p10) },
+        { label: 'Lowest 25% earn less than', value: formatAnnual(f.annual.p25) },
+        { label: 'Top 25% earn more than', value: formatAnnual(f.annual.p75) },
+        { label: 'Top 10% earn more than', value: formatAnnual(f.annual.p90) },
+        { label: `Jobs in the area (wage survey, ${pay.release.referencePeriod})`, value: formatJobs(f.employment) },
+      ]}
+    />
+    <PayRangeBar annual={f.annual} />
+    <SourceLine data={pay} />
+  </section>
+
+  {highlights.length > 0 && <KeyTakeaways items={highlights} />}
+  <TableOfContents items={contents} />
+
+  <PayPeriodsTable id="pay-periods" place={short} figures={f} source={source} />
+
+  <section class="stack" aria-labelledby="compares">
+    <h2 id="compares" class="section-title">How {short} compares</h2>
+    <p>{comparisons.join(' ')}</p>
+    {rankSentence && <p>{rankSentence}</p>}
+    {
+      (higher || lower) && (
+        <p>
+          {higher && (
+            <>
+              The next higher paying metropolitan area is{' '}
+              <SmartLink href={pathByCode.get(higher.code) ?? ''}>{shortByCode.get(higher.code) ?? higher.name}</SmartLink> (
+              {formatAnnual(higher.median)} a year).{' '}
+            </>
+          )}
+          {lower && (
+            <>
+              The next lower paying is <SmartLink href={pathByCode.get(lower.code) ?? ''}>{shortByCode.get(lower.code) ?? lower.name}</SmartLink> (
+              {formatAnnual(lower.median)} a year).
+            </>
+          )}
+        </p>
+      )
+    }
+  </section>
+
+  <AdSlot size="inline" id="area-content-1" />
+
+  {
+    states.map((state) => {
+      const others = areasInState(pay, state.abbr);
+      return (
+        <section class="stack" aria-labelledby={`other-${state.abbr.toLowerCase()}`}>
+          <h2 id={`other-${state.abbr.toLowerCase()}`} class="section-title">
+            {otherHeading(state)}
+          </h2>
+          {others.length > 1 ? (
+            <ScrollTable
+              caption={`${name} salary in each area that includes ${placeName(state.name)}, highest median first`}
+              columns={['Area', 'Median per year', 'Median per hour']}
+              minWidth={480}
+            >
+              {others.map((other) => (
+                <tr class:list={[{ 'own-row': other.code === area.code }]}>
+                  <th scope="row">
+                    {other.code === area.code ? (
+                      <>{other.name} (this page)</>
+                    ) : pathByCode.has(other.code) ? (
+                      <SmartLink href={pathByCode.get(other.code)!}>{other.name}</SmartLink>
+                    ) : (
+                      other.name
+                    )}
+                  </th>
+                  <td class="strong">{formatAnnual(other.figures.annual.median)}</td>
+                  <td>{formatHourly(other.figures.hourly.median)}</td>
+                </tr>
+              ))}
+            </ScrollTable>
+          ) : (
+            <p>{short} is the only area that includes {placeName(state.name)} with published figures.</p>
+          )}
+          <p class="note">Source: {source}. Rural regions are listed as nonmetropolitan areas.</p>
+        </section>
+      );
+    })
+  }
+
+  <section class="panel stack" aria-labelledby="working">
+    <h2 id="working" class="section-title">{working.length === 1 ? `Working in ${working[0]!.where}` : 'Working in these states'}</h2>
+    {
+      working.map((w) => (
+        <div class="stack working">
+          {working.length > 1 && <h3 class="working__state">{w.state.name}</h3>}
+          <p>{w.growth}</p>
+          <ul class="working__links">
+            <li>
+              <SmartLink href={`${w.href}#outlook`}>Job outlook in {w.where}</SmartLink>
+            </li>
+            <li>
+              <SmartLink href={`${w.href}#schools`}>Colleges in {w.where}</SmartLink>
+            </li>
+            <li>
+              <SmartLink href={`${w.href}#licensing`}>Getting licensed in {w.where}</SmartLink>
+            </li>
+          </ul>
+        </div>
+      ))
+    }
+  </section>
+
+  {questions.length > 0 && <FaqList id="common-questions" heading="Common questions" items={questions} />}
+
+  <SourcesBox items={sources} />
+  <UpNext
+    steps={[
+      {
+        label: `${name} salary in ${placeName(firstState.name)}`,
+        href: `/${slug}/${slugify(firstState.name)}/`,
+        text: `The statewide salary, every area, the job outlook and licensing in ${placeName(firstState.name)}.`,
+      },
+      ...upNext('area', slug, name),
+    ]}
+  />
+
+  <Fragment slot="aside">
+    <CalculatorLink
+      profession={slug}
+      state={slugify(calculatorState.name)}
+      area={area.code}
+      heading="Salary calculator"
+      text={`See the salary in ${short} per hour, week, month or year, and compare it with another area or state.`}
+      label={`Compare ${short}`}
+    />
+    <AdSlot size="sidebar" id="area-side-1" />
+    <LinkPanel
+      heading="Related guides"
+      links={[
+        ...states.map((s) => ({ label: `${name} salary in ${placeName(s.name)}`, href: `/${slug}/${slugify(s.name)}/` })),
+        { label: `${name} salary in the US`, href: `/${slug}/salary/` },
+        { label: 'Salary in every metropolitan area', href: `/${slug}/salary/areas/` },
+      ]}
+    />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .own-row th,
+  .own-row td {
+    background: var(--color-tint);
+  }
+
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+
+  .working__state {
+    font-size: var(--text-lg);
+  }
+
+  .working__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .working__links :global(a),
+  .working__links :global(.link-pending) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+</style>
