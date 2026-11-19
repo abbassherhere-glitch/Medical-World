@@ -119,8 +119,7 @@ const stateGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/state-guides' }),
   schema: z.object({
     profession: reference('professions'),
-    title: z.string(),
-    description: z.string(),
+    /** Page titles and descriptions are worked out from the pay data. */
     heading: z.string(),
     byline,
     /** Takeaways not about pay. A pay takeaway worked out from the data is added first. */

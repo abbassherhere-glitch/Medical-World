@@ -69,3 +69,54 @@ export function medianInWords(figures: PayFigures): string {
   if (hour !== undefined) return `${formatHourly(hour)} an hour`;
   return 'not available';
 }
+
+/** 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st. */
+export function ordinal(n: number): string {
+  const tens = n % 100;
+  if (tens >= 11 && tens <= 13) return `${n}th`;
+  return `${n}${{ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th'}`;
+}
+
+/**
+ * Where a place ranks by annual median among `states` (highest = 1st).
+ * Places with equal medians share a rank. Returns undefined when the place
+ * has no published median.
+ */
+export function rankOf(states: StatePay[], name: string): { rank: number; of: number } | undefined {
+  const ranked = rankByMedian(states);
+  const own = ranked.find((s) => s.name === name);
+  if (!own) return undefined;
+  return { rank: ranked.filter((s) => s.median > own.median).length + 1, of: ranked.length };
+}
+
+/** "12th highest of 50", "highest of 50" or "lowest of 50". */
+export function rankInWords(rank: { rank: number; of: number }): string {
+  if (rank.rank === 1) return `highest of ${rank.of}`;
+  if (rank.rank === rank.of) return `lowest of ${rank.of}`;
+  return `${ordinal(rank.rank)} highest of ${rank.of}`;
+}
+
+interface NamedFigures {
+  name: string;
+  figures: PayFigures;
+}
+
+/**
+ * One sentence naming the highest and lowest paying areas in a state, or
+ * saying plainly that only one area, or none, has published figures.
+ */
+export function areaSummary(place: string, areas: NamedFigures[]): string {
+  const ranked = areas
+    .map((a) => ({ name: a.name, median: numeric(a.figures.annual.median) }))
+    .filter((a): a is Ranked => a.median !== undefined)
+    .sort((a, b) => b.median - a.median);
+  const where = placeName(place);
+  if (ranked.length === 0) return `Pay figures for individual areas are not published for ${where}.`;
+  if (ranked.length === 1) {
+    const only = ranked[0]!;
+    return `Area figures are published for only one area that includes ${where}: ${only.name}, with a median of ${formatAnnual(only.median)} a year.`;
+  }
+  const top = ranked[0]!;
+  const bottom = ranked[ranked.length - 1]!;
+  return `Of the ${ranked.length} areas that include ${where} with published figures, the highest median pay is in ${top.name} (${formatAnnual(top.median)} a year) and the lowest is in ${bottom.name} (${formatAnnual(bottom.median)}).`;
+}
