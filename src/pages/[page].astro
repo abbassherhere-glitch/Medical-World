@@ -2,6 +2,7 @@
 /** Standard pages written in Markdown in src/content/pages/, for example /about/. */
 import { getCollection, render } from 'astro:content';
 import PageLayout from '../layouts/PageLayout.astro';
+import FillSettings from '../components/FillSettings.astro';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
@@ -18,5 +19,5 @@ const { Content } = await render(page);
   heading={page.data.heading}
   lastUpdated={page.data.lastUpdated}
 >
-  <Content />
+  <FillSettings><Content /></FillSettings>
 </PageLayout>

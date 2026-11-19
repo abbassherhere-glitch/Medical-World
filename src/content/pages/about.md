@@ -7,7 +7,7 @@ lastUpdated: "[DATE]"
 
 > **For the owner:** replace every item in square brackets before launch.
 
-[SITE NAME] explains healthcare careers in the United States: how to train, where to study, how to get licensed and what the work pays, state by state.
+{siteName} explains healthcare careers in the United States: how to train, where to study, how to get licensed and what the work pays, state by state.
 
 ## What we cover
 
@@ -15,7 +15,7 @@ We start with dental hygienists and will add more healthcare professions over ti
 
 ## Who we are
 
-[SITE NAME] is run by [COMPANY NAME], [COMPANY DESCRIPTION AND LOCATION].
+{siteName} is run by [COMPANY NAME], [COMPANY DESCRIPTION AND LOCATION].
 
 [Short description of the editorial team, with links to author and reviewer profile pages.]
 

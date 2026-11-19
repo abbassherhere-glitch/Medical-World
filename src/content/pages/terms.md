@@ -9,7 +9,7 @@ lastUpdated: "[DATE]"
 
 ## About these terms
 
-These terms apply to your use of [SITE NAME], run by [COMPANY NAME].
+These terms apply to your use of {siteName}, run by [COMPANY NAME].
 
 ## Information only
 

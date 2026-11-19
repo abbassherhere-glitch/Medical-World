@@ -9,7 +9,7 @@ national salary guide, the Texas state guide, the standard pages (About,
 Editorial standards, How we make money, Advertising disclosure, Privacy, Terms
 of use, Contact) and a "page not found" page.
 
-Anything in **square brackets**, such as `[SITE NAME]` or `[STATE FIGURE]`, is
+Anything in **square brackets**, such as `[COMPANY NAME]` or `[AUTHOR NAME]`, is
 a placeholder waiting for a real value.
 
 ## Where things live
@@ -47,12 +47,25 @@ a placeholder waiting for a real value.
 
 ### Before launch
 
-1. In `src/settings.ts`, fill in `siteName`, `siteUrl` and `companyName`.
+1. In `src/settings.ts`, fill in `companyName`. The site name (`ScrubPath`)
+   and address (`https://scrubpath.com`) are already set there.
 2. Replace every remaining square-bracket placeholder.
 3. When you are ready for search engines, set `allowIndexing` to `true`.
    Until then every page says "noindex" and `robots.txt` blocks all crawling.
 
 To hide every advert area, set `showAdverts` to `false` in `src/settings.ts`.
+
+### Site name and address
+
+The site name and address are set once, in `src/settings.ts` (`siteName` and
+`siteUrl`). Everything else reads them from there: page titles, the header
+and footer, canonical links, the sitemap and `robots.txt`. The standard pages
+in `src/content/pages/` write `{siteName}` where the name goes, and the build
+fills it in, so changing the name in `src/settings.ts` changes it everywhere.
+
+The header shows the name as text only. There is no logo yet; the owner will
+supply a logo and a favicon. Until then, `public/favicon.svg` is the simple
+icon added when the site was first set up.
 
 ## Run it on your computer
 

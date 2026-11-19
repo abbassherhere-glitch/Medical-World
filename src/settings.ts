@@ -6,13 +6,13 @@
  */
 export const settings = {
   /** The public name of the site, shown in the header, footer and page titles. */
-  siteName: '[SITE NAME]',
+  siteName: 'ScrubPath',
 
   /**
-   * The full public address of the site, for example "https://www.example.com".
+   * The full public address of the site, with no trailing slash.
    * Used for canonical links and the sitemap.
    */
-  siteUrl: '[SITE URL]',
+  siteUrl: 'https://scrubpath.com',
 
   /** The legal name of the company that runs the site. */
   companyName: '[COMPANY NAME]',

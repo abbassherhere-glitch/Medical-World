@@ -7,7 +7,7 @@ lastUpdated: "[DATE]"
 
 > **For the owner:** confirm this matches your business model before launch.
 
-[SITE NAME] is free to read. We pay for it through advertising.
+{siteName} is free to read. We pay for it through advertising.
 
 ## Display adverts
 
