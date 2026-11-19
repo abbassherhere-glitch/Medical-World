@@ -181,6 +181,19 @@ const statePages = defineCollection({
   }),
 });
 
+/**
+ * Guide links that can be switched on or off. A guide whose "published" is
+ * false is not shown anywhere on the site, in any list or menu, until it is
+ * switched on and its page exists.
+ */
+const guideLinks = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/guide-links' }),
+  schema: z.object({
+    profession: reference('professions'),
+    guides: z.array(z.object({ title: z.string(), href: z.string(), published: z.boolean() })),
+  }),
+});
+
 /** "How to become one" guide for a profession, for example /dental-hygienist/how-to-become/. */
 const becomeGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/become-guides' }),
@@ -219,4 +232,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, guideLinks, pages };

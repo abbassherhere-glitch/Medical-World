@@ -2,12 +2,15 @@
 /** The grid of guide cards for a profession. */
 import GuideCard from './GuideCard.astro';
 import type { IconName } from './Icon.astro';
+import { liveLinks } from '../data/routes';
 
 interface Props {
   cards: { icon: IconName; title: string; text: string; linkText: string; href: string }[];
 }
 
-const { cards } = Astro.props;
+const { cards: allCards } = Astro.props;
+// Only guides that exist are shown as cards.
+const cards = await liveLinks(allCards);
 ---
 
 <ul class="cards">

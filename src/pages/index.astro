@@ -10,6 +10,7 @@ import StateGrid from '../components/StateGrid.astro';
 import AdSlot from '../components/AdSlot.astro';
 import PersonPhoto from '../components/PersonPhoto.astro';
 import SmartLink from '../components/SmartLink.astro';
+import { liveLinks } from '../data/routes';
 import home from '../content/home.json';
 
 const professions = await getCollection('professions');
@@ -17,6 +18,7 @@ const featured = await getEntry('professions', home.featuredProfession);
 if (!featured) throw new Error(`Featured profession "${home.featuredProfession}" was not found.`);
 const profession = featured.data;
 const professionSlug = featured.id;
+const popularGuides = await liveLinks(profession.popularGuides);
 ---
 
 <BaseLayout title={home.title} description={home.description}>
@@ -80,7 +82,7 @@ const professionSlug = featured.id;
       <section class="popular" aria-labelledby="popular-title">
         <h2 id="popular-title" class="block-title">Popular guides</h2>
         <ul class="popular__list">
-          {profession.popularGuides.map((guide) => <li><SmartLink href={guide.href}>{guide.label}</SmartLink></li>)}
+          {popularGuides.map((guide) => <li><a href={guide.href}>{guide.label}</a></li>)}
         </ul>
       </section>
 
@@ -269,7 +271,7 @@ const professionSlug = featured.id;
     border-bottom: 1px solid var(--color-border);
   }
 
-  .popular__list :is(a, .link-pending) {
+  .popular__list a {
     display: block;
     padding: 14px 0;
   }

@@ -2,9 +2,13 @@
 import { getCollection } from 'astro:content';
 import { settings } from '../settings';
 import { FOOTER_ABOUT, FOOTER_LEGAL } from '../data/navigation';
-import SmartLink from './SmartLink.astro';
+import { liveLinks } from '../data/routes';
 
-const professions = await getCollection('professions');
+const professions = await Promise.all(
+  (await getCollection('professions')).map(async (p) => ({ name: p.data.name, links: await liveLinks(p.data.footerLinks) })),
+);
+const about = await liveLinks(FOOTER_ABOUT);
+const legal = await liveLinks(FOOTER_LEGAL);
 const year = new Date().getFullYear();
 ---
 
@@ -18,12 +22,12 @@ const year = new Date().getFullYear();
 
       {
         professions.map((profession) => (
-          <nav aria-label={`${profession.data.name} guides`}>
-            <h2 class="site-footer__heading">{profession.data.name}</h2>
+          <nav aria-label={`${profession.name} guides`}>
+            <h2 class="site-footer__heading">{profession.name}</h2>
             <ul class="site-footer__links">
-              {profession.data.footerLinks.map((link) => (
+              {profession.links.map((link) => (
                 <li>
-                  <SmartLink href={link.href}>{link.label}</SmartLink>
+                  <a href={link.href}>{link.label}</a>
                 </li>
               ))}
             </ul>
@@ -34,14 +38,14 @@ const year = new Date().getFullYear();
       <nav aria-label="About us">
         <h2 class="site-footer__heading">About us</h2>
         <ul class="site-footer__links">
-          {FOOTER_ABOUT.map((link) => <li><SmartLink href={link.href}>{link.label}</SmartLink></li>)}
+          {about.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
         </ul>
       </nav>
 
       <nav aria-label="Legal">
         <h2 class="site-footer__heading">Legal</h2>
         <ul class="site-footer__links">
-          {FOOTER_LEGAL.map((link) => <li><SmartLink href={link.href}>{link.label}</SmartLink></li>)}
+          {legal.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
         </ul>
       </nav>
     </div>
@@ -99,7 +103,7 @@ const year = new Date().getFullYear();
     padding: 0;
   }
 
-  .site-footer__links :is(a, .link-pending) {
+  .site-footer__links a {
     display: inline-flex;
     align-items: center;
     min-height: var(--tap-size);

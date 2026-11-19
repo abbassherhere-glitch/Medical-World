@@ -12,7 +12,6 @@ import AdSlot from '../../components/AdSlot.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import StatePicker from '../../components/StatePicker.astro';
 import SmartLink from '../../components/SmartLink.astro';
-import { getPublishedStatePages } from '../../data/state-pages';
 import { STATES_AND_DC } from '../../data/states';
 import { formatAnnual, getPayData, releaseName, statesAndDc, surveyPhrase } from '../../lib/pay';
 import { capitalize, highestAndLowest, joinNames, medianInWords } from '../../lib/pay/summary';
@@ -30,8 +29,7 @@ const plural = profession.namePlural;
 const pay = getPayData(slug);
 const release = releaseName(pay);
 const extremes = highestAndLowest(statesAndDc(pay));
-const published = new Set((await getPublishedStatePages()).filter((p) => p.profession === slug).map((p) => p.state));
-// The full grid lists every state and DC; unpublished ones show as plain text.
+// The grid lists every state and DC whose page is published.
 const states = STATES_AND_DC;
 
 const median = medianInWords(pay.national);
@@ -86,11 +84,6 @@ const sources = [`${pay.release.publisher}, ${release}`, ...overview.otherSource
     <h2 id="states" class="section-title" tabindex="-1">{overview.statesHeading}</h2>
     <p class="muted">{overview.statesIntro}</p>
     <StateGrid profession={slug} states={states} />
-    {
-      published.size < states.length && (
-        <p class="note">States shown without a link do not have a published page yet.</p>
-      )
-    }
   </section>
 
   <SourcesBox items={sources} />

@@ -1,6 +1,5 @@
 ---
 import Icon, { type IconName } from './Icon.astro';
-import { isLive } from '../data/routes';
 
 interface Props {
   icon: IconName;
@@ -11,17 +10,14 @@ interface Props {
 }
 
 const { icon, title, text, linkText, href } = Astro.props;
-// Until the guide is published, the card shows without a link or call to action.
-const live = await isLive(href);
-const Tag = live ? 'a' : 'div';
 ---
 
-<Tag class="guide-card" href={live ? href : undefined}>
+<a class="guide-card" href={href}>
   <Icon name={icon} />
   <span class="guide-card__title">{title}</span>
   <span class="guide-card__text">{text}</span>
-  {live && <span class="guide-card__link">{linkText}</span>}
-</Tag>
+  <span class="guide-card__link">{linkText}</span>
+</a>
 
 <style>
   .guide-card {
@@ -36,12 +32,12 @@ const Tag = live ? 'a' : 'div';
     border-radius: var(--radius-lg);
   }
 
-  a.guide-card:hover {
+  .guide-card:hover {
     color: var(--color-text);
     border-color: var(--color-accent);
   }
 
-  a.guide-card:hover .guide-card__link {
+  .guide-card:hover .guide-card__link {
     color: var(--color-accent-hover);
     text-decoration: underline;
   }

@@ -1,8 +1,10 @@
 ---
 import { settings } from '../settings';
 import { MAIN_MENU } from '../data/navigation';
-import SmartLink from './SmartLink.astro';
+import { liveLinks } from '../data/routes';
 
+// Only pages that exist appear in the menu.
+const menu = await liveLinks(MAIN_MENU);
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(href));
 ---
@@ -28,11 +30,11 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       <nav aria-label="Main">
         <ul class="main-nav">
           {
-            MAIN_MENU.map((item) => (
+            menu.map((item) => (
               <li>
-                <SmartLink href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
                   {item.label}
-                </SmartLink>
+                </a>
               </li>
             ))
           }
@@ -102,7 +104,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
     font-weight: var(--weight-bold);
   }
 
-  .main-nav :is(a, .link-pending) {
+  .main-nav a {
     display: inline-flex;
     align-items: center;
     min-height: var(--tap-size);
@@ -175,7 +177,7 @@ const isCurrent = (href: string) => path === href || (href !== '/' && path.start
       border-top: 1px solid var(--color-border);
     }
 
-    .main-nav :is(a, .link-pending) {
+    .main-nav a {
       display: flex;
       min-height: 48px;
     }

@@ -1,7 +1,7 @@
 ---
 /** A grid of state names that link to their pages once published. */
-import SmartLink from './SmartLink.astro';
 import { slugify } from '../data/states';
+import { liveLinks } from '../data/routes';
 
 interface Props {
   profession: string;
@@ -13,22 +13,27 @@ interface Props {
 }
 
 const { profession, states, more, section } = Astro.props;
+// Only published state pages are listed.
+const items = await liveLinks(
+  states.map((state) => ({ label: state, href: `/${profession}/${slugify(state)}/${section ? `#${section}` : ''}` })),
+);
+const moreItem = more ? (await liveLinks([more]))[0] : undefined;
 ---
 
 <ul class="state-grid">
   {
-    states.map((state) => (
+    items.map((item) => (
       <li>
-        <SmartLink href={`/${profession}/${slugify(state)}/${section ? `#${section}` : ''}`}>{state}</SmartLink>
+        <a href={item.href}>{item.label}</a>
       </li>
     ))
   }
   {
-    more && (
+    moreItem && (
       <li>
-        <SmartLink class="state-grid__more" href={more.href}>
-          {more.label}
-        </SmartLink>
+        <a class="state-grid__more" href={moreItem.href}>
+          {moreItem.label}
+        </a>
       </li>
     )
   }
@@ -43,7 +48,7 @@ const { profession, states, more, section } = Astro.props;
     padding: 0;
   }
 
-  .state-grid :is(a, .link-pending) {
+  .state-grid a {
     display: flex;
     align-items: center;
     min-height: 48px;
