@@ -14,6 +14,8 @@ import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
+import FaqList from '../../components/FaqList.astro';
+import { stateQuestions } from '../../lib/pay/state-questions';
 import {
   areasInState,
   byMedianDescending,
@@ -126,6 +128,17 @@ if (stateMedian !== undefined) {
 
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
+// Common questions, each answered from this state's own figures.
+const questions = stateQuestions({
+  state: statePay,
+  allStates,
+  areas,
+  neighbors,
+  national,
+  plural,
+  survey,
+}).map((q) => ({ question: q.question, answer: q.answer }));
+
 const contents = [
   { label: data.pay.heading, id: 'pay' },
   ...(local ? [{ label: 'Pay per hour, week, month and year', id: 'pay-periods' }] : []),
@@ -133,6 +146,7 @@ const contents = [
   { label: compareHeading, id: 'nearby' },
   { label: data.licensing.heading, id: 'licensing' },
   { label: data.schools.heading, id: 'schools' },
+  { label: 'Common questions', id: 'common-questions' },
 ];
 ---
 
@@ -279,6 +293,8 @@ const contents = [
     </ScrollTable>
     <p class="note">{data.schools.note}</p>
   </section>
+
+  {questions.length > 0 && <FaqList id="common-questions" heading="Common questions" items={questions} />}
 
   <SourcesBox items={sources} />
 
