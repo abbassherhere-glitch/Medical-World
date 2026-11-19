@@ -63,3 +63,16 @@ test('ignores addresses inside scripts and styles', () => {
   assert.deepEqual(check('<script>const a = `<a href="${url}">`;</script><style>a[href="/x/"]{}</style>'), []);
   assert.equal(stripCode('a<script>b</script>c<!-- d -->e'), 'ace');
 });
+
+test('college websites are not checked: external links are skipped, never fetched', () => {
+  const asked: string[] = [];
+  const watching: Site = {
+    hasPage: (path) => (asked.push(path), path in pages),
+    hasSection: (path, id) => (pages[path] ?? []).includes(id),
+  };
+  const html = `
+    <a class="external" href="https://www.example.edu/dental-hygiene" target="_blank" rel="nofollow noopener">A college</a>
+    <a class="external" href="http://example.edu/" target="_blank" rel="nofollow noopener">Another college</a>`;
+  assert.deepEqual(checkPage(html, '/dental-hygienist/texas/', watching), []);
+  assert.deepEqual(asked, []);
+});
