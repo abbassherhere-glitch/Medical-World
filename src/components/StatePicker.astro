@@ -1,0 +1,82 @@
+---
+/**
+ * Profession and state picker with a "Find schools" button.
+ * Leave out `professions` to show the state list only (for side panels).
+ */
+import { US_STATES, slugify } from '../data/states';
+
+interface Props {
+  /** A unique prefix for the field ids on this page. */
+  id: string;
+  professions?: { slug: string; name: string }[];
+  /** Used when the profession list is not shown. */
+  profession?: string;
+  layout?: 'row' | 'column';
+}
+
+const { id, professions, profession, layout = 'row' } = Astro.props;
+---
+
+<form
+  class:list={['picker', `picker--${layout}`]}
+  action="/schools/"
+  method="get"
+  data-state-picker
+  data-profession={profession}
+>
+  {
+    professions && (
+      <div class="field picker__field">
+        <label for={`${id}-profession`}>Profession</label>
+        <select id={`${id}-profession`} name="profession" class="select">
+          {professions.map((p) => (
+            <option value={p.slug}>{p.name}</option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+  {!professions && profession && <input type="hidden" name="profession" value={profession} />}
+  <div class="field picker__field">
+    <label for={`${id}-state`}>State</label>
+    <select id={`${id}-state`} name="state" class="select" required>
+      <option value="" selected disabled>Choose a state</option>
+      {US_STATES.map((state) => <option value={slugify(state)}>{state}</option>)}
+    </select>
+  </div>
+  <button type="submit" class="button button--action picker__button">Find schools</button>
+</form>
+
+<script>
+  import '../scripts/state-picker';
+</script>
+
+<style>
+  .picker {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .picker--row {
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .picker--row .picker__field {
+    flex: 1 1 170px;
+  }
+
+  .picker--row .picker__button {
+    flex: 0 0 auto;
+  }
+
+  .picker--column {
+    flex-direction: column;
+  }
+
+  @media (max-width: 480px) {
+    .picker--row .picker__button {
+      flex: 1 1 100%;
+    }
+  }
+</style>

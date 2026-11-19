@@ -1,0 +1,80 @@
+{
+  "profession": "dental-hygienist",
+  "title": "Dental hygienist salary in the US: national and state pay",
+  "description": "What dental hygienists earn in the United States: median yearly and hourly pay, the pay range, and pay by state, from US Bureau of Labor Statistics figures.",
+  "heading": "Dental hygienist salary in the United States",
+  "breadcrumb": "Salary",
+  "byline": {
+    "author": { "name": "[AUTHOR NAME]" },
+    "reviewer": { "name": "[REVIEWER NAME, QUALIFICATION]" },
+    "lastChecked": "[DATE]",
+    "sourceNote": "Source: US Bureau of Labor Statistics."
+  },
+  "summary": "Dental hygienists in the US earn a median of **$98,100 a year**, or **$47.16 an hour**, according to 2025 government figures.",
+  "stats": [
+    { "label": "Per year", "value": "$98,100" },
+    { "label": "Per hour", "value": "$47.16" },
+    { "label": "Job growth to 2035", "value": "8%" }
+  ],
+  "payRange": { "low": "[BLS FIGURE]", "median": "$98,100", "high": "[BLS FIGURE]" },
+  "takeaways": [
+    "The national median is $98,100 a year, or $47.16 an hour.",
+    "Jobs are forecast to grow 8% between 2025 and 2035.",
+    "[Highest and lowest paying states, from the latest figures.]",
+    "The typical entry requirement is an associate's degree."
+  ],
+  "image": {
+    "alt": "A dental hygienist at work",
+    "placeholder": "Photo of a dental hygienist at work [YOUR IMAGE]"
+  },
+  "payByState": {
+    "heading": "Pay by state",
+    "intro": "Pay varies widely between states. Choose a state for local pay, schools and licensing rules.",
+    "columns": ["State", "Lowest 10%", "Median", "Top 10%"],
+    "rows": [
+      { "state": "California", "href": "/dental-hygienist/california/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] },
+      { "state": "Texas", "href": "/dental-hygienist/texas/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] },
+      { "state": "Florida", "href": "/dental-hygienist/florida/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] },
+      { "state": "New York", "href": "/dental-hygienist/new-york/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] },
+      { "state": "Michigan", "href": "/dental-hygienist/michigan/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] },
+      { "state": "Ohio", "href": "/dental-hygienist/ohio/", "values": ["[STATE FIGURE]", "[STATE FIGURE]", "[STATE FIGURE]"] }
+    ],
+    "more": { "label": "Show all 50 states", "href": "/dental-hygienist/schools/" }
+  },
+  "factors": {
+    "heading": "What affects your pay",
+    "items": [
+      { "title": "Where you work.", "text": "[Explanation written from state and city figures.]" },
+      { "title": "Type of practice.", "text": "[Explanation written from government industry figures.]" },
+      { "title": "Hours.", "text": "[Explanation of full-time and part-time work, with source.]" },
+      { "title": "Experience.", "text": "[Explanation using the published pay range, with source.]" }
+    ]
+  },
+  "faqs": [
+    {
+      "question": "How much do dental hygienists make an hour?",
+      "answer": "The national median is $47.16 an hour, based on 2025 government figures."
+    },
+    {
+      "question": "Which state pays dental hygienists the most?",
+      "answer": "[Answer from the latest state figures.]"
+    },
+    {
+      "question": "What is the starting salary for a dental hygienist?",
+      "answer": "[Answer from the published lower pay range.]"
+    }
+  ],
+  "sources": [
+    "US Bureau of Labor Statistics, Occupational Outlook Handbook: Dental Hygienists",
+    "US Bureau of Labor Statistics, Occupational Employment and Wage Statistics, [RELEASE DATE]"
+  ],
+  "schoolFinder": {
+    "heading": "Find schools in your state",
+    "note": "Schools that pay to be featured are marked \"Sponsored\"."
+  },
+  "related": [
+    { "label": "How to become a dental hygienist", "href": "/dental-hygienist/how-to-become/" },
+    { "label": "Dental hygienist vs dental assistant", "href": "/dental-hygienist/vs-dental-assistant/" },
+    { "label": "How long does training take?", "href": "/dental-hygienist/how-to-become/" }
+  ]
+}

@@ -1,0 +1,65 @@
+---
+/**
+ * An image with fixed proportions, so the page does not move while it loads.
+ * Without a `src`, it shows a labelled placeholder box of the same shape.
+ */
+interface Props {
+  src?: string | undefined;
+  alt: string;
+  width: number;
+  height: number;
+  placeholder: string;
+  /** Load straight away (for images at the top of the page). Default: lazy. */
+  eager?: boolean;
+  class?: string;
+}
+
+const { src, alt, width, height, placeholder, eager = false, class: className } = Astro.props;
+---
+
+<div class:list={['image-slot', className]} style={`aspect-ratio: ${width} / ${height}`}>
+  {
+    src ? (
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    ) : (
+      <div class="image-slot__placeholder" role="img" aria-label={`Image placeholder: ${alt}`}>
+        {placeholder}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .image-slot {
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .image-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-slot__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--space-4);
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    background: var(--color-advert);
+    border: 1px dashed var(--color-input-border);
+    border-radius: inherit;
+  }
+</style>

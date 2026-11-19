@@ -1,0 +1,54 @@
+---
+/** Author and reviewer line with photo spots and the "last checked" date. */
+import PersonPhoto from './PersonPhoto.astro';
+
+interface Person {
+  name: string;
+  href?: string | undefined;
+  photo?: string | undefined;
+}
+
+interface Props {
+  author: Person;
+  reviewer: Person;
+  lastChecked: string;
+  sourceNote: string;
+}
+
+const { author, reviewer, lastChecked, sourceNote } = Astro.props;
+const people = [
+  { role: 'Written by', person: author },
+  { role: 'Reviewed by', person: reviewer },
+];
+---
+
+<div class="byline">
+  {
+    people.map(({ role, person }) => (
+      <div class="byline__person">
+        <PersonPhoto src={person.photo} name={person.name} />
+        <span>
+          {role} {person.href ? <a href={person.href}>{person.name}</a> : <span>{person.name}</span>}
+        </span>
+      </div>
+    ))
+  }
+  <span>Last checked {lastChecked}. {sourceNote}</span>
+</div>
+
+<style>
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-7);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .byline__person {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+</style>

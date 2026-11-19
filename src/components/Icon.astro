@@ -1,0 +1,43 @@
+---
+/** Small line icons. Decorative only, so they are hidden from screen readers. */
+export type IconName = 'document' | 'check' | 'clock' | 'steps' | 'school' | 'license' | 'chart';
+
+interface Props {
+  name: IconName;
+  size?: number;
+}
+
+const { name, size = 28 } = Astro.props;
+
+const paths: Record<IconName, string> = {
+  document: '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  steps: '<path d="M4 19h4v-4h4v-4h4V7h4"/>',
+  school: '<path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M7 11.5V16c1.5 1.5 3.2 2 5 2s3.5-.5 5-2v-4.5"/>',
+  license: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+};
+---
+
+<svg
+  aria-hidden="true"
+  focusable="false"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="icon"
+  set:html={paths[name]}
+/>
+
+<style>
+  .icon {
+    flex: none;
+    color: var(--color-accent);
+  }
+</style>

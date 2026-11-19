@@ -1,0 +1,90 @@
+---
+/**
+ * Layout for profession guide pages: profession menu bar, breadcrumb,
+ * page heading and byline, then the article column and a side column.
+ */
+import BaseLayout from './BaseLayout.astro';
+import ProfessionNav from '../components/ProfessionNav.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import Byline from '../components/Byline.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  profession: { name: string; menu: { key: string; label: string; href: string }[] };
+  activeMenu: string;
+  breadcrumb: { label: string; href?: string }[];
+  byline: {
+    author: { name: string; href?: string | undefined; photo?: string | undefined };
+    reviewer: { name: string; href?: string | undefined; photo?: string | undefined };
+    lastChecked: string;
+    sourceNote: string;
+  };
+}
+
+const { title, description, heading, profession, activeMenu, breadcrumb, byline } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <ProfessionNav slot="subnav" name={profession.name} items={profession.menu} active={activeMenu} />
+
+  <div class="container guide">
+    <main id="main" class="guide__main" tabindex="-1">
+      <Breadcrumb items={breadcrumb} />
+      <header class="guide__header">
+        <h1>{heading}</h1>
+        <Byline {...byline} />
+      </header>
+      <slot />
+    </main>
+
+    <aside class="guide__aside" aria-label="Related information">
+      <slot name="aside" />
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .guide {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-9);
+    padding-block: var(--space-7) var(--space-10);
+  }
+
+  .guide__main {
+    flex: 1 1 560px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+
+  .guide__main:focus {
+    outline: none;
+  }
+
+  .guide__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: calc(-1 * var(--space-4));
+  }
+
+  .guide__aside {
+    flex: 1 1 280px;
+    min-width: 0;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 939px) {
+    .guide__aside {
+      max-width: none;
+    }
+  }
+</style>

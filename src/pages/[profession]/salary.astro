@@ -1,0 +1,138 @@
+---
+/** National salary guide for a profession, for example /dental-hygienist/salary/. */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import KeyTakeaways from '../../components/KeyTakeaways.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import StatGrid from '../../components/StatGrid.astro';
+import PayRangeBar from '../../components/PayRangeBar.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import ScrollTable from '../../components/ScrollTable.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import FaqList from '../../components/FaqList.astro';
+import SourcesBox from '../../components/SourcesBox.astro';
+import StatePicker from '../../components/StatePicker.astro';
+import LinkPanel from '../../components/LinkPanel.astro';
+import { inlineMarkup } from '../../lib/text';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('salaryGuides');
+  return guides.map((guide) => ({
+    params: { profession: guide.data.profession.id },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const data = guide.data;
+const profession = await getEntry(data.profession);
+const professionSlug = data.profession.id;
+
+const contents = [
+  { label: data.payByState.heading, id: 'pay-by-state' },
+  { label: data.factors.heading, id: 'what-affects-pay' },
+  { label: 'Common questions', id: 'common-questions' },
+  { label: 'Sources', id: 'sources' },
+];
+---
+
+<GuideLayout
+  title={data.title}
+  description={data.description}
+  heading={data.heading}
+  profession={profession.data}
+  activeMenu="salary"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: profession.data.name, href: `/${professionSlug}/` },
+    { label: data.breadcrumb },
+  ]}
+  byline={data.byline}
+>
+  <section class="panel panel--tint stack summary" aria-label="Summary">
+    <p class="summary__lead" set:html={inlineMarkup(data.summary)} />
+    <StatGrid items={data.stats} />
+    <PayRangeBar {...data.payRange} />
+  </section>
+
+  <KeyTakeaways items={data.takeaways} />
+  <TableOfContents items={contents} />
+  <ImageSlot {...data.image} />
+
+  <section class="stack" aria-labelledby="pay-by-state">
+    <h2 id="pay-by-state" class="section-title">{data.payByState.heading}</h2>
+    <p class="muted">{data.payByState.intro}</p>
+    <ScrollTable caption={`${profession.data.name} pay by state`} columns={data.payByState.columns}>
+      {
+        data.payByState.rows.map((row) => (
+          <tr>
+            <th scope="row">{row.href ? <a href={row.href}>{row.state}</a> : row.state}</th>
+            {row.values.map((value) => <td>{value}</td>)}
+          </tr>
+        ))
+      }
+    </ScrollTable>
+    <a class="more-link" href={data.payByState.more.href}>{data.payByState.more.label}</a>
+  </section>
+
+  <AdSlot size="inline" id="salary-content-1" />
+
+  <section class="stack" aria-labelledby="what-affects-pay">
+    <h2 id="what-affects-pay" class="section-title">{data.factors.heading}</h2>
+    <ul class="factor-list">
+      {data.factors.items.map((item) => <li><strong>{item.title}</strong> {item.text}</li>)}
+    </ul>
+  </section>
+
+  <FaqList id="common-questions" heading="Common questions" items={data.faqs} />
+  <SourcesBox items={data.sources} />
+
+  <Fragment slot="aside">
+    <section class="panel panel--highlight stack" aria-labelledby="find-schools">
+      <h2 id="find-schools" class="panel-title">{data.schoolFinder.heading}</h2>
+      <StatePicker id="side" profession={professionSlug} layout="column" />
+      <p class="note">{data.schoolFinder.note}</p>
+    </section>
+    <AdSlot size="sidebar" id="salary-side-1" />
+    <LinkPanel heading="Related guides" links={data.related} />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .summary {
+    --stack-gap: 18px;
+    padding: var(--space-7);
+  }
+
+  .summary__lead {
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .muted {
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .more-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+  }
+
+  .factor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 22px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .summary {
+      padding: var(--space-5);
+    }
+  }
+</style>

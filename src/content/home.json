@@ -1,0 +1,47 @@
+{
+  "title": "Healthcare careers in the US: training, licensing and pay by state",
+  "description": "Training routes, schools, licensing rules and pay for healthcare jobs in every US state, checked against official sources.",
+  "hero": {
+    "heading": "Healthcare careers, explained with official figures",
+    "intro": "Training routes, schools, licensing rules and pay for healthcare jobs in every US state, checked against official sources before publishing.",
+    "pickerNote": "Schools that pay to be featured are marked \"Sponsored\".",
+    "image": {
+      "alt": "Healthcare students or staff",
+      "width": 800,
+      "height": 720,
+      "placeholder": "Photo of healthcare students or staff [YOUR IMAGE]"
+    }
+  },
+  "trust": [
+    {
+      "icon": "document",
+      "title": "Official figures",
+      "text": "Pay and job numbers come from the US Bureau of Labor Statistics."
+    },
+    {
+      "icon": "check",
+      "title": "Checked by a qualified reviewer",
+      "text": "Every guide names who wrote it and who reviewed it."
+    },
+    {
+      "icon": "clock",
+      "title": "Dated and kept current",
+      "text": "Each page shows when it was last checked against its sources."
+    }
+  ],
+  "featuredProfession": "dental-hygienist",
+  "comingSoon": {
+    "heading": "More professions on the way",
+    "items": [
+      "Ultrasound tech", "Medical assistant", "Radiology tech", "Surgical tech",
+      "Dental assistant", "Pharmacy technician", "Respiratory therapist"
+    ],
+    "note": "A guide is published only after its figures and licensing rules have been checked."
+  },
+  "factCheck": {
+    "heading": "How we check our facts",
+    "text": "Pay figures come from the US Bureau of Labor Statistics. Licensing rules come from each state's licensing board. Every page shows its sources and the date it was last checked.",
+    "reviewer": "[REVIEWER NAME, QUALIFICATION]",
+    "link": { "label": "Read our editorial standards", "href": "/editorial-standards/" }
+  }
+}

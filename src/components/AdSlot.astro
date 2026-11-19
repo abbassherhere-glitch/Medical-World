@@ -1,0 +1,59 @@
+---
+/**
+ * An empty, labelled advert area with a fixed size, so the page does not move
+ * when adverts are added later. Hide every advert area with `showAdverts`
+ * in src/settings.ts.
+ *
+ * Sizes:
+ *  - banner:  full-width strip between page sections
+ *  - inline:  inside article content
+ *  - sidebar: in the side column
+ */
+import { settings } from '../settings';
+
+interface Props {
+  size: 'banner' | 'inline' | 'sidebar';
+  /** A name for this slot, used later to connect it to an advert network. */
+  id: string;
+}
+
+const { size, id } = Astro.props;
+---
+
+{
+  settings.showAdverts && (
+    <aside class={`ad ad--${size}`} aria-label="Advertisement" data-ad-slot={id}>
+      <span class="ad__label">Advertisement</span>
+    </aside>
+  )
+}
+
+<style>
+  .ad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: var(--color-advert);
+    border: 1px dashed var(--color-input-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .ad__label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .ad--banner {
+    height: 110px;
+  }
+
+  .ad--inline {
+    height: 120px;
+  }
+
+  .ad--sidebar {
+    height: 280px;
+  }
+</style>

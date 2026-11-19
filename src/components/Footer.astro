@@ -1,0 +1,124 @@
+---
+import { getCollection } from 'astro:content';
+import { settings } from '../settings';
+import { FOOTER_ABOUT, FOOTER_LEGAL } from '../data/navigation';
+
+const professions = await getCollection('professions');
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__columns">
+      <div class="site-footer__about">
+        <p class="site-footer__name">{settings.siteName}</p>
+        <p class="site-footer__text">Independent guides to healthcare careers in the United States.</p>
+      </div>
+
+      {
+        professions.map((profession) => (
+          <nav aria-label={`${profession.data.name} guides`}>
+            <h2 class="site-footer__heading">{profession.data.name}</h2>
+            <ul class="site-footer__links">
+              {profession.data.footerLinks.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+
+      <nav aria-label="About us">
+        <h2 class="site-footer__heading">About us</h2>
+        <ul class="site-footer__links">
+          {FOOTER_ABOUT.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </nav>
+
+      <nav aria-label="Legal">
+        <h2 class="site-footer__heading">Legal</h2>
+        <ul class="site-footer__links">
+          {FOOTER_LEGAL.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+
+    <p class="site-footer__small">
+      Pay and job figures come from the US Bureau of Labor Statistics. This site is not affiliated
+      with any government body or licensing board. &copy; {`${year} ${settings.companyName}`}.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-footer);
+    color: var(--color-on-dark);
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    padding-block: 44px var(--space-7);
+  }
+
+  .site-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-7);
+  }
+
+  .site-footer__about {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .site-footer__name {
+    font-size: 20px;
+    font-weight: var(--weight-black);
+  }
+
+  .site-footer__text {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-on-dark-muted);
+  }
+
+  .site-footer__heading {
+    padding-bottom: 6px;
+    font-size: var(--text-md);
+  }
+
+  .site-footer__links {
+    list-style: none;
+    padding: 0;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-size: var(--text-sm);
+    color: var(--color-on-dark);
+  }
+
+  .site-footer__links a:hover {
+    color: var(--color-on-dark-muted);
+  }
+
+  .site-footer a:focus-visible {
+    outline-color: var(--color-on-dark);
+  }
+
+  .site-footer__small {
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border-dark);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--color-on-dark-muted);
+  }
+</style>
