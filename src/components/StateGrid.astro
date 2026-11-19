@@ -1,0 +1,53 @@
+---
+/** A grid of state names that link to their pages once published. */
+import SmartLink from './SmartLink.astro';
+import { slugify } from '../data/states';
+
+interface Props {
+  profession: string;
+  states: readonly string[];
+  /** Optional last item, for example a link to all states. */
+  more?: { label: string; href: string };
+}
+
+const { profession, states, more } = Astro.props;
+---
+
+<ul class="state-grid">
+  {
+    states.map((state) => (
+      <li>
+        <SmartLink href={`/${profession}/${slugify(state)}/`}>{state}</SmartLink>
+      </li>
+    ))
+  }
+  {
+    more && (
+      <li>
+        <SmartLink class="state-grid__more" href={more.href}>
+          {more.label}
+        </SmartLink>
+      </li>
+    )
+  }
+</ul>
+
+<style>
+  .state-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: var(--space-1) var(--space-5);
+    list-style: none;
+    padding: 0;
+  }
+
+  .state-grid :is(a, .link-pending) {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+  }
+
+  .state-grid__more {
+    font-weight: var(--weight-bold);
+  }
+</style>

@@ -73,6 +73,21 @@ const professions = defineCollection({
     }),
     popularGuides: z.array(link),
     footerLinks: z.array(link),
+    /** The profession's overview page, for example /dental-hygienist/. Leave out to not build one. */
+    overview: z
+      .object({
+        heading: z.string(),
+        byline,
+        intro: z.array(z.string()),
+        figuresHeading: z.string(),
+        guidesHeading: z.string(),
+        statesHeading: z.string(),
+        statesIntro: z.string(),
+        payHeading: z.string(),
+        otherSources: z.array(z.string()),
+        related: z.array(link),
+      })
+      .optional(),
   }),
 });
 

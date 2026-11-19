@@ -9,7 +9,8 @@ import { getPublishedStatePages } from './state-pages';
  * The 404 page is left out on purpose.
  */
 export async function getPublicRoutes(): Promise<string[]> {
-  const [salaryGuides, statePages, pages] = await Promise.all([
+  const [professions, salaryGuides, statePages, pages] = await Promise.all([
+    getCollection('professions'),
     getCollection('salaryGuides'),
     getPublishedStatePages(),
     getCollection('pages'),
@@ -17,6 +18,7 @@ export async function getPublicRoutes(): Promise<string[]> {
 
   return [
     '/',
+    ...professions.filter((p) => p.data.overview).map((p) => `/${p.id}/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
     ...statePages.map((p) => p.path),
     ...pages.map((p) => `/${p.id}/`),
