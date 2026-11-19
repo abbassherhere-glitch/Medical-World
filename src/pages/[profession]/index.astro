@@ -93,6 +93,7 @@ const sources = [`${pay.release.publisher}, ${release}`, ...(outlook ? [outlook.
         plural={plural}
         data={outlook}
         statesAndDc={statesAndDc(pay).map((s) => s.name)}
+        separateSourceNote={`These state projections cover ${outlook.source.baseYear} to ${outlook.source.projectedYear}. They come from a different source, and cover a different period, from the national jobs and growth figures near the top of this page.`}
       />
     )
   }

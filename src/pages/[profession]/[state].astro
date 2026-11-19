@@ -205,7 +205,7 @@ const contents = [
         { label: 'US, median per year', value: formatAnnual(national.annual.median) },
         { label: 'US, median per hour', value: formatHourly(national.hourly.median) },
         { label: 'Rank by median pay', value: rank ? `${ordinal(rank.rank)} of ${rank.of}` : 'Not ranked' },
-        { label: `Jobs in ${state}`, value: formatJobs(local?.employment) },
+        { label: `Jobs in ${state} (wage survey, ${pay.release.referencePeriod})`, value: formatJobs(local?.employment) },
         { label: 'Lowest 10% earn less than', value: formatAnnual(local?.annual.p10) },
         { label: 'Top 10% earn more than', value: formatAnnual(local?.annual.p90) },
       ]}

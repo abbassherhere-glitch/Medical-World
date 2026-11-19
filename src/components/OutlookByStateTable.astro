@@ -26,9 +26,11 @@ interface Props {
   data: OutlookData;
   /** Names of the 50 states and DC; territories are left out of the table. */
   statesAndDc: string[];
+  /** A sentence pointing out that other national figures on the page come from a different source. */
+  separateSourceNote?: string;
 }
 
-const { id, profession, plural, data, statesAndDc } = Astro.props;
+const { id, profession, plural, data, statesAndDc, separateSourceNote } = Astro.props;
 const { baseYear, projectedYear } = data.source;
 const years = projectionYears(data);
 const places = data.places.filter((p) => statesAndDc.includes(p.name));
@@ -49,6 +51,7 @@ const missing = statesAndDc.filter((name) => !data.places.some((p) => p.name ===
 <section class="stack" aria-labelledby={id}>
   <h2 id={id} class="section-title">Job outlook by state</h2>
   <p>{nationalSentence}</p>
+  {separateSourceNote && <p class="note">{separateSourceNote}</p>}
   <p>{`The five fastest growing are ${listOf(fastest)}. The five slowest are ${listOf(slowest)}.`}</p>
   <ScrollTable
     caption={`Job outlook for ${plural} by state, ${years}, fastest growth first`}
