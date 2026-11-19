@@ -1,0 +1,81 @@
+---
+/**
+ * "Job outlook in {state}": the official state projections for one place,
+ * beside the national growth for the same period. These figures come from the
+ * state projections, not the pay survey, and are never mixed with it.
+ */
+import StatGrid from './StatGrid.astro';
+import {
+  formatCount,
+  formatJobChange,
+  formatPercentChange,
+  jobChange,
+  OPENINGS_NOTE,
+  outlookSentence,
+  projectionYears,
+  ROUNDING_NOTE,
+  type OutlookData,
+  type OutlookFigures,
+  growthRankInWords,
+} from '../lib/outlook';
+
+interface Props {
+  id: string;
+  /** For example "Texas" or "the District of Columbia". */
+  place: string;
+  heading: string;
+  data: OutlookData;
+  figures: OutlookFigures | undefined;
+  rank?: { rank: number; of: number };
+}
+
+const { id, place, heading, data, figures, rank } = Astro.props;
+const { baseYear, projectedYear } = data.source;
+const years = projectionYears(data);
+const sentence = outlookSentence(place, figures, data.national, years);
+const rankSentence = rank
+  ? `By projected growth, ${place} ranks ${growthRankInWords(rank)} (the 50 states and DC).`
+  : '';
+---
+
+<section class="panel stack outlook" aria-labelledby={id}>
+  <h2 id={id} class="section-title">{heading}</h2>
+  {
+    figures ? (
+      <StatGrid
+        size="small"
+        items={[
+          { label: `Jobs in ${baseYear}`, value: formatCount(figures.baseJobs) },
+          { label: `Projected jobs in ${projectedYear}`, value: formatCount(figures.projectedJobs) },
+          { label: 'Change in jobs', value: formatJobChange(jobChange(figures)) },
+          { label: `Percent change, ${years}`, value: formatPercentChange(figures.percentChange) },
+          { label: 'Average openings a year', value: formatCount(figures.openings) },
+          { label: `US growth, ${years}`, value: formatPercentChange(data.national.percentChange) },
+        ]}
+      />
+    ) : null
+  }
+  <p class="outlook__sentence">
+    {sentence}
+    {rankSentence && ` ${rankSentence}`}
+  </p>
+  <p class="note">{OPENINGS_NOTE} {ROUNDING_NOTE}</p>
+  <p class="note">Source: {data.source.name}.</p>
+</section>
+
+<style>
+  .outlook {
+    --stack-gap: 16px;
+    padding: var(--space-7);
+  }
+
+  .outlook__sentence {
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .outlook {
+      padding: var(--space-5);
+    }
+  }
+</style>

@@ -84,3 +84,13 @@ export function rankByGrowth(places: OutlookPlace[]): { name: string; percentCha
 export function projectionYears(data: OutlookData): string {
   return `${data.source.baseYear} to ${data.source.projectedYear}`;
 }
+
+/** "5th fastest of 51", "fastest of 51" or "slowest of 51". */
+export function growthRankInWords(rank: { rank: number; of: number }): string {
+  if (rank.rank === 1) return `fastest of ${rank.of}`;
+  if (rank.rank === rank.of) return `slowest of ${rank.of}`;
+  const n = rank.rank;
+  const tens = n % 100;
+  const suffix = tens >= 11 && tens <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th';
+  return `${n}${suffix} fastest of ${rank.of}`;
+}

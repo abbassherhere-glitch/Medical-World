@@ -1,7 +1,7 @@
 /** Tests for job outlook wording, ranking and overrides. Run with: npm test */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { formatJobChange, formatPercentChange, jobChange, outlookSentence, pace, rankByGrowth } from './summary.ts';
+import { growthRankInWords, formatJobChange, formatPercentChange, jobChange, outlookSentence, pace, rankByGrowth } from './summary.ts';
 import { applyOutlookOverrides } from './overrides.ts';
 import type { OutlookData, OutlookFigures } from './types.ts';
 
@@ -63,4 +63,11 @@ test('overrides replace one figure, and a mistake stops the build', () => {
   assert.equal(applyOutlookOverrides(data, 'p', [{ profession: 'p', place: 'United States', figure: 'percentChange', value: 'Not available' }], ['p']).national.percentChange, null);
   assert.throws(() => applyOutlookOverrides(data, 'p', [{ profession: 'p', place: 'Texsa', figure: 'openings', value: 1 }], ['p']), /unknown place/);
   assert.throws(() => applyOutlookOverrides(data, 'p', [{ profession: 'p', place: 'Texas', figure: 'growth', value: 1 }], ['p']), /unknown figure/);
+});
+
+test('describes a growth rank in words', () => {
+  assert.equal(growthRankInWords({ rank: 5, of: 51 }), '5th fastest of 51');
+  assert.equal(growthRankInWords({ rank: 1, of: 51 }), 'fastest of 51');
+  assert.equal(growthRankInWords({ rank: 51, of: 51 }), 'slowest of 51');
+  assert.equal(growthRankInWords({ rank: 12, of: 51 }), '12th fastest of 51');
 });

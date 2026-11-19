@@ -15,6 +15,8 @@ import SourceLine from '../../components/SourceLine.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
+import OutlookSection from '../../components/OutlookSection.astro';
+import { findOutlookPlace, getOutlook, outlookSentence, projectionYears, rankByGrowth, formatCount } from '../../lib/outlook';
 import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
 import UpNext from '../../components/UpNext.astro';
 import { upNext } from '../../data/up-next';
@@ -131,6 +133,23 @@ if (stateMedian !== undefined) {
 
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
+// Job outlook, from the state projections (a different source from the pay
+// survey; never mixed with it). Ranked among the states and DC only.
+const outlook = getOutlook(professionSlug);
+const outlookPlace = outlook ? findOutlookPlace(outlook, state) : undefined;
+const outlookYears = outlook ? projectionYears(outlook) : '';
+const growthRanking = outlook ? rankByGrowth(outlook.places.filter((p) => allStates.some((s) => s.name === p.name))) : [];
+const growthRankEntry = growthRanking.find((r) => r.name === state);
+const growthRank = growthRankEntry ? { rank: growthRankEntry.rank, of: growthRanking.length } : undefined;
+const outlookLine = outlook ? outlookSentence(where, outlookPlace?.figures, outlook.national, outlookYears) : undefined;
+if (outlookLine) {
+  takeaways.splice(
+    takeaways.length - data.takeaways.length,
+    0,
+    `${outlookLine.replace(/\.$/, '')} (Projections Central, state projections ${outlookYears}).`,
+  );
+}
+
 // Common questions, each answered from this state's own figures.
 const questions = stateQuestions({
   state: statePay,
@@ -141,12 +160,19 @@ const questions = stateQuestions({
   plural,
   survey,
 }).map((q) => ({ question: q.question, answer: q.answer }));
+if (outlook && outlookPlace && outlookLine) {
+  questions.push({
+    question: `What is the job outlook for ${plural} in ${where}?`,
+    answer: `${outlookLine} The projections expect an average of ${formatCount(outlookPlace.figures.openings)} openings a year in ${where}, from growth and from workers who leave the occupation or the workforce (${outlook.source.name}).`,
+  });
+}
 
 const contents = [
   { label: data.pay.heading, id: 'pay' },
   ...(local ? [{ label: 'Pay per hour, week, month and year', id: 'pay-periods' }] : []),
   { label: data.cityPay.heading, id: 'pay-by-city' },
   { label: compareHeading, id: 'nearby' },
+  ...(outlook ? [{ label: `Job outlook in ${where}`, id: 'outlook' }] : []),
   { label: data.licensing.heading, id: 'licensing' },
   { label: data.schools.heading, id: 'schools' },
   { label: 'Common questions', id: 'common-questions' },
@@ -260,6 +286,19 @@ const contents = [
     </ScrollTable>
     <p class="note">Yearly and hourly medians. Source: {pay.release.publisher}, {release}.</p>
   </section>
+
+  {
+    outlook && (
+      <OutlookSection
+        id="outlook"
+        place={where}
+        heading={`Job outlook in ${where}`}
+        data={outlook}
+        figures={outlookPlace?.figures}
+        rank={growthRank}
+      />
+    )
+  }
 
   <AdSlot size="inline" id="state-content-1" />
 
