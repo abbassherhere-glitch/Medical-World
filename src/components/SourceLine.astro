@@ -1,0 +1,12 @@
+---
+/** A short "Source:" line naming the wage survey release the figures come from. */
+import { releaseName, type PayData } from '../lib/pay';
+
+interface Props {
+  data: PayData;
+}
+
+const { data } = Astro.props;
+---
+
+<p class="note">Source: {data.release.publisher}, {releaseName(data)}.</p>

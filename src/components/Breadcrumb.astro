@@ -1,5 +1,7 @@
 ---
 /** Breadcrumb trail. The last item is the current page and is not a link. */
+import SmartLink from './SmartLink.astro';
+
 interface Props {
   items: { label: string; href?: string }[];
 }
@@ -13,7 +15,7 @@ const { items } = Astro.props;
       items.map((item, index) => (
         <li>
           {item.href && index < items.length - 1 ? (
-            <a href={item.href}>{item.label}</a>
+            <SmartLink href={item.href}>{item.label}</SmartLink>
           ) : (
             <span aria-current="page">{item.label}</span>
           )}
@@ -44,8 +46,7 @@ const { items } = Astro.props;
     align-items: center;
   }
 
-  .breadcrumb a,
-  .breadcrumb span {
+  .breadcrumb :is(a, span) {
     display: inline-flex;
     align-items: center;
     min-height: var(--tap-size);

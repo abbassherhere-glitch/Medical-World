@@ -4,6 +4,7 @@
  * Leave out `professions` to show the state list only (for side panels).
  */
 import { US_STATES, slugify } from '../data/states';
+import { isLive } from '../data/routes';
 
 interface Props {
   /** A unique prefix for the field ids on this page. */
@@ -15,6 +16,14 @@ interface Props {
 }
 
 const { id, professions, profession, layout = 'row' } = Astro.props;
+
+// Offer only states whose page is published, so the picker never leads to a
+// missing page. (With more than one profession this uses the first one; the
+// list will need to follow the chosen profession once a second one is added.)
+const target = profession ?? professions?.[0]?.slug ?? '';
+const states = (
+  await Promise.all(US_STATES.map(async (name) => ({ name, slug: slugify(name), live: await isLive(`/${target}/${slugify(name)}/`) })))
+).filter((state) => state.live);
 ---
 
 <form
@@ -41,7 +50,7 @@ const { id, professions, profession, layout = 'row' } = Astro.props;
     <label for={`${id}-state`}>State</label>
     <select id={`${id}-state`} name="state" class="select" required>
       <option value="" selected disabled>Choose a state</option>
-      {US_STATES.map((state) => <option value={slugify(state)}>{state}</option>)}
+      {states.map((state) => <option value={state.slug}>{state.name}</option>)}
     </select>
   </div>
   <button type="submit" class="button button--action picker__button">Find schools</button>

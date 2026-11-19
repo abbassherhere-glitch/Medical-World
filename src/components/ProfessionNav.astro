@@ -1,5 +1,7 @@
 ---
 /** The menu bar for one profession, shown under the site header on guide pages. */
+import SmartLink from './SmartLink.astro';
+
 interface Props {
   name: string;
   items: { key: string; label: string; href: string }[];
@@ -29,9 +31,9 @@ const menuId = 'profession-menu';
       {
         items.map((item) => (
           <li>
-            <a href={item.href} aria-current={item.key === active ? 'page' : undefined}>
+            <SmartLink href={item.href} aria-current={item.key === active ? 'page' : undefined}>
               {item.label}
-            </a>
+            </SmartLink>
           </li>
         ))
       }
@@ -69,7 +71,7 @@ const menuId = 'profession-menu';
     padding: 0;
   }
 
-  .profession-nav__list a {
+  .profession-nav__list :is(a, .link-pending) {
     display: inline-flex;
     align-items: center;
     min-height: 48px;
@@ -128,7 +130,7 @@ const menuId = 'profession-menu';
       border-top: 1px solid var(--color-border);
     }
 
-    .profession-nav__list a {
+    .profession-nav__list :is(a, .link-pending) {
       display: flex;
       font-size: var(--text-base);
     }

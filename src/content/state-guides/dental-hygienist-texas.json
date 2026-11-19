@@ -6,24 +6,21 @@
   "description": "Dental hygienist pay in Texas, pay by city, the steps to get licensed in Texas and accredited dental hygiene schools in the state.",
   "heading": "Dental hygienist pay, schools and license in Texas",
   "byline": {
-    "author": { "name": "[AUTHOR NAME]" },
-    "reviewer": { "name": "[REVIEWER NAME, QUALIFICATION]" },
+    "author": {
+      "name": "[AUTHOR NAME]"
+    },
+    "reviewer": {
+      "name": "[REVIEWER NAME, QUALIFICATION]"
+    },
     "lastChecked": "[DATE]",
     "sourceNote": "Sources are listed at the end of the page."
   },
   "takeaways": [
-    "[Texas median pay, compared with the national $98,100.]",
     "[The Texas licensing steps in one sentence, from the state board.]",
     "[Number of accredited programs in Texas and typical length.]"
   ],
   "pay": {
-    "heading": "Pay in Texas",
-    "stats": [
-      { "label": "Texas, per year", "value": "[STATE FIGURE]" },
-      { "label": "Texas, per hour", "value": "[STATE FIGURE]" },
-      { "label": "US, per year", "value": "$98,100" }
-    ],
-    "summary": "[One or two sentences comparing Texas pay with the national figure and with living costs, written from the data.]"
+    "heading": "Pay in Texas"
   },
   "image": {
     "alt": "A dental hygienist at work",
@@ -31,56 +28,114 @@
   },
   "cityPay": {
     "heading": "Pay by city",
-    "columns": ["Area", "Median per year", "Median per hour"],
-    "rows": [
-      ["[CITY OR METRO AREA]", "[CITY FIGURE]", "[CITY FIGURE]"],
-      ["[CITY OR METRO AREA]", "[CITY FIGURE]", "[CITY FIGURE]"],
-      ["[CITY OR METRO AREA]", "[CITY FIGURE]", "[CITY FIGURE]"],
-      ["[CITY OR METRO AREA]", "[CITY FIGURE]", "[CITY FIGURE]"]
-    ]
+    "intro": "Median pay in each metropolitan area in Texas, and in the state's rural (nonmetropolitan) regions, from highest to lowest. Areas that cross a state line are included."
   },
   "licensing": {
     "heading": "Getting licensed in Texas",
     "intro": "[Introduction to the Texas licensing process, written from the state dental board's own rules.]",
     "steps": [
-      { "title": "Education.", "text": "[Texas requirement, from the state board.]" },
-      { "title": "National board exam.", "text": "[Texas requirement, from the state board.]" },
-      { "title": "Clinical exam.", "text": "[Texas requirement, from the state board.]" },
-      { "title": "Application and fees.", "text": "[Texas fee and process, from the state board.]" },
-      { "title": "Renewal.", "text": "[Texas renewal period and continuing education, from the state board.]" }
+      {
+        "title": "Education.",
+        "text": "[Texas requirement, from the state board.]"
+      },
+      {
+        "title": "National board exam.",
+        "text": "[Texas requirement, from the state board.]"
+      },
+      {
+        "title": "Clinical exam.",
+        "text": "[Texas requirement, from the state board.]"
+      },
+      {
+        "title": "Application and fees.",
+        "text": "[Texas fee and process, from the state board.]"
+      },
+      {
+        "title": "Renewal.",
+        "text": "[Texas renewal period and continuing education, from the state board.]"
+      }
     ]
   },
   "schools": {
     "heading": "Dental hygiene schools in Texas",
-    "columns": ["School", "City", "Award", "Length"],
+    "columns": [
+      "School",
+      "City",
+      "Award",
+      "Length"
+    ],
     "rows": [
-      { "name": "[SCHOOL NAME]", "city": "[CITY]", "award": "[AWARD]", "length": "[LENGTH]" },
-      { "name": "[SCHOOL NAME]", "city": "[CITY]", "award": "[AWARD]", "length": "[LENGTH]" },
-      { "name": "[SCHOOL NAME]", "city": "[CITY]", "award": "[AWARD]", "length": "[LENGTH]", "sponsored": true },
-      { "name": "[SCHOOL NAME]", "city": "[CITY]", "award": "[AWARD]", "length": "[LENGTH]" }
+      {
+        "name": "[SCHOOL NAME]",
+        "city": "[CITY]",
+        "award": "[AWARD]",
+        "length": "[LENGTH]"
+      },
+      {
+        "name": "[SCHOOL NAME]",
+        "city": "[CITY]",
+        "award": "[AWARD]",
+        "length": "[LENGTH]"
+      },
+      {
+        "name": "[SCHOOL NAME]",
+        "city": "[CITY]",
+        "award": "[AWARD]",
+        "length": "[LENGTH]",
+        "sponsored": true
+      },
+      {
+        "name": "[SCHOOL NAME]",
+        "city": "[CITY]",
+        "award": "[AWARD]",
+        "length": "[LENGTH]"
+      }
     ],
     "note": "Only accredited programs are listed. Any school that pays to be featured is marked \"Sponsored\"."
   },
-  "sources": [
-    "US Bureau of Labor Statistics, Occupational Employment and Wage Statistics, [RELEASE DATE]",
+  "otherSources": [
     "[Texas state dental board, page and date checked]",
     "[Accrediting body's program list, date checked]"
   ],
   "compare": {
     "heading": "Compare Texas programs",
     "text": "See entry requirements and start dates for accredited schools.",
-    "button": { "label": "Find schools", "href": "#schools" },
+    "button": {
+      "label": "Find schools",
+      "href": "#schools"
+    },
     "note": "Schools that pay to be featured are marked \"Sponsored\"."
   },
   "nearbyStates": [
-    { "label": "Oklahoma", "href": "/dental-hygienist/oklahoma/" },
-    { "label": "Louisiana", "href": "/dental-hygienist/louisiana/" },
-    { "label": "New Mexico", "href": "/dental-hygienist/new-mexico/" },
-    { "label": "Arkansas", "href": "/dental-hygienist/arkansas/" }
+    {
+      "label": "Oklahoma",
+      "href": "/dental-hygienist/oklahoma/"
+    },
+    {
+      "label": "Louisiana",
+      "href": "/dental-hygienist/louisiana/"
+    },
+    {
+      "label": "New Mexico",
+      "href": "/dental-hygienist/new-mexico/"
+    },
+    {
+      "label": "Arkansas",
+      "href": "/dental-hygienist/arkansas/"
+    }
   ],
   "nationalGuides": [
-    { "label": "Dental hygienist salary in the US", "href": "/dental-hygienist/salary/" },
-    { "label": "How to become a dental hygienist", "href": "/dental-hygienist/how-to-become/" },
-    { "label": "The national board exam explained", "href": "/dental-hygienist/board-exam/" }
+    {
+      "label": "Dental hygienist salary in the US",
+      "href": "/dental-hygienist/salary/"
+    },
+    {
+      "label": "How to become a dental hygienist",
+      "href": "/dental-hygienist/how-to-become/"
+    },
+    {
+      "label": "The national board exam explained",
+      "href": "/dental-hygienist/board-exam/"
+    }
   ]
 }

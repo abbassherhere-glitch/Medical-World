@@ -13,7 +13,9 @@
     "check": "astro check",
     "lint": "eslint .",
     "wording": "node scripts/check-wording.mjs",
-    "verify": "npm run wording && npm run check && npm run lint && npm run build"
+    "verify": "npm run wording && npm run check && npm run lint && npm test && npm run build",
+    "import-pay": "node scripts/import-pay/import.ts",
+    "test": "node --test \"scripts/**/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
     "astro": "^7.4.13"

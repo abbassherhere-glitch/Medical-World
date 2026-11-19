@@ -222,7 +222,7 @@ select {
   padding: 0;
 }
 
-.link-list a {
+.link-list :is(a, .link-pending) {
   display: flex;
   align-items: center;
   min-height: var(--tap-size);
@@ -261,4 +261,9 @@ select {
   border-left: 4px solid var(--color-accent);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   font-size: var(--text-md);
+}
+
+/* Text of a link whose page is not published yet (see SmartLink). */
+.link-pending {
+  color: inherit;
 }

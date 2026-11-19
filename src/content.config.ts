@@ -32,16 +32,25 @@ const byline = z.object({
   sourceNote: z.string(),
 });
 
-const tableRow = z.array(z.string());
-
 const professions = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/professions' }),
   schema: z.object({
     name: z.string(),
     /** Profession menu bar, in order. `key` marks the active item on each page. */
     menu: z.array(link.extend({ key: z.string() })),
-    figures: z.array(figure),
-    figuresSource: z.string(),
+    /** Plural form used in sentences, for example "dental hygienists". */
+    namePlural: z.string(),
+    /**
+     * Figures from the Occupational Outlook Handbook (a different publication
+     * from the wage survey). Each is shown with this source and never mixed
+     * with wage survey figures in one sentence.
+     */
+    outlook: z.object({
+      source: z.string(),
+      jobs: figure,
+      growth: figure,
+      entry: z.string(),
+    }),
     featured: z.object({
       eyebrow: z.string(),
       heading: z.string(),
@@ -76,24 +85,27 @@ const salaryGuides = defineCollection({
     heading: z.string(),
     breadcrumb: z.string(),
     byline,
-    summary: z.string(),
-    stats: z.array(figure),
-    payRange: z.object({ low: z.string(), median: z.string(), high: z.string() }),
-    takeaways: z.array(z.string()),
+    /** Takeaways from the Occupational Outlook Handbook, shown after those worked out from the wage data. */
+    outlookTakeaways: z.array(z.string()),
     image,
-    payByState: z.object({
-      heading: z.string(),
-      intro: z.string(),
-      columns: z.array(z.string()),
-      rows: z.array(z.object({ state: z.string(), href: z.string().optional(), values: tableRow })),
-      more: link,
-    }),
+    payByState: z.object({ heading: z.string(), intro: z.string() }),
     factors: z.object({
       heading: z.string(),
       items: z.array(z.object({ title: z.string(), text: z.string() })),
     }),
-    faqs: z.array(z.object({ question: z.string(), answer: z.string() })),
-    sources: z.array(z.string()),
+    /**
+     * Common questions. Set `answerFrom` to have the answer worked out from the
+     * pay data instead of written by hand.
+     */
+    faqs: z.array(
+      z.object({
+        question: z.string(),
+        answer: z.string().optional(),
+        answerFrom: z.enum(['hourly-median', 'highest-state', 'lower-pay']).optional(),
+      }),
+    ),
+    /** Sources other than the wage survey, which is added automatically. */
+    otherSources: z.array(z.string()),
     schoolFinder: z.object({ heading: z.string(), note: z.string() }),
     related: z.array(link),
   }),
@@ -109,14 +121,11 @@ const stateGuides = defineCollection({
     description: z.string(),
     heading: z.string(),
     byline,
+    /** Takeaways not about pay. A pay takeaway worked out from the data is added first. */
     takeaways: z.array(z.string()),
-    pay: z.object({ heading: z.string(), stats: z.array(figure), summary: z.string() }),
+    pay: z.object({ heading: z.string() }),
     image,
-    cityPay: z.object({
-      heading: z.string(),
-      columns: z.array(z.string()),
-      rows: z.array(tableRow),
-    }),
+    cityPay: z.object({ heading: z.string(), intro: z.string() }),
     licensing: z.object({
       heading: z.string(),
       intro: z.string(),
@@ -137,7 +146,8 @@ const stateGuides = defineCollection({
       ),
       note: z.string(),
     }),
-    sources: z.array(z.string()),
+    /** Sources other than the wage survey, which is added automatically. */
+    otherSources: z.array(z.string()),
     compare: z.object({ heading: z.string(), text: z.string(), button: link, note: z.string() }),
     nearbyStates: z.array(link),
     nationalGuides: z.array(link),
