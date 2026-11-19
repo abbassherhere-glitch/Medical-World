@@ -357,11 +357,14 @@ territories have no pages on this site.
 **Short names.** Titles and headings use a short name, such as "Houston, TX".
 They are kept in `src/data/area-names.json`, next to each official name. Each
 short name is the first principal city, as written in the official name, plus
-the state part. City names with a hyphen (Winston-Salem, Wilkes-Barre,
-Nashville-Davidson) and consolidated city names (Athens-Clarke County,
-Augusta-Richmond County, Macon-Bibb County, Lexington-Fayette) are kept whole.
-To change one, edit `short` there; never change `name`. The build stops if
-two areas share a short name or a name does not match the pay data.
+the first state code only: "New York, NY" for New York-Newark-Jersey City,
+NY-NJ. Consolidated city names use the plain city name ("Nashville, TN",
+"Louisville, KY", "Lexington, KY", "Athens, GA", "Augusta, GA", "Macon, GA").
+Winston-Salem keeps its hyphen. The full official name, with every state, is
+shown directly under the heading on each area page, and the comparisons name
+every state the area covers. To change a short name, edit `short` there;
+never change `name`. The build stops if two areas share a short name or a
+name does not match the pay data.
 
 **Switching an area page on or off.** `src/content/area-pages/dental-hygienist.json`
 lists every area page with a switch, in the same way as the state pages:

@@ -32,21 +32,37 @@ test('the real files match: every area has a unique short name and a unique, saf
   assert.equal(houston.short, 'Houston, TX');
 });
 
-test('an area that crosses state lines has one page, with every state in its short name', () => {
+test('an area that crosses state lines has one page; its short name uses the first state only', () => {
   const pages = buildAreaPages('dental-hygienist', real, names, switches);
   const dc = pages.filter((p) => p.area.name === 'Washington-Arlington-Alexandria, DC-VA-MD-WV');
   assert.equal(dc.length, 1);
-  assert.equal(dc[0]!.short, 'Washington, DC-VA-MD-WV');
+  assert.equal(dc[0]!.short, 'Washington, DC');
   assert.deepEqual(dc[0]!.area.states, ['DC', 'VA', 'MD', 'WV']);
 });
 
-test('city names with hyphens are kept whole in short names', () => {
-  const short = (name: string) => names.find((n) => n.name === name)?.short;
+const short = (name: string) => names.find((n) => n.name === name)?.short;
+
+test('Winston-Salem keeps its hyphen; consolidated city names use the plain city', () => {
   assert.equal(short('Winston-Salem, NC'), 'Winston-Salem, NC');
   assert.equal(short('Scranton--Wilkes-Barre, PA'), 'Scranton, PA');
-  assert.equal(short('Nashville-Davidson--Murfreesboro--Franklin, TN'), 'Nashville-Davidson, TN');
-  assert.equal(short('Lexington-Fayette, KY'), 'Lexington-Fayette, KY');
-  assert.equal(short('Athens-Clarke County, GA'), 'Athens-Clarke County, GA');
+  assert.equal(short('Nashville-Davidson--Murfreesboro--Franklin, TN'), 'Nashville, TN');
+  assert.equal(short('Louisville/Jefferson County, KY-IN'), 'Louisville, KY');
+  assert.equal(short('Lexington-Fayette, KY'), 'Lexington, KY');
+  assert.equal(short('Athens-Clarke County, GA'), 'Athens, GA');
+  assert.equal(short('Augusta-Richmond County, GA-SC'), 'Augusta, GA');
+  assert.equal(short('Macon-Bibb County, GA'), 'Macon, GA');
+});
+
+test('short names of areas that cross state lines use the first state code only', () => {
+  assert.equal(short('New York-Newark-Jersey City, NY-NJ'), 'New York, NY');
+  assert.equal(short('Chicago-Naperville-Elgin, IL-IN'), 'Chicago, IL');
+  assert.equal(short('Kansas City, MO-KS'), 'Kansas City, MO');
+  assert.equal(short('Philadelphia-Camden-Wilmington, PA-NJ-DE-MD'), 'Philadelphia, PA');
+  for (const n of names) {
+    const states = n.name.slice(n.name.lastIndexOf(', ') + 2).split('-');
+    assert.match(n.short, /, [A-Z]{2}$/, `${n.short} should end in one state code`);
+    assert.equal(n.short.slice(-2), states[0], `${n.short} should use the first state of ${n.name}`);
+  }
 });
 
 test('addresses are made from the official name', () => {
