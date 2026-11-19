@@ -28,3 +28,5 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Links
+        run: npm run check-links
