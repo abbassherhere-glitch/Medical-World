@@ -8,16 +8,18 @@ interface Props {
   states: readonly string[];
   /** Optional last item, for example a link to all states. */
   more?: { label: string; href: string };
+  /** Optional section of each state page to link to, for example "licensing". */
+  section?: string;
 }
 
-const { profession, states, more } = Astro.props;
+const { profession, states, more, section } = Astro.props;
 ---
 
 <ul class="state-grid">
   {
     states.map((state) => (
       <li>
-        <SmartLink href={`/${profession}/${slugify(state)}/`}>{state}</SmartLink>
+        <SmartLink href={`/${profession}/${slugify(state)}/${section ? `#${section}` : ''}`}>{state}</SmartLink>
       </li>
     ))
   }

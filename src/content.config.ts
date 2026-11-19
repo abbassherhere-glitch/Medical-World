@@ -181,6 +181,34 @@ const statePages = defineCollection({
   }),
 });
 
+/** "How to become one" guide for a profession, for example /dental-hygienist/how-to-become/. */
+const becomeGuides = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/become-guides' }),
+  schema: z.object({
+    profession: reference('professions'),
+    title: z.string(),
+    description: z.string(),
+    heading: z.string(),
+    breadcrumb: z.string(),
+    byline,
+    intro: z.string(),
+    takeaways: z.array(z.string()),
+    steps: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        paragraphs: z.array(z.string()),
+        /** Text of the link to the state pages for this step's state rules. */
+        stateLink: z.string(),
+      }),
+    ),
+    statesHeading: z.string(),
+    statesIntro: z.string(),
+    otherSources: z.array(z.string()),
+    related: z.array(link),
+  }),
+});
+
 const pages = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/pages' }),
   schema: z.object({
@@ -191,4 +219,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, statePages, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, pages };

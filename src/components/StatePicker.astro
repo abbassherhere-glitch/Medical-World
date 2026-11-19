@@ -13,9 +13,11 @@ interface Props {
   /** Used when the profession list is not shown. */
   profession?: string;
   layout?: 'row' | 'column';
+  /** Button text. Default: "Find schools". */
+  buttonLabel?: string;
 }
 
-const { id, professions, profession, layout = 'row' } = Astro.props;
+const { id, professions, profession, layout = 'row', buttonLabel = 'Find schools' } = Astro.props;
 
 // Offer only states whose page is published, so the picker never leads to a
 // missing page. (With more than one profession this uses the first one; the
@@ -53,7 +55,7 @@ const states = (
       {states.map((state) => <option value={state.slug}>{state.name}</option>)}
     </select>
   </div>
-  <button type="submit" class="button button--action picker__button">Find schools</button>
+  <button type="submit" class="button button--action picker__button">{buttonLabel}</button>
 </form>
 
 <script>
