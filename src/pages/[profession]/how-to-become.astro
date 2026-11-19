@@ -6,6 +6,8 @@ import KeyTakeaways from '../../components/KeyTakeaways.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import StateGrid from '../../components/StateGrid.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
+import UpNext from '../../components/UpNext.astro';
+import { upNext } from '../../data/up-next';
 import AdSlot from '../../components/AdSlot.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import StatePicker from '../../components/StatePicker.astro';
@@ -76,6 +78,7 @@ const contents = [
   </section>
 
   <SourcesBox items={guide.otherSources} />
+  <UpNext steps={upNext('become', slug, profession.data.name)} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="find-state">

@@ -1,0 +1,91 @@
+---
+/**
+ * "Up next": one or two clearly chosen next steps at the end of a guide.
+ * Give the choices in order of preference; only pages that exist are shown,
+ * and the block is left out if none do.
+ */
+import { liveLinks } from '../data/routes';
+
+interface Props {
+  steps: { label: string; href: string; text: string }[];
+}
+
+const { steps: allSteps } = Astro.props;
+const steps = (await liveLinks(allSteps)).slice(0, 2);
+---
+
+{
+  steps.length > 0 && (
+    <nav class="up-next" aria-labelledby="up-next-title" data-pagefind-ignore>
+      <h2 id="up-next-title" class="up-next__title">Up next</h2>
+      <ul class="up-next__list">
+        {steps.map((step) => (
+          <li>
+            <a class="up-next__card" href={step.href}>
+              <span class="up-next__label">{step.label}</span>
+              <span class="up-next__text">{step.text}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .up-next {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .up-next__title {
+    font-size: 1.3rem;
+  }
+
+  .up-next__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .up-next__list li {
+    display: flex;
+  }
+
+  .up-next__card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-5);
+    color: var(--color-text);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+  }
+
+  .up-next__card:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+  }
+
+  .up-next__label {
+    font-size: 1.1rem;
+    font-weight: var(--weight-black);
+    color: var(--color-accent);
+  }
+
+  .up-next__card:hover .up-next__label {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+  }
+
+  .up-next__text {
+    font-size: var(--text-md);
+    color: var(--color-text-secondary);
+  }
+</style>

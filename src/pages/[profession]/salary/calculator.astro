@@ -12,6 +12,8 @@ import StateGrid from '../../../components/StateGrid.astro';
 import LinkPanel from '../../../components/LinkPanel.astro';
 import AdSlot from '../../../components/AdSlot.astro';
 import SourcesBox from '../../../components/SourcesBox.astro';
+import UpNext from '../../../components/UpNext.astro';
+import { upNext } from '../../../data/up-next';
 import { getPublishedStatePages } from '../../../data/state-pages';
 import { STATES_AND_DC } from '../../../data/states';
 import { formatAnnual, getPayData, releaseName } from '../../../lib/pay';
@@ -127,6 +129,7 @@ const description = `Compare ${plural}' pay in any state or area with the US med
   </section>
 
   <SourcesBox items={[`${pay.release.publisher}, ${release}`]} />
+  <UpNext steps={upNext('calculator', slug, profession.data.name)} />
 
   <Fragment slot="aside">
     <AdSlot size="sidebar" id="calculator-side-1" />

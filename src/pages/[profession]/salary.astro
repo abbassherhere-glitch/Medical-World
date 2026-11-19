@@ -10,6 +10,8 @@ import ImageSlot from '../../components/ImageSlot.astro';
 import PayByStateTable from '../../components/PayByStateTable.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
+import UpNext from '../../components/UpNext.astro';
+import { upNext } from '../../data/up-next';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
@@ -156,6 +158,7 @@ const contents = [
 
   <FaqList id="common-questions" heading="Common questions" items={faqs} />
   <SourcesBox items={sources} />
+  <UpNext steps={upNext('salary', professionSlug, profession.data.name)} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="find-schools">
