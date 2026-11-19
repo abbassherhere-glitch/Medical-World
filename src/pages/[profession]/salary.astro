@@ -30,6 +30,7 @@ import {
 } from '../../lib/pay';
 import { capitalize, highestAndLowest, joinNames, medianInWords, rankByMedian } from '../../lib/pay/summary';
 import { inlineMarkup } from '../../lib/text';
+import { salaryTitle } from '../../lib/pay/salary-wording';
 
 export async function getStaticPaths() {
   const guides = await getCollection('salaryGuides');
@@ -55,13 +56,15 @@ const survey = surveyPhrase(pay);
 const topState = rankByMedian(states.filter((s) => s.kind === 'state'))[0];
 
 const median = medianInWords(national);
-const summary = `${capitalize(plural)} in the US earn a median of **${median}**, according to ${survey}.`;
+const summary = `The median salary for ${plural} in the US is **${median}**, according to ${survey}.`;
+const title = salaryTitle(profession.data.name, 'the US', national);
+const description = `The median ${profession.data.name.toLowerCase()} salary in the US is ${formatAnnual(national.annual.median)} a year (${formatHourly(national.hourly.median)} an hour), from ${survey}. The salary range and the salary in every state.`;
 
 const listRanked = (items: { name: string; median: number }[]) =>
   `${joinNames(items.map((s) => s.name))} (${formatAnnual(items[0]!.median)})`;
 
 const takeaways = [
-  `The national median pay is ${median} (${release}).`,
+  `The national median salary is ${median} (${release}).`,
   ...(extremes
     ? [
         `By median yearly pay, the highest pay is in ${listRanked(extremes.highest)}${
@@ -106,8 +109,8 @@ const contents = [
 ---
 
 <GuideLayout
-  title={data.title}
-  description={data.description}
+  title={title}
+  description={description}
   heading={data.heading}
   profession={profession.data}
   activeMenu="salary"
@@ -135,9 +138,9 @@ const contents = [
   <PayPeriodsTable id="pay-periods" place="the United States" figures={national} source={`${pay.release.publisher}, ${release}`} />
   <CalculatorLink
     profession={professionSlug}
-    heading="Compare pay in your state"
-    text="Choose a state or an area, see pay per hour, week, month or year, and compare two places side by side."
-    label="Open the pay calculator"
+    heading="Compare salaries in your state"
+    text="Choose a state or an area, see the salary per hour, week, month or year, and compare two places side by side."
+    label="Open the salary calculator"
   />
   <TableOfContents items={contents} />
   <ImageSlot {...data.image} />

@@ -18,7 +18,7 @@ import OutlookByStateTable from '../../components/OutlookByStateTable.astro';
 import { getOutlook } from '../../lib/outlook';
 import { STATES_AND_DC } from '../../data/states';
 import { formatAnnual, getPayData, releaseName, statesAndDc, surveyPhrase } from '../../lib/pay';
-import { capitalize, highestAndLowest, joinNames, medianInWords } from '../../lib/pay/summary';
+import { highestAndLowest, joinNames, medianInWords } from '../../lib/pay/summary';
 
 export async function getStaticPaths() {
   const professions = await getCollection('professions');
@@ -38,7 +38,7 @@ const states = STATES_AND_DC;
 
 const median = medianInWords(pay.national);
 const paySummary = [
-  `${capitalize(plural)} in the US earn a median of ${median}, according to ${surveyPhrase(pay)}.`,
+  `The median salary for ${plural} in the US is ${median}, according to ${surveyPhrase(pay)}.`,
   extremes
     ? `By median yearly pay, the highest pay is in ${joinNames(extremes.highest.map((s) => s.name))} (${formatAnnual(extremes.highest[0]!.median)}) and the lowest is in ${joinNames(extremes.lowest.map((s) => s.name))} (${formatAnnual(extremes.lowest[0]!.median)}).`
     : '',
@@ -46,8 +46,8 @@ const paySummary = [
   .filter(Boolean)
   .join(' ');
 
-const title = `${profession.name}: pay, training and license by state`;
-const description = `${capitalize(plural)} in the US earn a median of ${formatAnnual(pay.national.annual.median)} a year (${release}). How to become one, and pay and licensing in every state.`;
+const title = `${profession.name}: salary, training and license by state`;
+const description = `The median ${profession.name.toLowerCase()} salary in the US is ${formatAnnual(pay.national.annual.median)} a year (${release}). How to become one, and the salary and licensing in every state.`;
 const outlook = getOutlook(slug);
 const sources = [`${pay.release.publisher}, ${release}`, ...(outlook ? [outlook.source.name] : []), ...overview.otherSources];
 ---

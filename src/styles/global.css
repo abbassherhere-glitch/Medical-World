@@ -268,3 +268,9 @@ select {
 .link-pending {
   color: inherit;
 }
+
+/* The opening sentence of a guide, which answers the page's main question. */
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.55;
+}

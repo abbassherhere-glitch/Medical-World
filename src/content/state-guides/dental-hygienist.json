@@ -1,6 +1,6 @@
 {
   "profession": "dental-hygienist",
-  "heading": "Dental hygienist pay, schools and license in {state}",
+  "heading": "Dental hygienist salary in {state}",
   "byline": {
     "author": {
       "name": "[AUTHOR NAME]"
@@ -15,15 +15,15 @@
     "[Licensing steps in {state} in one sentence, from the state board.]"
   ],
   "pay": {
-    "heading": "Pay in {state}"
+    "heading": "Salary in {state}"
   },
   "image": {
     "alt": "A dental hygienist at work",
     "placeholder": "Photo of a dental hygienist at work [YOUR IMAGE]"
   },
   "cityPay": {
-    "heading": "Pay by city",
-    "intro": "Median pay in each metropolitan area in {state}, and in its rural (nonmetropolitan) regions, from highest to lowest. Areas that cross a state line are included."
+    "heading": "Salary by area",
+    "intro": "Median salary in each metropolitan area in {state}, and in its rural (nonmetropolitan) regions, from highest to lowest. Areas that cross a state line are included."
   },
   "licensing": {
     "heading": "Getting licensed in {state}",
@@ -72,7 +72,7 @@
       "href": "/dental-hygienist/salary/"
     },
     {
-      "label": "Dental hygienist pay calculator",
+      "label": "Dental hygienist salary calculator",
       "href": "/dental-hygienist/salary/calculator/"
     },
     {

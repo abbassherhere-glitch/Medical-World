@@ -95,8 +95,6 @@ const salaryGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/salary-guides' }),
   schema: z.object({
     profession: reference('professions'),
-    title: z.string(),
-    description: z.string(),
     heading: z.string(),
     breadcrumb: z.string(),
     byline,
