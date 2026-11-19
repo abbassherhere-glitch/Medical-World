@@ -31,6 +31,8 @@ a placeholder waiting for a real value.
 | Common questions on state pages | `src/lib/pay/state-questions.ts` |
 | Pay figures (made by the import, do not edit by hand) | `src/data/pay/` |
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
+| Job outlook figures (made by the import, do not edit by hand) | `src/data/outlook/` |
+| Your changes to single job outlook figures | `src/data/outlook/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
 | Standard pages (About, Privacy and so on) | `src/content/pages/` (one Markdown file each) |
 | Colors, sizes and spacing | `src/styles/tokens.css` |
@@ -138,6 +140,51 @@ release does not match.
 **Adding a profession.** Add one line to `scripts/import-pay/config.ts` with
 the profession's page name and its official occupation code, then run the
 import again.
+
+## Updating job outlook figures
+
+The job outlook comes from the official state projections: Projections
+Central, State Occupational Projections, long-term projections (currently
+2024 to 2034), sponsored by the US Department of Labor. To update it:
+
+1. Put the new state projections CSV in `data/source/`. Its name must contain
+   "projections" and end in `.csv`, for example
+   `state-projections-2024-2034-dental-hygienists.csv`. It needs the columns
+   `state_fips, area, occupation_code, occupation_title, base_year,
+   projected_year, base_employment, projected_employment, percent_change,
+   average_annual_openings`.
+2. Run:
+
+   ```bash
+   npm run import-outlook
+   ```
+
+   (`npm run import-pay` also runs it.) States are matched by FIPS code. It
+   writes `src/data/outlook/dental-hygienist.json` and prints the national
+   figures and any states the file leaves out.
+3. Run `npm run verify`, check the pages, and commit the changed file.
+
+The percent change is shown exactly as the source publishes it. The source
+rounds job counts, so the percent change may not match the rounded counts
+exactly (for example, Rhode Island goes from 860 to 860 jobs but +0.6%).
+
+**Two different national figures.** The site shows two national job figures
+and never mixes them:
+
+- the US Bureau of Labor Statistics, Occupational Outlook Handbook: 225,300
+  jobs in 2025 and 8% growth from 2025 to 2035 (home, overview, all
+  professions and salaries pages, labelled "Occupational Outlook Handbook");
+- the state projections' national row: 221,600 jobs in 2024, 237,200
+  projected for 2034, 7% growth (job outlook sections, labelled with the
+  projections source). State growth is always compared with this one.
+
+The pay survey's own job count (222,740, May 2025) is a third figure, labelled
+"wage survey". The three are never added or compared with each other.
+
+To change a single outlook figure, use `src/data/outlook/overrides.json` in
+the same way as the pay overrides below. `figure` is one of `baseJobs`,
+`projectedJobs`, `percentChange` or `openings`, and `place` is
+`United States` or a state name.
 
 ## Changing a single pay figure
 

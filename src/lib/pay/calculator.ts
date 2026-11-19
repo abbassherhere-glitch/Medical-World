@@ -5,6 +5,8 @@
  */
 import type { PayData, PayFigures, PayPercentiles, PaySymbol, PayValue } from './types.ts';
 import { exactAmount, formatPeriodAmount, PERIODS, payFor, type Period, type PeriodAmount } from './periods.ts';
+import type { OutlookData, OutlookFigures } from '../outlook/types.ts';
+import { formatCount, formatPercentChange, pace } from '../outlook/summary.ts';
 
 /** Figures packed into a short list: jobs, then hourly and annual 10th, 25th, median, 75th and 90th. */
 export type PackedFigures = (number | PaySymbol)[];
@@ -28,6 +30,8 @@ export interface CalculatorData {
   national: PackedFigures;
   states: CalculatorState[];
   areas: Record<string, { name: string; figures: PackedFigures }>;
+  /** Job outlook from the state projections, if available. */
+  outlook?: CalculatorOutlook;
 }
 
 const packValue = (value: PayValue): number | PaySymbol => (typeof value === 'number' ? value : value.symbol);
@@ -232,4 +236,99 @@ export function snapshot(figures: PayFigures | undefined, base: PayFigures | und
     ? `Pay range: the lowest 10% earn less than ${rows[0]!.value}, half earn less than ${rows[2]!.value}, and the top 10% earn more than ${rows[4]!.value}.`
     : 'Pay range: not available, because one or more figures are not published.';
   return { rows, jobs, comparedWith, bar, barText };
+}
+
+/* ---------- Job outlook in the calculator (from the state projections) ---------- */
+
+/** Outlook packed into a short list: jobs in the base year, projected jobs, percent change, openings a year. */
+export type PackedOutlook = (number | null)[];
+
+export interface CalculatorOutlook {
+  /** The source name to show, for example "Projections Central, …". */
+  source: string;
+  baseYear: number;
+  projectedYear: number;
+  national: PackedOutlook;
+  /** By state slug. States the projections do not cover are absent. */
+  states: Record<string, PackedOutlook>;
+}
+
+export function packOutlook(f: OutlookFigures): PackedOutlook {
+  return [f.baseJobs, f.projectedJobs, f.percentChange, f.openings];
+}
+
+export function unpackOutlook(p: PackedOutlook | undefined): OutlookFigures | undefined {
+  if (!p) return undefined;
+  return { baseJobs: p[0] ?? null, projectedJobs: p[1] ?? null, percentChange: p[2] ?? null, openings: p[3] ?? null };
+}
+
+export function buildCalculatorOutlook(outlook: OutlookData, published: { name: string; slug: string }[]): CalculatorOutlook {
+  const states: Record<string, PackedOutlook> = {};
+  for (const { name, slug } of published) {
+    const place = outlook.places.find((p) => p.name === name);
+    if (place) states[slug] = packOutlook(place.figures);
+  }
+  return {
+    source: outlook.source.name,
+    baseYear: outlook.source.baseYear,
+    projectedYear: outlook.source.projectedYear,
+    national: packOutlook(outlook.national),
+    states,
+  };
+}
+
+export interface OutlookSnapshot {
+  /** For example "Job outlook, 2024 to 2034" or "Job outlook for Texas, 2024 to 2034". */
+  heading: string;
+  jobs: string;
+  growth: string;
+  openings: string;
+  /** For example "Faster than the US (+7%)" or "14.8 percentage points higher than Texas". */
+  comparedWith: string;
+}
+
+/**
+ * The outlook rows of a snapshot card. `base` is what to compare with: the
+ * national figures for the first card, the first card's figures for the
+ * second.
+ */
+export function outlookSnapshot(
+  figures: OutlookFigures | undefined,
+  scope: string,
+  years: { base: number; projected: number },
+  base: { figures: OutlookFigures | undefined; name: string; isNation: boolean } | undefined,
+): OutlookSnapshot {
+  const span = `${years.base} to ${years.projected}`;
+  const heading = scope ? `Job outlook for ${scope}, ${span}` : `Job outlook, ${span}`;
+  if (!figures) {
+    return { heading, jobs: 'Not available', growth: 'Not available', openings: 'Not available', comparedWith: base ? 'Not available' : '–' };
+  }
+  const jobs =
+    figures.baseJobs !== null && figures.projectedJobs !== null
+      ? `${formatCount(figures.baseJobs)} to ${formatCount(figures.projectedJobs)}`
+      : 'Not available';
+  let comparedWith = '–';
+  if (base) {
+    const here = figures.percentChange;
+    const there = base.figures?.percentChange ?? null;
+    if (here === null || there === null) comparedWith = 'Not available';
+    else if (base.isNation) {
+      const p = pace(here, there);
+      comparedWith =
+        p === 'falling'
+          ? `Falling, while the US grows ${formatPercentChange(there)}`
+          : p === 'faster'
+            ? `Faster than the US (${formatPercentChange(there)})`
+            : p === 'slower'
+              ? `Slower than the US (${formatPercentChange(there)})`
+              : `About the same as the US (${formatPercentChange(there)})`;
+    } else {
+      const diff = Math.round((here - there) * 10) / 10;
+      comparedWith =
+        diff === 0
+          ? `The same as ${base.name}`
+          : `${Math.abs(diff)} percentage points ${diff > 0 ? 'higher' : 'lower'} than ${base.name}`;
+    }
+  }
+  return { heading, jobs, growth: formatPercentChange(figures.percentChange), openings: formatCount(figures.openings), comparedWith };
 }

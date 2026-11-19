@@ -14,6 +14,8 @@ import AdSlot from '../../components/AdSlot.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import StatePicker from '../../components/StatePicker.astro';
 import SmartLink from '../../components/SmartLink.astro';
+import OutlookByStateTable from '../../components/OutlookByStateTable.astro';
+import { getOutlook } from '../../lib/outlook';
 import { STATES_AND_DC } from '../../data/states';
 import { formatAnnual, getPayData, releaseName, statesAndDc, surveyPhrase } from '../../lib/pay';
 import { capitalize, highestAndLowest, joinNames, medianInWords } from '../../lib/pay/summary';
@@ -46,7 +48,8 @@ const paySummary = [
 
 const title = `${profession.name}: pay, training and license by state`;
 const description = `${capitalize(plural)} in the US earn a median of ${formatAnnual(pay.national.annual.median)} a year (${release}). How to become one, and pay and licensing in every state.`;
-const sources = [`${pay.release.publisher}, ${release}`, ...overview.otherSources];
+const outlook = getOutlook(slug);
+const sources = [`${pay.release.publisher}, ${release}`, ...(outlook ? [outlook.source.name] : []), ...overview.otherSources];
 ---
 
 <GuideLayout
@@ -81,6 +84,19 @@ const sources = [`${pay.release.publisher}, ${release}`, ...overview.otherSource
   </section>
 
   <AdSlot size="inline" id="overview-content-1" />
+
+  {
+    outlook && (
+      <OutlookByStateTable
+        id="outlook-by-state"
+        profession={slug}
+        plural={plural}
+        data={outlook}
+        statesAndDc={statesAndDc(pay).map((s) => s.name)}
+        separateSourceNote={`These state projections cover ${outlook.source.baseYear} to ${outlook.source.projectedYear}. They come from a different source, and cover a different period, from the national jobs and growth figures near the top of this page.`}
+      />
+    )
+  }
 
   <section class="stack" aria-labelledby="states">
     <h2 id="states" class="section-title" tabindex="-1">{overview.statesHeading}</h2>

@@ -17,7 +17,8 @@
     "import-pay": "node scripts/import-pay/import.ts",
     "test": "node --test \"scripts/**/*.test.ts\" \"src/**/*.test.ts\"",
     "check-links": "node scripts/site/check-links.ts",
-    "placeholders": "node scripts/site/placeholders.ts"
+    "placeholders": "node scripts/site/placeholders.ts",
+    "import-outlook": "node scripts/import-pay/import-outlook.ts"
   },
   "dependencies": {
     "astro": "^7.4.13"

@@ -7,7 +7,8 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { getPublishedStatePages } from '../../../data/state-pages';
 import { getPayData, releaseName } from '../../../lib/pay';
-import { buildCalculatorData } from '../../../lib/pay/calculator';
+import { buildCalculatorData, buildCalculatorOutlook } from '../../../lib/pay/calculator';
+import { getOutlook } from '../../../lib/outlook';
 
 export const getStaticPaths = (async () => {
   const guides = await getCollection('salaryGuides');
@@ -21,5 +22,7 @@ export const GET: APIRoute = async ({ params }) => {
     .filter((p) => p.profession === profession)
     .map((p) => ({ name: p.state, slug: p.slug }));
   const data = buildCalculatorData(pay, published, releaseName(pay));
+  const outlook = getOutlook(profession);
+  if (outlook) data.outlook = buildCalculatorOutlook(outlook, published);
   return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 };

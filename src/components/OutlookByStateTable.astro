@@ -1,0 +1,86 @@
+---
+/**
+ * "Job outlook by state": every state and DC with jobs in the base and
+ * projected years, the percent change and average openings a year, fastest
+ * growth first. From the state projections only.
+ */
+import ScrollTable from './ScrollTable.astro';
+import SmartLink from './SmartLink.astro';
+import { slugify } from '../data/states';
+import {
+  formatCount,
+  formatPercentChange,
+  OPENINGS_NOTE,
+  projectionYears,
+  rankByGrowth,
+  ROUNDING_NOTE,
+  type OutlookData,
+} from '../lib/outlook';
+import { joinNames } from '../lib/pay/summary';
+
+interface Props {
+  id: string;
+  profession: string;
+  /** For example "dental hygienists". */
+  plural: string;
+  data: OutlookData;
+  /** Names of the 50 states and DC; territories are left out of the table. */
+  statesAndDc: string[];
+  /** A sentence pointing out that other national figures on the page come from a different source. */
+  separateSourceNote?: string;
+}
+
+const { id, profession, plural, data, statesAndDc, separateSourceNote } = Astro.props;
+const { baseYear, projectedYear } = data.source;
+const years = projectionYears(data);
+const places = data.places.filter((p) => statesAndDc.includes(p.name));
+const ranked = rankByGrowth(places);
+const rows = [
+  ...ranked.map((r) => places.find((p) => p.name === r.name)!),
+  ...places.filter((p) => p.figures.percentChange === null),
+];
+const fastest = ranked.slice(0, 5);
+const slowest = ranked.slice(-5).reverse();
+const listOf = (items: typeof ranked) => joinNames(items.map((r) => `${r.name} (${formatPercentChange(r.percentChange)})`));
+const us = data.national.percentChange;
+const nationalChange = us === null ? 'are projected to change' : us >= 0 ? `are projected to grow by ${us}%` : `are projected to fall by ${Math.abs(us)}%`;
+const nationalSentence = `Nationally, jobs for ${plural} ${nationalChange} from ${years}, from ${formatCount(data.national.baseJobs)} to ${formatCount(data.national.projectedJobs)}, with an average of ${formatCount(data.national.openings)} openings a year.`;
+const missing = statesAndDc.filter((name) => !data.places.some((p) => p.name === name));
+---
+
+<section class="stack" aria-labelledby={id}>
+  <h2 id={id} class="section-title">Job outlook by state</h2>
+  <p>{nationalSentence}</p>
+  {separateSourceNote && <p class="note">{separateSourceNote}</p>}
+  <p>{`The five fastest growing are ${listOf(fastest)}. The five slowest are ${listOf(slowest)}.`}</p>
+  <ScrollTable
+    caption={`Job outlook for ${plural} by state, ${years}, fastest growth first`}
+    columns={['State', `Jobs ${baseYear}`, `Jobs ${projectedYear}`, 'Percent change', 'Openings a year']}
+    minWidth={600}
+  >
+    {
+      rows.map((place) => (
+        <tr>
+          <th scope="row">
+            <SmartLink href={`/${profession}/${slugify(place.name)}/`}>{place.name}</SmartLink>
+          </th>
+          <td>{formatCount(place.figures.baseJobs)}</td>
+          <td>{formatCount(place.figures.projectedJobs)}</td>
+          <td class="strong">{formatPercentChange(place.figures.percentChange)}</td>
+          <td>{formatCount(place.figures.openings)}</td>
+        </tr>
+      ))
+    }
+  </ScrollTable>
+  <p class="note">
+    {OPENINGS_NOTE} {ROUNDING_NOTE}
+    {missing.length > 0 && ` The projections do not include ${joinNames(missing)}.`}
+  </p>
+  <p class="note">Source: {data.source.name}.</p>
+</section>
+
+<style>
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+</style>

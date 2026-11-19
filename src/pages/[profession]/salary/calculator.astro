@@ -17,7 +17,8 @@ import { upNext } from '../../../data/up-next';
 import { getPublishedStatePages } from '../../../data/state-pages';
 import { STATES_AND_DC } from '../../../data/states';
 import { formatAnnual, getPayData, releaseName } from '../../../lib/pay';
-import { snapshot } from '../../../lib/pay/calculator';
+import { outlookSnapshot, snapshot } from '../../../lib/pay/calculator';
+import { getOutlook, OPENINGS_NOTE, ROUNDING_NOTE } from '../../../lib/outlook';
 import { PERIOD_LABELS, PERIOD_NOTE, PERIODS } from '../../../lib/pay/periods';
 
 export async function getStaticPaths() {
@@ -33,6 +34,9 @@ const release = releaseName(pay);
 const states = (await getPublishedStatePages()).filter((p) => p.profession === slug);
 const national = snapshot(pay.national, undefined, '', 'year');
 const plural = profession.data.namePlural;
+const outlook = getOutlook(slug);
+const outlookYears = outlook ? { base: outlook.source.baseYear, projected: outlook.source.projectedYear } : undefined;
+const nationalOutlook = outlook && outlookYears ? outlookSnapshot(outlook.national, '', outlookYears, undefined) : undefined;
 
 const title = `${profession.data.name} pay calculator: compare pay by state`;
 const description = `Compare ${plural}' pay in any state or area with the US median of ${formatAnnual(pay.national.annual.median)} a year, per hour, week, month or year (${release}).`;
@@ -53,8 +57,8 @@ const description = `Compare ${plural}' pay in any state or area with the US med
   byline={guide.byline}
 >
   <p class="intro">
-    See what {plural} earn in any state, or in an area within it, and compare two places side by side. All figures are
-    official, from the {pay.release.publisher} wage survey.
+    See what {plural} earn in any state, or in an area within it, and compare two places side by side. Pay figures are
+    official, from the {pay.release.publisher} wage survey.{outlook && ' Job outlook figures are official state projections, from a different source; both sources are named below the results.'}
   </p>
 
   <form class="calc-controls js-only" data-calc-form aria-label="Pay calculator choices" action={`/${slug}/salary/calculator/`} method="get" data-pagefind-ignore>
@@ -109,16 +113,24 @@ const description = `Compare ${plural}' pay in any state or area with the US med
 
   <p class="visually-hidden" role="status" aria-live="polite" data-calc-announce></p>
   <div class="calc-results">
-    <SnapshotCard id="a" heading="United States" snap={national} periodLabel={PERIOD_LABELS.year} />
+    <SnapshotCard id="a" heading="United States" snap={national} periodLabel={PERIOD_LABELS.year} outlook={nationalOutlook} />
     <div class="js-only">
-      <SnapshotCard id="b" heading="Compare" snap={national} periodLabel={PERIOD_LABELS.year} emptyMessage="Choose a second state above to compare." />
+      <SnapshotCard id="b" heading="Compare" snap={national} periodLabel={PERIOD_LABELS.year} emptyMessage="Choose a second state above to compare." outlook={nationalOutlook} />
     </div>
   </div>
 
   <p class="calc-notice" data-calc-notice hidden></p>
 
   <p class="note">{PERIOD_NOTE}</p>
-  <p class="note">Source: {pay.release.publisher}, {release}. Reference period: {pay.release.referencePeriod}.</p>
+  <p class="note">Pay source: {pay.release.publisher}, {release}. Reference period: {pay.release.referencePeriod}.</p>
+  {
+    outlook && (
+      <p class="note">
+        Job outlook source: {outlook.source.name}. Projections are published for whole states, so an area shows its state's outlook. {OPENINGS_NOTE}{' '}
+        {ROUNDING_NOTE}
+      </p>
+    )
+  }
 
   <AdSlot size="inline" id="calculator-content-1" />
 
@@ -128,7 +140,7 @@ const description = `Compare ${plural}' pay in any state or area with the US med
     <StateGrid profession={slug} states={STATES_AND_DC} />
   </section>
 
-  <SourcesBox items={[`${pay.release.publisher}, ${release}`]} />
+  <SourcesBox items={[`${pay.release.publisher}, ${release}`, ...(outlook ? [outlook.source.name] : [])]} />
   <UpNext steps={upNext('calculator', slug, profession.data.name)} />
 
   <Fragment slot="aside">

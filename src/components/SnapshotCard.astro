@@ -4,7 +4,7 @@
  * the national figures; the calculator script updates the same fields in
  * place, so the layout does not move.
  */
-import type { Snapshot } from '../lib/pay/calculator';
+import type { OutlookSnapshot, Snapshot } from '../lib/pay/calculator';
 
 interface Props {
   id: 'a' | 'b';
@@ -13,9 +13,11 @@ interface Props {
   periodLabel: string;
   /** Shown instead of figures until a place is chosen (comparison card). */
   emptyMessage?: string;
+  /** Job outlook rows, from the state projections. */
+  outlook?: OutlookSnapshot;
 }
 
-const { id, heading, snap, periodLabel, emptyMessage } = Astro.props;
+const { id, heading, snap, periodLabel, emptyMessage, outlook } = Astro.props;
 ---
 
 <section class="snapshot" data-snapshot={id} aria-labelledby={`snapshot-${id}-title`} data-empty={emptyMessage ? '' : undefined}>
@@ -32,7 +34,7 @@ const { id, heading, snap, periodLabel, emptyMessage } = Astro.props;
       ))
     }
     <div class="snapshot__row">
-      <dt>Jobs</dt>
+      <dt>Jobs (wage survey)</dt>
       <dd data-field="jobs">{snap.jobs}</dd>
     </div>
     <div class="snapshot__row">
@@ -45,6 +47,31 @@ const { id, heading, snap, periodLabel, emptyMessage } = Astro.props;
     <span class="snapshot__marker" style={snap.bar ? `left:${snap.bar.median}%` : 'display:none'}></span>
   </div>
   <p class="snapshot__bar-text note" data-field="bar-text">{snap.barText}</p>
+  {
+    outlook && (
+      <div class="snapshot__outlook">
+        <h3 class="snapshot__subtitle" data-field="outlook-heading">{outlook.heading}</h3>
+        <dl class="snapshot__rows">
+          <div class="snapshot__row">
+            <dt>Jobs (projections)</dt>
+            <dd data-field="outlook-jobs">{outlook.jobs}</dd>
+          </div>
+          <div class="snapshot__row">
+            <dt>Projected growth</dt>
+            <dd data-field="outlook-growth">{outlook.growth}</dd>
+          </div>
+          <div class="snapshot__row">
+            <dt>Average openings a year</dt>
+            <dd data-field="outlook-openings">{outlook.openings}</dd>
+          </div>
+          <div class="snapshot__row">
+            <dt data-field="outlook-compared-label">Growth compared with the US</dt>
+            <dd data-field="outlook-compared">{outlook.comparedWith}</dd>
+          </div>
+        </dl>
+      </div>
+    )
+  }
 </section>
 
 <style>
@@ -140,6 +167,15 @@ const { id, heading, snap, periodLabel, emptyMessage } = Astro.props;
 
   .snapshot__bar-text {
     min-height: 4.5em;
+  }
+
+  .snapshot__subtitle {
+    min-height: 2.6em;
+    font-size: var(--text-base);
+  }
+
+  .snapshot[data-empty] .snapshot__outlook {
+    visibility: hidden;
   }
 
   @media (max-width: 480px) {
