@@ -23,7 +23,7 @@
   },
   "cityPay": {
     "heading": "Salary by area",
-    "intro": "Median salary in each metropolitan area in {state}, and in its rural (nonmetropolitan) regions, from highest to lowest. Areas that cross a state line are included."
+    "intro": "Median salary in each metropolitan area in {state}, and in its rural (nonmetropolitan) regions, from highest to lowest. Areas that cross a state line are included. Select a metropolitan area for its own salary page."
   },
   "licensing": {
     "heading": "Getting licensed in {state}",

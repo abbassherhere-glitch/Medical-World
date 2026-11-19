@@ -6,6 +6,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { getPublishedStatePages } from '../../../data/state-pages';
+import { getPublishedAreaPages } from '../../../data/area-pages';
 import { getPayData, releaseName } from '../../../lib/pay';
 import { buildCalculatorData, buildCalculatorOutlook } from '../../../lib/pay/calculator';
 import { getOutlook } from '../../../lib/outlook';
@@ -21,7 +22,8 @@ export const GET: APIRoute = async ({ params }) => {
   const published = (await getPublishedStatePages())
     .filter((p) => p.profession === profession)
     .map((p) => ({ name: p.state, slug: p.slug }));
-  const data = buildCalculatorData(pay, published, releaseName(pay));
+  const areaPages = new Map((await getPublishedAreaPages(profession)).map((p) => [p.area.code, p.path]));
+  const data = buildCalculatorData(pay, published, releaseName(pay), areaPages);
   const outlook = getOutlook(profession);
   if (outlook) data.outlook = buildCalculatorOutlook(outlook, published);
   return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });

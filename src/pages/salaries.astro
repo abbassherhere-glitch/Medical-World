@@ -16,6 +16,7 @@ const professions = await Promise.all(
     links: await liveLinks([
       { href: `/${p.id}/salary/`, label: `Read the ${p.data.name.toLowerCase()} salary guide` },
       { href: `/${p.id}/salary/calculator/`, label: 'Open the salary calculator' },
+      { href: `/${p.id}/salary/areas/`, label: 'See the salary in every metropolitan area' },
     ]),
   })),
 );
@@ -31,7 +32,7 @@ const firstPay = first ? getPayData(first.slug) : undefined;
       : 'Official salary figures for healthcare jobs, state by state.'
   }
   heading="Salaries"
-  intro="Official salary figures for each profession, nationally and in every state, from the US Bureau of Labor Statistics wage survey."
+  intro="Official salary figures for each profession, nationally, in every state and in each metropolitan area, from the US Bureau of Labor Statistics wage survey."
 >
   {
     professions.map((p) => (

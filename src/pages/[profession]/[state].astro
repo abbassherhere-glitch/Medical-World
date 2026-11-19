@@ -42,6 +42,7 @@ import {
 import { areaSummary, capitalize, ordinal, compareWithNational, placeName, rankByMedian, rankInWords, rankOf } from '../../lib/pay/summary';
 import { fillState } from '../../lib/publishing';
 import { getPublishedStatePages } from '../../data/state-pages';
+import { getPublishedAreaPages } from '../../data/area-pages';
 import { bordersOf } from '../../data/borders';
 import { slugify } from '../../data/states';
 
@@ -78,6 +79,8 @@ const comparison =
   compareWithNational(state, local, national) ??
   `The ${pay.release.referencePeriod} survey has no statewide pay figures for ${plural} in ${where}.`;
 const areas = areasInState(pay, statePay.abbr);
+// Metropolitan areas with their own salary page; nonmetropolitan areas stay as plain rows.
+const areaPath = new Map((await getPublishedAreaPages(professionSlug)).map((p) => [p.area.code, p.path]));
 const areaSentence = areaSummary(state, areas);
 const areaMedians = areas.map((a) => numeric(a.figures.annual.median)).filter((m): m is number => m !== undefined);
 
@@ -270,7 +273,9 @@ const contents = [
         >
           {areas.map((area) => (
             <tr>
-              <th scope="row">{area.name}</th>
+              <th scope="row">
+                {areaPath.has(area.code) ? <SmartLink href={areaPath.get(area.code)!}>{area.name}</SmartLink> : area.name}
+              </th>
               <td class="strong">{formatAnnual(area.figures.annual.median)}</td>
               <td>{formatHourly(area.figures.hourly.median)}</td>
               <td>{formatJobs(area.figures.employment)}</td>

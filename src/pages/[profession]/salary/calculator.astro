@@ -121,6 +121,7 @@ const description = `Compare ${plural}' salaries in any state or area with the U
   </div>
 
   <p class="calc-notice" data-calc-notice hidden></p>
+  <ul class="calc-area-links js-only" data-calc-area-links hidden></ul>
 
   <p class="note">{PERIOD_NOTE}</p>
   <p class="note">Pay source: {pay.release.publisher}, {release}. Reference period: {pay.release.referencePeriod}.</p>
@@ -257,6 +258,21 @@ const description = `Compare ${plural}' salaries in any state or area with the U
 
   .calc-results > .js-only {
     min-width: 0;
+  }
+
+  .calc-area-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .calc-area-links :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   .calc-results > .js-only > :global(.snapshot) {

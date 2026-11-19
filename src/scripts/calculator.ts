@@ -81,6 +81,7 @@ export async function startCalculator(): Promise<void> {
   const cardB = $<HTMLElement>('[data-snapshot="b"]');
   const announce = $<HTMLElement>('[data-calc-announce]');
   const notice = $<HTMLElement>('[data-calc-notice]');
+  const areaLinks = $<HTMLUListElement>('[data-calc-area-links]');
   if (!form || !cardA || !cardB || !announce || !notice) return;
 
   const fields = {
@@ -180,6 +181,24 @@ export async function startCalculator(): Promise<void> {
       cardB.setAttribute('data-empty', '');
       const name = $<HTMLElement>('[data-field="name"]', cardB);
       if (name) name.textContent = 'Compare';
+    }
+
+    // Links to the chosen areas' own salary pages.
+    if (areaLinks) {
+      const chosen = [...new Set([choices.area, choices.compareArea])]
+        .map((code) => (code ? data.areas[code] : undefined))
+        .filter((a): a is NonNullable<typeof a> & { page: string } => !!a?.page);
+      areaLinks.replaceChildren(
+        ...chosen.map((a) => {
+          const item = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = a.page;
+          link.textContent = `Full salary page for ${a.name}`;
+          item.append(link);
+          return item;
+        }),
+      );
+      areaLinks.hidden = chosen.length === 0;
     }
 
     const query = writeChoices(choices);

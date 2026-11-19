@@ -19,6 +19,8 @@ import SourceLine from '../../components/SourceLine.astro';
 import StatePicker from '../../components/StatePicker.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import { settings } from '../../settings';
+import { getPublishedAreaPages } from '../../data/area-pages';
+import SmartLink from '../../components/SmartLink.astro';
 import {
   formatAnnual,
   formatHourly,
@@ -58,7 +60,7 @@ const topState = rankByMedian(states.filter((s) => s.kind === 'state'))[0];
 const median = medianInWords(national);
 const summary = `The median salary for ${plural} in the US is **${median}**, according to ${survey}.`;
 const title = salaryTitle(profession.data.name, 'the US', national);
-const description = `The median ${profession.data.name.toLowerCase()} salary in the US is ${formatAnnual(national.annual.median)} a year (${formatHourly(national.hourly.median)} an hour), from ${survey}. The salary range and the salary in every state.`;
+const description = `The median ${profession.data.name.toLowerCase()} salary in the US is ${formatAnnual(national.annual.median)} a year (${formatHourly(national.hourly.median)} an hour), from ${survey}. The salary range, and the salary in every state and metropolitan area.`;
 
 const listRanked = (items: { name: string; median: number }[]) =>
   `${joinNames(items.map((s) => s.name))} (${formatAnnual(items[0]!.median)})`;
@@ -98,10 +100,12 @@ const faqs = data.faqs.map((faq) => ({
 }));
 
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
+const areaCount = (await getPublishedAreaPages(professionSlug)).length;
 
 const contents = [
   { label: 'Pay per hour, week, month and year', id: 'pay-periods' },
   { label: data.payByState.heading, id: 'pay-by-state' },
+  ...(areaCount > 0 ? [{ label: 'Salary by metropolitan area', id: 'pay-by-area' }] : []),
   { label: data.factors.heading, id: 'what-affects-pay' },
   { label: 'Common questions', id: 'common-questions' },
   { label: 'Sources', id: 'sources' },
@@ -150,6 +154,22 @@ const contents = [
     <p class="muted">{data.payByState.intro}</p>
     <PayByStateTable profession={professionSlug} name={profession.data.name} plural={plural} />
   </section>
+
+  {
+    areaCount > 0 && (
+      <section class="stack" aria-labelledby="pay-by-area">
+        <h2 id="pay-by-area" class="section-title">Salary by metropolitan area</h2>
+        <p>
+          {`The survey also publishes a median salary for ${plural} in ${areaCount} metropolitan areas. Each has its own page with the salary range and how it compares with its state and the US.`}
+        </p>
+        <p>
+          <SmartLink class="more-link" href={`/${professionSlug}/salary/areas/`}>
+            See the salary in every metropolitan area
+          </SmartLink>
+        </p>
+      </section>
+    )
+  }
 
   <AdSlot size="inline" id="salary-content-1" />
 
