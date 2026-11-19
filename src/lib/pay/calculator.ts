@@ -4,7 +4,7 @@
  * browser, so it uses no site-building code.
  */
 import type { PayData, PayFigures, PayPercentiles, PaySymbol, PayValue } from './types.ts';
-import { exactAmount, PERIODS, payFor, type Period, type PeriodAmount } from './periods.ts';
+import { exactAmount, formatPeriodAmount, PERIODS, payFor, type Period, type PeriodAmount } from './periods.ts';
 
 /** Figures packed into a short list: jobs, then hourly and annual 10th, 25th, median, 75th and 90th. */
 export type PackedFigures = (number | PaySymbol)[];
@@ -179,4 +179,57 @@ export function writeChoices(choices: Omit<Choices, 'ignored'>): string {
   if (choices.period !== 'year') params.set(PARAMS.period, choices.period);
   const query = params.toString();
   return query ? `?${query}` : '';
+}
+
+/* ---------- What a "pay snapshot" shows, shared by the built page and the browser ---------- */
+
+export const SNAPSHOT_ROWS = [
+  { key: 'p10', label: 'Lowest 10% earn less than' },
+  { key: 'p25', label: '25% earn less than' },
+  { key: 'median', label: 'Median (half earn more, half less)' },
+  { key: 'p75', label: '25% earn more than' },
+  { key: 'p90', label: 'Top 10% earn more than' },
+] as const;
+
+const count = new Intl.NumberFormat('en-US');
+
+export interface Snapshot {
+  rows: { key: string; label: string; value: string }[];
+  jobs: string;
+  /** For example "$1,140 (1.2%) higher than the national median". */
+  comparedWith: string;
+  /** Marker positions on the range bar, as percentages, or undefined if any figure is missing. */
+  bar?: { p25: number; median: number; p75: number };
+  /** A text version of the range bar, for screen readers and as a caption. */
+  barText: string;
+}
+
+/** Everything one snapshot card shows, for one place and period. */
+export function snapshot(figures: PayFigures | undefined, base: PayFigures | undefined, baseName: string, period: Period): Snapshot {
+  const amounts = Object.fromEntries(SNAPSHOT_ROWS.map((r) => [r.key, payFor(figures, r.key, period)])) as Record<
+    (typeof SNAPSHOT_ROWS)[number]['key'],
+    PeriodAmount
+  >;
+  const rows = SNAPSHOT_ROWS.map((r) => ({ key: r.key, label: r.label, value: formatPeriodAmount(amounts[r.key], period) }));
+  const jobs = figures && typeof figures.employment === 'number' ? count.format(figures.employment) : 'Not available';
+
+  const diff = base ? medianDifference(figures, base, period) : undefined;
+  const comparedWith = !diff
+    ? '–'
+    : diff.kind === 'missing'
+      ? 'Not available'
+      : diff.kind === 'equal'
+        ? `The same as ${baseName}`
+        : `${formatDifference(diff, period)} than ${baseName}`;
+
+  const [low, p25, mid, p75, high] = (['p10', 'p25', 'median', 'p75', 'p90'] as const).map((k) => exactAmount(amounts[k]));
+  let bar: Snapshot['bar'];
+  if ([low, p25, mid, p75, high].every((v) => v !== undefined) && high! > low!) {
+    const at = (v: number) => Math.round(((v - low!) / (high! - low!)) * 1000) / 10;
+    bar = { p25: at(p25!), median: at(mid!), p75: at(p75!) };
+  }
+  const barText = bar
+    ? `Pay range: the lowest 10% earn less than ${rows[0]!.value}, half earn less than ${rows[2]!.value}, and the top 10% earn more than ${rows[4]!.value}.`
+    : 'Pay range: not available, because one or more figures are not published.';
+  return { rows, jobs, comparedWith, bar, barText };
 }

@@ -11,7 +11,10 @@ const professions = await Promise.all(
   (await professionsWithPages()).map(async (p) => ({
     slug: p.id,
     data: p.data,
-    salaryGuide: (await liveLinks([{ href: `/${p.id}/salary/`, label: '' }])).length > 0,
+    links: await liveLinks([
+      { href: `/${p.id}/salary/`, label: `Read the ${p.data.name.toLowerCase()} salary guide` },
+      { href: `/${p.id}/salary/calculator/`, label: 'Open the pay calculator' },
+    ]),
   })),
 );
 const first = professions[0];
@@ -35,11 +38,13 @@ const firstPay = first ? getPayData(first.slug) : undefined;
           {p.data.name}
         </h2>
         <NationalFigures profession={p.slug} outlook={p.data.outlook} />
-        {p.salaryGuide && (
+        {p.links.length > 0 && (
           <ul class="hub-links">
-            <li>
-              <a href={`/${p.slug}/salary/`}>Read the {p.data.name.toLowerCase()} salary guide</a>
-            </li>
+            {p.links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
           </ul>
         )}
         <h3 class="table-title">Pay by state</h3>

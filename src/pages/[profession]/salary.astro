@@ -9,6 +9,7 @@ import PayRangeBar from '../../components/PayRangeBar.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
 import PayByStateTable from '../../components/PayByStateTable.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
+import CalculatorLink from '../../components/CalculatorLink.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
@@ -129,6 +130,12 @@ const contents = [
 
   <KeyTakeaways items={takeaways} />
   <PayPeriodsTable id="pay-periods" place="the United States" figures={national} source={`${pay.release.publisher}, ${release}`} />
+  <CalculatorLink
+    profession={professionSlug}
+    heading="Compare pay in your state"
+    text="Choose a state or an area, see pay per hour, week, month or year, and compare two places side by side."
+    label="Open the pay calculator"
+  />
   <TableOfContents items={contents} />
   <ImageSlot {...data.image} />
 

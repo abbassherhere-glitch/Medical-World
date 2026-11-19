@@ -102,3 +102,22 @@ test('writes choices back into the page address', () => {
   assert.equal(writeChoices({ period: 'year' }), '');
   assert.equal(writeChoices({ area: '12420', period: 'year' }), '', 'an area without its state is left out');
 });
+
+import { snapshot } from './calculator.ts';
+
+test('a snapshot shows every figure, the comparison and a text version of the range bar', () => {
+  const snap = snapshot(figures(99240), figures(98100), 'the national median', 'year');
+  assert.deepEqual(snap.rows.map((r) => r.value), ['$31,200', '$35,360', '$99,240', '$47,840', '$54,080']);
+  assert.equal(snap.jobs, '100');
+  assert.equal(snap.comparedWith, '$1,140 (1.2%) higher than the national median');
+  assert.match(snap.barText, /lowest 10% earn less than \$31,200, half earn less than \$99,240/);
+});
+
+test('a snapshot for a place with no figures says so, with no range bar', () => {
+  const snap = snapshot(undefined, figures(98100), 'the national median', 'month');
+  assert.ok(snap.rows.every((r) => r.value === 'Not available'));
+  assert.equal(snap.jobs, 'Not available');
+  assert.equal(snap.comparedWith, 'Not available');
+  assert.equal(snap.bar, undefined);
+  assert.match(snap.barText, /not available/);
+});

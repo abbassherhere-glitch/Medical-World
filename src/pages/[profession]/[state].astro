@@ -13,6 +13,7 @@ import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
+import CalculatorLink from '../../components/CalculatorLink.astro';
 import {
   areasInState,
   byMedianDescending,
@@ -288,6 +289,13 @@ const contents = [
       <a class="button button--action" href={data.compare.button.href}>{data.compare.button.label}</a>
       <p class="note">{data.compare.note}</p>
     </section>
+    <CalculatorLink
+      profession={professionSlug}
+      state={slugify(state)}
+      heading="Pay calculator"
+      text={`See pay in ${where} per hour, week, month or year, and compare it with another state.`}
+      label={`Compare ${state}`}
+    />
     <AdSlot size="sidebar" id="state-side-1" />
     {
       neighbors.length > 0 && (

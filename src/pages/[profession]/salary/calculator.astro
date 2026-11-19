@@ -1,0 +1,249 @@
+---
+/**
+ * Pay calculator and state comparison, for example
+ * /dental-hygienist/salary/calculator/. The built page shows the national
+ * figures and a link to every state page, so it is useful without
+ * JavaScript; the calculator script adds the choices.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../../layouts/GuideLayout.astro';
+import SnapshotCard from '../../../components/SnapshotCard.astro';
+import StateGrid from '../../../components/StateGrid.astro';
+import LinkPanel from '../../../components/LinkPanel.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import SourcesBox from '../../../components/SourcesBox.astro';
+import { getPublishedStatePages } from '../../../data/state-pages';
+import { STATES_AND_DC } from '../../../data/states';
+import { formatAnnual, getPayData, releaseName } from '../../../lib/pay';
+import { snapshot } from '../../../lib/pay/calculator';
+import { PERIOD_LABELS, PERIOD_NOTE, PERIODS } from '../../../lib/pay/periods';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('salaryGuides');
+  return guides.map((g) => ({ params: { profession: g.data.profession.id }, props: { guide: g.data } }));
+}
+
+const { guide } = Astro.props;
+const profession = await getEntry(guide.profession);
+const slug = guide.profession.id;
+const pay = getPayData(slug);
+const release = releaseName(pay);
+const states = (await getPublishedStatePages()).filter((p) => p.profession === slug);
+const national = snapshot(pay.national, undefined, '', 'year');
+const plural = profession.data.namePlural;
+
+const title = `${profession.data.name} pay calculator: compare pay by state`;
+const description = `Compare ${plural}' pay in any state or area with the US median of ${formatAnnual(pay.national.annual.median)} a year, per hour, week, month or year (${release}).`;
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  heading={`${profession.data.name} pay calculator`}
+  profession={profession.data}
+  activeMenu="salary"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: profession.data.name, href: `/${slug}/` },
+    { label: 'Salary', href: `/${slug}/salary/` },
+    { label: 'Pay calculator' },
+  ]}
+  byline={guide.byline}
+>
+  <p class="intro">
+    See what {plural} earn in any state, or in an area within it, and compare two places side by side. All figures are
+    official, from the {pay.release.publisher} wage survey.
+  </p>
+
+  <form class="calc-controls js-only" data-calc-form aria-label="Pay calculator choices" action={`/${slug}/salary/calculator/`} method="get" data-pagefind-ignore>
+    <fieldset class="calc-group">
+      <legend>Your place</legend>
+      <div class="field">
+        <label for="calc-state">State</label>
+        <select id="calc-state" class="select" name="state" data-calc="state">
+          <option value="">United States (national)</option>
+          {states.map((s) => <option value={s.slug}>{s.state}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="calc-area">Area in that state (optional)</label>
+        <select id="calc-area" class="select" name="area" data-calc="area" disabled>
+          <option value="">Whole state</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset class="calc-group">
+      <legend>Compare with another state (optional)</legend>
+      <div class="field">
+        <label for="calc-vs">State</label>
+        <select id="calc-vs" class="select" name="vs" data-calc="vs">
+          <option value="">No comparison</option>
+          {states.map((s) => <option value={s.slug}>{s.state}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="calc-vsarea">Area in that state (optional)</label>
+        <select id="calc-vsarea" class="select" name="vsarea" data-calc="vsarea" disabled>
+          <option value="">Whole state</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset class="calc-group calc-periods">
+      <legend>Show pay</legend>
+      <div class="calc-radios">
+        {
+          PERIODS.map((p) => (
+            <label class="calc-radio">
+              <input type="radio" name="per" value={p} checked={p === 'year'} data-calc="per" />
+              <span>{PERIOD_LABELS[p]}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+  </form>
+
+  <p class="visually-hidden" role="status" aria-live="polite" data-calc-announce></p>
+  <div class="calc-results">
+    <SnapshotCard id="a" heading="United States" snap={national} periodLabel={PERIOD_LABELS.year} />
+    <div class="js-only">
+      <SnapshotCard id="b" heading="Compare" snap={national} periodLabel={PERIOD_LABELS.year} emptyMessage="Choose a second state above to compare." />
+    </div>
+  </div>
+
+  <p class="calc-notice" data-calc-notice hidden></p>
+
+  <p class="note">{PERIOD_NOTE}</p>
+  <p class="note">Source: {pay.release.publisher}, {release}. Reference period: {pay.release.referencePeriod}.</p>
+
+  <AdSlot size="inline" id="calculator-content-1" />
+
+  <section class="stack" aria-labelledby="state-pages">
+    <h2 id="state-pages" class="section-title">Pay in each state</h2>
+    <p class="muted">Each state page has its pay figures, pay by area and how it compares with nearby states.</p>
+    <StateGrid profession={slug} states={STATES_AND_DC} />
+  </section>
+
+  <SourcesBox items={[`${pay.release.publisher}, ${release}`]} />
+
+  <Fragment slot="aside">
+    <AdSlot size="sidebar" id="calculator-side-1" />
+    <LinkPanel
+      heading="Related guides"
+      links={[
+        { label: `${profession.data.name} salary in the US`, href: `/${slug}/salary/` },
+        { label: 'Salaries by state', href: '/salaries/' },
+        { label: `How to become a ${profession.data.name.toLowerCase()}`, href: `/${slug}/how-to-become/` },
+      ]}
+    />
+  </Fragment>
+</GuideLayout>
+
+<script>
+  import { startCalculator } from '../../../scripts/calculator';
+  startCalculator();
+</script>
+
+<style>
+  .intro {
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .muted {
+    color: var(--color-text-secondary);
+  }
+
+  /* Shown only when JavaScript runs (the "js" class is set before the page is drawn). */
+  .js-only {
+    display: none;
+  }
+
+  :global(.js) .js-only {
+    display: block;
+  }
+
+  :global(.js) .calc-controls.js-only {
+    display: grid;
+  }
+
+  .calc-controls {
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .calc-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .calc-group legend {
+    margin-bottom: var(--space-2);
+    padding: 0;
+    font-weight: var(--weight-black);
+  }
+
+  .calc-periods {
+    grid-column: 1 / -1;
+  }
+
+  .calc-radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .calc-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-size);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .calc-radio:has(input:checked) {
+    background: var(--color-tint);
+    border-color: var(--color-accent);
+    font-weight: var(--weight-bold);
+  }
+
+  .calc-radio input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  .calc-notice {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-light);
+    border-left: 4px solid var(--color-action);
+  }
+
+  .calc-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-4);
+  }
+
+  .calc-results > .js-only {
+    min-width: 0;
+  }
+
+  .calc-results > .js-only > :global(.snapshot) {
+    height: 100%;
+  }
+</style>
