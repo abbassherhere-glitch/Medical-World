@@ -30,7 +30,7 @@ const { title, description, heading, profession, activeMenu, breadcrumb, byline 
   <ProfessionNav slot="subnav" name={profession.name} items={profession.menu} active={activeMenu} />
 
   <div class="container guide">
-    <main id="main" class="guide__main" tabindex="-1">
+    <main id="main" class="guide__main" tabindex="-1" data-pagefind-body>
       <Breadcrumb items={breadcrumb} />
       <header class="guide__header">
         <h1>{heading}</h1>

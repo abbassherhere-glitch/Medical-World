@@ -17,7 +17,7 @@ interface Props {
 const { src, alt, width, height, placeholder, eager = false, class: className } = Astro.props;
 ---
 
-<div class:list={['image-slot', className]} style={`aspect-ratio: ${width} / ${height}`}>
+<div data-pagefind-ignore class:list={['image-slot', className]} style={`aspect-ratio: ${width} / ${height}`}>
   {
     src ? (
       <img
