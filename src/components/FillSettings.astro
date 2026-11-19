@@ -1,0 +1,8 @@
+---
+/** Renders its contents with {siteName} replaced by the name in src/settings.ts. */
+import { fillSettings } from '../lib/markdown-settings';
+
+const html = await Astro.slots.render('default');
+---
+
+<Fragment set:html={fillSettings(html)} />

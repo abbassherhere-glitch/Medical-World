@@ -16,7 +16,7 @@ export function inlineMarkup(text: string): string {
   return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 }
 
-/** Builds a page title such as "Dental hygienist salary | [SITE NAME]". */
+/** Builds a page title such as "Dental hygienist salary | ScrubPath". */
 export function pageTitle(title: string, siteName: string): string {
   return title === siteName ? title : `${title} | ${siteName}`;
 }

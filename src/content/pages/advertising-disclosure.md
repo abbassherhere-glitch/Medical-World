@@ -7,7 +7,7 @@ lastUpdated: "[DATE]"
 
 > **For the owner:** this page needs a review before launch. Replace every item in square brackets.
 
-[SITE NAME] is supported by advertising.
+{siteName} is supported by advertising.
 
 ## Adverts
 
