@@ -12,7 +12,7 @@ import type { PayData } from '../../src/lib/pay/types.ts';
 import { OUTPUT_DIR, PROFESSIONS, SOURCE_DIR } from './config.ts';
 import { buildAreas, buildStates, figuresFromRow, findOccupation, symbolsUsed } from './extract.ts';
 import { readSources } from './sources.ts';
-import { SYMBOL_MEANINGS } from './symbols.ts';
+import { SYMBOL_MEANINGS, TOP_PAY_LEVEL } from '../../src/lib/pay/symbols.ts';
 import { formatPayData } from './format.ts';
 
 const codes = new Set<string>(PROFESSIONS.map((p) => p.occCode));
@@ -21,6 +21,13 @@ const yy = String(sources.year).slice(2);
 const today = new Date().toISOString().slice(0, 10);
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
+
+if (TOP_PAY_LEVEL.release !== `May ${sources.year}`) {
+  console.warn(
+    `Note: the top pay limits in src/lib/pay/symbols.ts are for ${TOP_PAY_LEVEL.release}, ` +
+      `but this is the May ${sources.year} release. Check the release's official notes and update them.`,
+  );
+}
 
 for (const profession of PROFESSIONS) {
   const { row, title } = findOccupation(sources.national, profession.occCode, profession.expectedTitle);

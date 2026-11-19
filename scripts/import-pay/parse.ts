@@ -1,15 +1,6 @@
+/** Reads figures and flags from cells of the official files. */
 import type { PaySymbol, PayValue } from '../../src/lib/pay/types.ts';
-
-/**
- * Meaning of each symbol used in the official files in place of a number,
- * as given in the survey's published field descriptions.
- */
-export const SYMBOL_MEANINGS: Record<PaySymbol, string> = {
-  '*': 'A wage estimate is not available.',
-  '**': 'An employment estimate is not available.',
-  '#': "The wage is at or above the survey's highest published pay level.",
-  '~': 'Fewer than 0.5% of establishments reported this occupation.',
-};
+import { SYMBOL_MEANINGS } from '../../src/lib/pay/symbols.ts';
 
 const SYMBOLS = new Set<string>(Object.keys(SYMBOL_MEANINGS));
 

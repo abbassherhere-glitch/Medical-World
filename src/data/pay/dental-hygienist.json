@@ -18,7 +18,7 @@
     "sourceNote": "Read from row extracts of the official files: rows copied unchanged, with every original column and the original header row.",
     "importedOn": "2026-11-19"
   },
-  "symbols": {"**":"An employment estimate is not available."},
+  "symbols": {"**":"Indicates that an employment estimate is not available."},
   "national": {"employment":222740,"hourly":{"mean":47.59,"p10":36,"p25":40.18,"median":47.16,"p75":52.16,"p90":60.6},"annual":{"mean":98990,"p10":74880,"p25":83570,"median":98100,"p75":108480,"p90":126050}},
   "states": [
     {"code":"01","name":"Alabama","abbr":"AL","kind":"state","published":true,"figures":{"employment":3170,"hourly":{"mean":29.25,"p10":23.54,"p25":28.27,"median":29.41,"p75":30.49,"p90":34.81},"annual":{"mean":60850,"p10":48960,"p25":58800,"median":61160,"p75":63410,"p90":72410}}},

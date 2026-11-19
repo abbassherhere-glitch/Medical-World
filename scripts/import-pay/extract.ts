@@ -4,7 +4,7 @@
  * tested without the files themselves.
  */
 import type { AreaPay, PayFigures, PayPercentiles, PaySymbol, PayValue, StateKind, StatePay } from '../../src/lib/pay/types.ts';
-import { parseFlag, parseValue } from './symbols.ts';
+import { parseFlag, parseValue } from './parse.ts';
 
 export type Row = Record<string, string>;
 

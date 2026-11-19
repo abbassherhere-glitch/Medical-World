@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { crc32, deflateRawSync } from 'node:zlib';
 import { parseCsv, toRecords } from './csv.ts';
 import { buildAreas, buildStates, figuresFromRow, findOccupation, statesOfArea, symbolsUsed } from './extract.ts';
-import { parseFlag, parseValue } from './symbols.ts';
+import { parseFlag, parseValue } from './parse.ts';
 import { columnIndex, readSheet } from './xlsx.ts';
 
 const HEADER =

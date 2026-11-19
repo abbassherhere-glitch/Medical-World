@@ -1,18 +1,8 @@
 /** Turns pay figures into the words and numbers shown on the site. */
 import type { PayValue } from './types.ts';
-
-/**
- * Pay level above which the survey shows "#" instead of a figure.
- * Fill these in from the release's official notes to show "At least $X";
- * while they are empty, the site shows the general wording below.
- */
-export const TOP_PAY_LEVEL: { hourly: number | null; annual: number | null } = {
-  hourly: null,
-  annual: null,
-};
+import { TOP_PAY_LEVEL } from './symbols.ts';
 
 export const NOT_AVAILABLE = 'Not available';
-export const ABOVE_TOP_LEVEL = 'Above the survey’s top pay level';
 
 /** The number in a figure, or undefined if the survey shows a symbol instead. */
 export function numeric(value: PayValue | undefined): number | undefined {
@@ -30,18 +20,14 @@ export function formatDollars(amount: number): string {
 /** Formats a yearly figure, for example "$98,100". */
 export function formatAnnual(value: PayValue | undefined): string {
   if (typeof value === 'number') return dollars.format(value);
-  if (value?.symbol === '#') {
-    return TOP_PAY_LEVEL.annual !== null ? `At least ${dollars.format(TOP_PAY_LEVEL.annual)}` : ABOVE_TOP_LEVEL;
-  }
+  if (value?.symbol === '#') return `At least ${dollars.format(TOP_PAY_LEVEL.annual)}`;
   return NOT_AVAILABLE;
 }
 
 /** Formats an hourly figure, for example "$47.16". */
 export function formatHourly(value: PayValue | undefined): string {
   if (typeof value === 'number') return cents.format(value);
-  if (value?.symbol === '#') {
-    return TOP_PAY_LEVEL.hourly !== null ? `At least ${cents.format(TOP_PAY_LEVEL.hourly)}` : ABOVE_TOP_LEVEL;
-  }
+  if (value?.symbol === '#') return `At least ${cents.format(TOP_PAY_LEVEL.hourly)}`;
   return NOT_AVAILABLE;
 }
 

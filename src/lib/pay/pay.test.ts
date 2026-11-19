@@ -71,7 +71,8 @@ test('special values are shown in words, never as a blank or zero', () => {
   assert.equal(formatAnnual({ symbol: '*' }), NOT_AVAILABLE);
   assert.equal(formatJobs({ symbol: '**' }), NOT_AVAILABLE);
   assert.equal(formatAnnual(undefined), NOT_AVAILABLE);
-  assert.match(formatAnnual({ symbol: '#' }), /top pay level|At least/);
+  assert.equal(formatAnnual({ symbol: '#' }), 'At least $239,200');
+  assert.equal(formatHourly({ symbol: '#' }), 'At least $115.00');
 });
 
 import { compareWithNational, highestAndLowest, joinNames, rankByMedian } from './summary.ts';

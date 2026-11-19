@@ -108,14 +108,18 @@ title in the new files no longer matches.
 **Special symbols.** Some cells in the official files hold a symbol instead
 of a number. The site never turns these into numbers:
 
-| Symbol | Meaning | Shown on the site as |
+| Symbol | Official meaning (May 2025 notes) | Shown on the site as |
 | --- | --- | --- |
 | `*` | A wage estimate is not available | Not available |
-| `**` | An employment (jobs) estimate is not available | Not available |
-| `#` | Pay is at or above the survey's top published level | Above the survey's top pay level |
+| `**` | An employment estimate is not available | Not available |
+| `#` | A wage equal to or greater than $115.00 per hour or $239,200 per year | At least $239,200 (yearly) or At least $115.00 (hourly) |
+| `~` | The percent of establishments reporting the occupation is less than 0.5% | Kept in the data file |
 
-To show "At least $X" for `#` instead, fill in the release's top pay level in
-`TOP_PAY_LEVEL` in `src/lib/pay/format.ts`.
+The meanings and the `#` limits are in one file, `src/lib/pay/symbols.ts`,
+labelled with the release they belong to. The limits can change between
+releases: when you import a new release, check its official notes (in the
+national zip file) and update that file. The import prints a reminder if the
+release does not match.
 
 **Adding a profession.** Add one line to `scripts/import-pay/config.ts` with
 the profession's page name and its official occupation code, then run the
