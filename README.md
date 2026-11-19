@@ -16,7 +16,7 @@ a placeholder waiting for a real value.
 
 | What | Where |
 | --- | --- |
-| Site name, address, company name, indexing switch, advert switch, "Useful organizations" switch | `src/settings.ts` |
+| Site name, address, company name, indexing switch, advert switch, "Useful organizations" switch, sponsored listings switch | `src/settings.ts` |
 | Page text | `src/content/` |
 | Which state pages are published | `src/content/state-pages/dental-hygienist.json` |
 | Text shared by every state page (with `{state}` where the name goes) | `src/content/state-guides/dental-hygienist.json` |
@@ -33,6 +33,8 @@ a placeholder waiting for a real value.
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
 | Job outlook figures (made by the import, do not edit by hand) | `src/data/outlook/` |
 | Your changes to single job outlook figures | `src/data/outlook/overrides.json` |
+| College lists (made by the import, do not edit by hand) | `src/data/schools/` |
+| Your changes to single colleges (hide or correct) | `src/data/schools/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
 | Standard pages (About, Privacy and so on) | `src/content/pages/` (one Markdown file each) |
 | Colors, sizes and spacing | `src/styles/tokens.css` |
@@ -185,6 +187,64 @@ To change a single outlook figure, use `src/data/outlook/overrides.json` in
 the same way as the pay overrides below. `figure` is one of `baseJobs`,
 `projectedJobs`, `percentChange` or `openings`, and `place` is
 `United States` or a state name.
+
+## Updating the college lists
+
+The schools on each state page come from the US Department of Education,
+National Center for Education Statistics, Integrated Postsecondary Education
+Data System (IPEDS), Completions (currently 2023-24). The list shows colleges
+that reported dental hygiene awards (program 51.0602). It is **not** a list of
+accredited programs, and the site never says a college is accredited,
+approved, recommended or accepting students. To update it:
+
+1. Put the new IPEDS CSV in `data/source/`. Its name must start with "ipeds"
+   and end in `.csv`, for example `ipeds-2024-25-dental-hygiene-programs.csv`.
+   It needs the columns `unitid, institution, city, state, state_fips,
+   website, control, award_level_code, award_level, cip_code, program,
+   completions, award_year`.
+2. Run:
+
+   ```bash
+   npm run import-schools
+   ```
+
+   (`npm run import-pay` also runs it.) States are matched by FIPS code, and a
+   college's rows (one per award level) are grouped by its `unitid`. It writes
+   `src/data/schools/dental-hygienist.json` and prints the totals.
+3. Run `npm run verify`, check the pages, and commit the changed file.
+
+Names, cities and web addresses are shown exactly as in the file. Where an
+address has no "https://", it is added only to make the link work.
+
+**Colleges with no awards.** A college can report the program with 0 awards
+in the year. It is not in the table. It is named on a separate line under the
+table: "Also reported the program, with no awards in 2023-24", and it is not
+counted in any total.
+
+**Hiding or correcting a college.** Add an entry to
+`src/data/schools/overrides.json`, using the college's `unitid` from the file
+as `id`. To hide a college:
+
+```json
+{ "overrides": [{ "profession": "dental-hygienist", "id": "139311", "hide": true, "note": "Why" }] }
+```
+
+To correct one detail, use `field` (`name`, `city`, `website` or `control`)
+and `value`:
+
+```json
+{ "profession": "dental-hygienist", "id": "139311", "field": "name", "value": "Clayton State University", "note": "Why, and where it was checked" }
+```
+
+`control` must be `Public`, `Private nonprofit` or `Private for-profit`. The
+build stops if the profession, college or field is unknown.
+
+## Sponsored listings (switched off)
+
+There are no paid listings. The "Sponsored" label (`src/components/SponsoredLabel.astro`)
+and the notes about paid listings are kept for later, but nothing shows while
+`showSponsoredListings` is `false` in `src/settings.ts`. Turn it on only when
+real paid listings exist, and mark each one clearly.
 
 ## Changing a single pay figure
 

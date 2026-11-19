@@ -15,7 +15,7 @@ Adverts appear in clearly labelled areas marked "Advertisement". They are kept s
 
 ## Sponsored school listings
 
-Schools may pay to be featured. Any paid listing is marked "Sponsored". [Describe how sponsored listings are chosen and shown.]
+There are no paid school listings at present. If schools pay to be featured in future, each paid listing will be marked "Sponsored". [Describe how sponsored listings are chosen and shown.]
 
 ## What advertisers cannot do
 
