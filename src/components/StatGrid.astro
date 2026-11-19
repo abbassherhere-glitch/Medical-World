@@ -48,7 +48,16 @@ const { items, size = 'large' } = Astro.props;
     line-height: 1.25;
   }
 
+  .stat-grid--small {
+    grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr));
+    gap: var(--space-3);
+  }
+
+  .stat-grid--small .stat-grid__item {
+    padding: 14px;
+  }
+
   .stat-grid--small dd {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 </style>

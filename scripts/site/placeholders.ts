@@ -6,26 +6,11 @@
  *   npm run build
  *   npm run placeholders
  */
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import { STATES_AND_DC } from '../../src/data/states.ts';
+import { htmlFiles, pagePath } from './dist-files.ts';
 
 const DIST = 'dist';
-
-function htmlFiles(dir: string): string[] {
-  const out: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...htmlFiles(full));
-    else if (entry.name.endsWith('.html')) out.push(full);
-  }
-  return out.sort();
-}
-
-function pagePath(file: string): string {
-  const rel = relative(DIST, file).split(sep).join('/');
-  return rel === 'index.html' ? '/' : `/${rel.replace(/index\.html$/, '')}`;
-}
 
 /** The visible text of a page, including its title and description. */
 function visibleText(html: string): string {
@@ -68,7 +53,7 @@ for (const file of htmlFiles(DIST)) {
     overall.set(key, (overall.get(key) ?? 0) + 1);
     total++;
   }
-  byPage.set(pagePath(file), counts);
+  byPage.set(pagePath(DIST, file), counts);
 }
 
 console.log('Placeholders still on the built site\n');
