@@ -57,6 +57,12 @@ const { title, description, heading, intro } = Astro.props;
     font-size: 1.75rem;
   }
 
+  .hub :global(.hub-section__title a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+  }
+
   .hub :global(.hub-links) {
     display: flex;
     flex-wrap: wrap;
