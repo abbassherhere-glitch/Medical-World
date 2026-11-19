@@ -1,6 +1,8 @@
 ---
 /**
- * Profession and state picker with a "Find schools" button.
+ * Profession and state picker. Choosing a state opens its page (at
+ * `section`, if given). With nothing chosen, or without JavaScript, the form
+ * goes to the matching index page, so every choice leads somewhere real.
  * Leave out `professions` to show the state list only (for side panels).
  */
 import { STATES_AND_DC, slugify } from '../data/states';
@@ -15,14 +17,24 @@ interface Props {
   layout?: 'row' | 'column';
   /** Button text. Default: "Find schools". */
   buttonLabel?: string;
+  /** Section of the state page to open at, for example "schools". */
+  section?: string;
 }
 
-const { id, professions, profession, layout = 'row', buttonLabel = 'Find schools' } = Astro.props;
+const { id, professions, profession, layout = 'row', buttonLabel = 'Find schools', section } = Astro.props;
 
 // Offer only states whose page is published, so the picker never leads to a
 // missing page. (With more than one profession this uses the first one; the
 // list will need to follow the chosen profession once a second one is added.)
 const target = profession ?? professions?.[0]?.slug ?? '';
+// Where the form goes with no state chosen, or without JavaScript.
+const action = professions
+  ? '/schools/'
+  : section === 'schools'
+    ? `/${target}/schools/`
+    : section === 'licensing'
+      ? `/${target}/licensing/`
+      : `/${target}/#states`;
 const states = (
   await Promise.all(STATES_AND_DC.map(async (name) => ({ name, slug: slugify(name), live: await isLive(`/${target}/${slugify(name)}/`) })))
 ).filter((state) => state.live);
@@ -30,10 +42,12 @@ const states = (
 
 <form
   class:list={['picker', `picker--${layout}`]}
-  action="/schools/"
+  action={action}
   method="get"
   data-state-picker
   data-profession={profession}
+  data-section={section}
+  data-pagefind-ignore
 >
   {
     professions && (
@@ -50,8 +64,8 @@ const states = (
   {!professions && profession && <input type="hidden" name="profession" value={profession} />}
   <div class="field picker__field">
     <label for={`${id}-state`}>State</label>
-    <select id={`${id}-state`} name="state" class="select" required>
-      <option value="" selected disabled>Choose a state</option>
+    <select id={`${id}-state`} name="state" class="select">
+      <option value="" selected>Choose a state</option>
       {states.map((state) => <option value={state.slug}>{state.name}</option>)}
     </select>
   </div>

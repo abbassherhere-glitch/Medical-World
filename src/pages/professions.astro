@@ -1,0 +1,39 @@
+---
+/** All professions: every profession with pages, with its figures and guides. */
+import HubLayout from '../layouts/HubLayout.astro';
+import NationalFigures from '../components/NationalFigures.astro';
+import { professionsWithPages } from '../data/professions';
+import { liveLinks } from '../data/routes';
+
+const professions = await Promise.all(
+  (await professionsWithPages()).map(async (p) => ({ slug: p.id, data: p.data, guides: await liveLinks(p.data.menu) })),
+);
+const names = professions.map((p) => p.data.namePlural).join(', ');
+---
+
+<HubLayout
+  title="All professions: healthcare career guides"
+  description={`Healthcare career guides on this site: ${names}. Pay, training and licensing for each, state by state.`}
+  heading="All professions"
+  intro="The healthcare professions covered on this site. Each has guides to pay, training and licensing, and a page for every state."
+>
+  {
+    professions.map((p) => (
+      <section class="hub-section" aria-labelledby={`profession-${p.slug}`}>
+        <h2 id={`profession-${p.slug}`} class="hub-section__title">
+          <a href={`/${p.slug}/`}>{p.data.name}</a>
+        </h2>
+        <NationalFigures profession={p.slug} outlook={p.data.outlook} />
+        <nav aria-label={`${p.data.name} guides`}>
+          <ul class="hub-links">
+            {p.guides.map((g) => (
+              <li>
+                <a href={g.href}>{g.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </section>
+    ))
+  }
+</HubLayout>

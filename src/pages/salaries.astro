@@ -1,0 +1,56 @@
+---
+/** Salaries: national figures and pay by state for every profession with pages. */
+import HubLayout from '../layouts/HubLayout.astro';
+import NationalFigures from '../components/NationalFigures.astro';
+import PayByStateTable from '../components/PayByStateTable.astro';
+import { professionsWithPages } from '../data/professions';
+import { liveLinks } from '../data/routes';
+import { formatAnnual, getPayData, releaseName } from '../lib/pay';
+
+const professions = await Promise.all(
+  (await professionsWithPages()).map(async (p) => ({
+    slug: p.id,
+    data: p.data,
+    salaryGuide: (await liveLinks([{ href: `/${p.id}/salary/`, label: '' }])).length > 0,
+  })),
+);
+const first = professions[0];
+const firstPay = first ? getPayData(first.slug) : undefined;
+---
+
+<HubLayout
+  title="Healthcare salaries by state"
+  description={
+    first && firstPay
+      ? `Official pay figures for healthcare jobs, state by state. ${first.data.name}: ${formatAnnual(firstPay.national.annual.median)} median a year (${releaseName(firstPay)}).`
+      : 'Official pay figures for healthcare jobs, state by state.'
+  }
+  heading="Salaries"
+  intro="Official pay figures for each profession, nationally and in every state, from the US Bureau of Labor Statistics wage survey."
+>
+  {
+    professions.map((p) => (
+      <section class="hub-section" aria-labelledby={`salary-${p.slug}`}>
+        <h2 id={`salary-${p.slug}`} class="hub-section__title">
+          {p.data.name}
+        </h2>
+        <NationalFigures profession={p.slug} outlook={p.data.outlook} />
+        {p.salaryGuide && (
+          <ul class="hub-links">
+            <li>
+              <a href={`/${p.slug}/salary/`}>Read the {p.data.name.toLowerCase()} salary guide</a>
+            </li>
+          </ul>
+        )}
+        <h3 class="table-title">Pay by state</h3>
+        <PayByStateTable profession={p.slug} name={p.data.name} plural={p.data.namePlural} />
+      </section>
+    ))
+  }
+</HubLayout>
+
+<style>
+  .table-title {
+    font-size: 1.3rem;
+  }
+</style>

@@ -1,23 +1,29 @@
 ---
 /** Breadcrumb trail. The last item is the current page and is not a link. */
-import SmartLink from './SmartLink.astro';
+import { isLive } from '../data/routes';
 
 interface Props {
   items: { label: string; href?: string }[];
 }
 
-const { items } = Astro.props;
+const { items: allItems } = Astro.props;
+// A step whose page does not exist yet is shown as text, never as a dead link.
+const items = await Promise.all(
+  allItems.map(async (item) => ({ ...item, href: item.href && (await isLive(item.href)) ? item.href : undefined })),
+);
 ---
 
-<nav aria-label="Breadcrumb" class="breadcrumb">
+<nav aria-label="Breadcrumb" class="breadcrumb" data-pagefind-ignore>
   <ol>
     {
       items.map((item, index) => (
         <li>
-          {item.href && index < items.length - 1 ? (
-            <SmartLink href={item.href}>{item.label}</SmartLink>
-          ) : (
+          {index === items.length - 1 ? (
             <span aria-current="page">{item.label}</span>
+          ) : item.href ? (
+            <a href={item.href}>{item.label}</a>
+          ) : (
+            <span>{item.label}</span>
           )}
         </li>
       ))

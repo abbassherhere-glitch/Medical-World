@@ -1,0 +1,150 @@
+---
+/**
+ * Site search results, at /search/?q=… The search index is built from the
+ * published pages after each build (see the "build" script), so this works
+ * on static hosting with no server. This page is never indexed by search
+ * engines and is not in the sitemap.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { liveLinks } from '../data/routes';
+import { professionsWithPages } from '../data/professions';
+
+// The main guides, offered when a search is empty or finds nothing.
+const professions = await professionsWithPages();
+const guides = await liveLinks([
+  ...professions.flatMap((p) => [
+    { href: `/${p.id}/`, label: `${p.data.name}: overview` },
+    { href: `/${p.id}/salary/`, label: `${p.data.name} salary guide` },
+    { href: `/${p.id}/how-to-become/`, label: `How to become a ${p.data.name.toLowerCase()}` },
+  ]),
+  { href: '/professions/', label: 'All professions' },
+  { href: '/salaries/', label: 'Salaries by state' },
+  { href: '/schools/', label: 'Schools by state' },
+  { href: '/licensing/', label: 'Licensing by state' },
+]);
+---
+
+<BaseLayout
+  title="Search"
+  description="Search the healthcare career guides on this site."
+  indexable={false}
+  canonical={false}
+>
+  <main id="main" class="container search" tabindex="-1">
+    <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Search' }]} />
+    <h1>Search</h1>
+
+    <form class="search__form" role="search" action="/search/" method="get" data-search-form>
+      <label for="search-page-input" class="search__label">Search the guides</label>
+      <div class="search__row">
+        <input id="search-page-input" class="input" type="search" name="q" autocomplete="off" />
+        <button type="submit" class="button button--dark">Search</button>
+      </div>
+      <p class="note">Try a state, such as "Texas", or a topic, such as "license" or "salary".</p>
+    </form>
+
+    <p class="search__status" role="status" aria-live="polite" data-search-status></p>
+    <ol class="search__results" data-search-results></ol>
+
+    <div class="search__help" data-search-help hidden>
+      <h2 class="search__help-title">Popular guides</h2>
+      <ul class="link-list">
+        {guides.map((g) => <li><a href={g.href}>{g.label}</a></li>)}
+      </ul>
+    </div>
+
+    <noscript>
+      <p class="search__status">Search needs JavaScript turned on. You can browse the guides instead:</p>
+      <ul class="link-list">
+        {guides.map((g) => <li><a href={g.href}>{g.label}</a></li>)}
+      </ul>
+    </noscript>
+  </main>
+</BaseLayout>
+
+<script>
+  import { startSearch } from '../scripts/search';
+  startSearch();
+</script>
+
+<style>
+  .search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 800px;
+    padding-block: var(--space-7) var(--space-10);
+  }
+
+  .search:focus {
+    outline: none;
+  }
+
+  .search__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .search__label {
+    font-weight: var(--weight-bold);
+  }
+
+  .search__row {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .search__row .input {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .search__status {
+    font-weight: var(--weight-bold);
+  }
+
+  .search__status:empty {
+    display: none;
+  }
+
+  .search__results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    list-style: none;
+    padding: 0;
+  }
+
+  .search__results:empty {
+    display: none;
+  }
+
+  .search__results :global(li) {
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .search__results :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-size: 1.15rem;
+    font-weight: var(--weight-bold);
+  }
+
+  .search__results :global(p) {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .search__results :global(mark) {
+    background: var(--color-tint-strong);
+    color: var(--color-text);
+  }
+
+  .search__help-title {
+    font-size: 1.3rem;
+  }
+</style>

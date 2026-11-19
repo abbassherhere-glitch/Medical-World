@@ -17,7 +17,7 @@ const { title, description, heading, lastUpdated, indexable, canonical, breadcru
 ---
 
 <BaseLayout title={title} description={description} indexable={indexable} canonical={canonical}>
-  <main id="main" class="container page" tabindex="-1">
+  <main id="main" class="container page" tabindex="-1" data-pagefind-body={indexable === false ? undefined : true}>
     {breadcrumb && <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: heading }]} />}
     <h1>{heading}</h1>
     {lastUpdated && <p class="page__updated">Last updated {lastUpdated}.</p>}

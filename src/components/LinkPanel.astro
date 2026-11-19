@@ -1,21 +1,27 @@
 ---
 /** A bordered side panel with a heading and a list of links. */
-import SmartLink from './SmartLink.astro';
+import { liveLinks } from '../data/routes';
 
 interface Props {
   heading: string;
   links: { label: string; href: string }[];
 }
 
-const { heading, links } = Astro.props;
+const { heading, links: allLinks } = Astro.props;
+// Only links that lead somewhere real; the panel is left out if none do.
+const links = await liveLinks(allLinks);
 ---
 
-<nav class="panel link-panel" aria-label={heading}>
-  <h2 class="panel-title link-panel__title">{heading}</h2>
-  <ul class="link-list">
-    {links.map((link) => <li><SmartLink href={link.href}>{link.label}</SmartLink></li>)}
-  </ul>
-</nav>
+{
+  links.length > 0 && (
+    <nav class="panel link-panel" aria-label={heading}>
+      <h2 class="panel-title link-panel__title">{heading}</h2>
+      <ul class="link-list">
+        {links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+  )
+}
 
 <style>
   .link-panel {

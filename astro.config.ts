@@ -4,17 +4,18 @@ import type { AstroIntegration } from 'astro';
 import { settings, siteOrigin } from './src/settings';
 
 /**
- * While indexing is switched off, also send an "X-Robots-Tag: noindex" header
- * with every response from Cloudflare, as a second safeguard next to the
- * robots meta tag and robots.txt.
+ * Extra safeguards sent as "X-Robots-Tag" headers by Cloudflare: while
+ * indexing is switched off, every response says "noindex"; the search
+ * results page always says "noindex", even after launch.
  */
 function robotsHeader(): AstroIntegration {
   return {
     name: 'robots-header',
     hooks: {
       'astro:build:done': async ({ dir }) => {
-        const body = settings.allowIndexing ? '' : '/*\n  X-Robots-Tag: noindex, nofollow\n';
-        await writeFile(new URL('_headers', dir), body);
+        const rules = ['/search/*\n  X-Robots-Tag: noindex\n'];
+        if (!settings.allowIndexing) rules.unshift('/*\n  X-Robots-Tag: noindex, nofollow\n');
+        await writeFile(new URL('_headers', dir), rules.join('\n'));
       },
     },
   };

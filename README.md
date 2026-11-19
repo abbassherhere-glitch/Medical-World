@@ -23,6 +23,9 @@ a placeholder waiting for a real value.
 | Overview page text | `overview` in `src/content/professions/dental-hygienist.json` |
 | "How to become one" page text | `src/content/become-guides/dental-hygienist.json` |
 | Which states border which | `src/data/borders.ts` |
+| Which guide links are switched on | `src/content/guide-links/dental-hygienist.json` |
+| Schools by state, Licensing and Board exam page text | `src/content/topic-pages/dental-hygienist.json` |
+| Top menu items | `src/data/navigation.ts` |
 | Pay figures (made by the import, do not edit by hand) | `src/data/pay/` |
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
@@ -64,7 +67,9 @@ npm run build
 ```
 
 The finished site is written to the `dist/` folder. The site has a page for
-every state and the District of Columbia, so expect about 60 pages. To look at the built
+every state and the District of Columbia, so expect about 70 pages. The build
+also makes the search index (in `dist/pagefind/`); search only works on the
+built site, not while running `npm run dev`. To look at the built
 version:
 
 ```bash
@@ -72,7 +77,7 @@ npm run preview
 ```
 
 To run every check that also runs on pull requests (wording, type check, lint,
-tests, build and link check):
+tests, build with search index, and link check):
 
 ```bash
 npm run verify
@@ -212,18 +217,51 @@ list: if a state is missing, misspelled or listed twice, the build stops and
 says which one. Territories (Puerto Rico, Guam, the US Virgin Islands) do
 not have pages; their figures stay in the data file.
 
-## Pages that are not built yet
+## Switching a guide link on or off
 
-Menus and lists mention guides that are planned but not written yet, such as
-"Schools by state", "Licensing" and "Board exam". These show as plain text
-and become links automatically once the page exists. The list of published
-pages is in `src/data/routes.ts`.
+Some guides are planned but not written yet, such as "Dental hygiene school
+prerequisites". Links to them are listed in one file:
+`src/content/guide-links/dental-hygienist.json`:
 
-To check that no link on the built site leads to a missing page or section:
+```json
+{ "title": "Dental hygiene school prerequisites", "href": "/dental-hygienist/prerequisites/", "published": false },
+```
+
+- While `published` is `false`, the guide is not shown anywhere on the site:
+  not in menus, popular guides, related guides or any other list.
+- When the guide is written, change it to `true`. Links to it appear as soon
+  as its page exists.
+
+If the same address is listed twice, or an address does not start with `/`,
+the build stops and says which one.
+
+## Menus and links never lead nowhere
+
+Menus, the footer, side panels and lists of links show only pages that
+exist. A planned page appears in them automatically once it is built. The
+list of published pages is in `src/data/routes.ts`.
+
+To check the built site:
 
 ```bash
 npm run check-links
 ```
+
+It fails if any link leads to a missing page or section, if any form (the
+search box or a state picker) goes to a missing page, if any state in a
+picker leads to a missing page, or if a menu or list shows an item whose page
+does not exist. It runs on every pull request.
+
+## Search
+
+The search box in the header opens `/search/`. After each build, the search
+tool Pagefind reads the published pages in `dist/` and writes a small search
+index next to them, so search works without a server. A page switched off is
+not built, so it never appears in search.
+
+Only the main content of each page is searched (not menus, bylines or advert
+areas). The search page itself is never indexed by search engines and is not
+in the sitemap, even after launch.
 
 ## Placeholders still to fill in
 

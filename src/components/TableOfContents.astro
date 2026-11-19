@@ -7,7 +7,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<nav class="toc" aria-labelledby="toc-title">
+<nav class="toc" aria-labelledby="toc-title" data-pagefind-ignore>
   <h2 id="toc-title" class="toc__title">In this article</h2>
   <ul class="toc__list">
     {items.map((item) => <li><a href={`#${item.id}`}>{item.label}</a></li>)}

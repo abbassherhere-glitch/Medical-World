@@ -222,7 +222,7 @@ select {
   padding: 0;
 }
 
-.link-list :is(a, .link-pending) {
+.link-list a {
   display: flex;
   align-items: center;
   min-height: var(--tap-size);
@@ -263,7 +263,8 @@ select {
   font-size: var(--text-md);
 }
 
-/* Text of a link whose page is not published yet (see SmartLink). */
+/* Text of a link whose page is not published yet (see SmartLink).
+   Only used inside body text and tables, never in menus or lists of links. */
 .link-pending {
   color: inherit;
 }

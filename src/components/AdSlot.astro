@@ -22,7 +22,7 @@ const { size, id } = Astro.props;
 
 {
   settings.showAdverts && (
-    <aside class={`ad ad--${size}`} aria-label="Advertisement" data-ad-slot={id}>
+    <aside class={`ad ad--${size}`} aria-label="Advertisement" data-ad-slot={id} data-pagefind-ignore>
       <span class="ad__label">Advertisement</span>
     </aside>
   )
