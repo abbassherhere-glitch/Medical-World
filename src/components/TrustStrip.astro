@@ -1,0 +1,56 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  items: { icon: string; title: string; text: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="trust" aria-label="Why you can trust our guides">
+  <ul class="container trust__list">
+    {
+      items.map((item) => (
+        <li class="trust__item">
+          <Icon name={item.icon as IconName} />
+          <div>
+            <p class="trust__title">{item.title}</p>
+            <p class="trust__text">{item.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .trust {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .trust__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+    list-style: none;
+  }
+
+  .trust__item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .trust__title {
+    font-weight: var(--weight-bold);
+  }
+
+  .trust__text {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+</style>

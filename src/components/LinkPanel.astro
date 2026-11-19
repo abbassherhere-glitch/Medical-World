@@ -1,0 +1,26 @@
+---
+/** A bordered side panel with a heading and a list of links. */
+interface Props {
+  heading: string;
+  links: { label: string; href: string }[];
+}
+
+const { heading, links } = Astro.props;
+---
+
+<nav class="panel link-panel" aria-label={heading}>
+  <h2 class="panel-title link-panel__title">{heading}</h2>
+  <ul class="link-list">
+    {links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+  </ul>
+</nav>
+
+<style>
+  .link-panel {
+    padding: 22px;
+  }
+
+  .link-panel__title {
+    margin-bottom: var(--space-1);
+  }
+</style>

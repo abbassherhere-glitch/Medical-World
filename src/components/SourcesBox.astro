@@ -1,0 +1,28 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="panel panel--light stack sources" aria-labelledby="sources">
+  <h2 id="sources" class="panel-title">Sources</h2>
+  <ul class="sources__list">
+    {items.map((item) => <li>{item}</li>)}
+  </ul>
+</section>
+
+<style>
+  .sources {
+    --stack-gap: var(--space-2);
+    padding: 22px;
+  }
+
+  .sources__list {
+    padding-left: 20px;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+  }
+</style>

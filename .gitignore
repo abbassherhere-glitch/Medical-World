@@ -1,0 +1,16 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local Cloudflare files
+.wrangler/
+.dev.vars*
+
+# logs and system files
+npm-debug.log*
+.DS_Store
+.env
+.env.*

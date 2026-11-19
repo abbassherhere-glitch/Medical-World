@@ -1,0 +1,169 @@
+---
+/** State guide for a profession, for example /dental-hygienist/texas/. */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import KeyTakeaways from '../../components/KeyTakeaways.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import StatGrid from '../../components/StatGrid.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import ScrollTable from '../../components/ScrollTable.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import SourcesBox from '../../components/SourcesBox.astro';
+import LinkPanel from '../../components/LinkPanel.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('stateGuides');
+  return guides.map((guide) => ({
+    params: { profession: guide.data.profession.id, state: guide.data.stateSlug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const data = guide.data;
+const profession = await getEntry(data.profession);
+const professionSlug = data.profession.id;
+
+const contents = [
+  { label: data.pay.heading, id: 'pay' },
+  { label: data.cityPay.heading, id: 'pay-by-city' },
+  { label: data.licensing.heading, id: 'licensing' },
+  { label: `Schools in ${data.state}`, id: 'schools' },
+];
+---
+
+<GuideLayout
+  title={data.title}
+  description={data.description}
+  heading={data.heading}
+  profession={profession.data}
+  activeMenu="schools"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: profession.data.name, href: `/${professionSlug}/` },
+    { label: data.state },
+  ]}
+  byline={data.byline}
+>
+  <KeyTakeaways items={data.takeaways} />
+  <TableOfContents items={contents} />
+
+  <section class="panel panel--tint stack pay" aria-labelledby="pay">
+    <h2 id="pay" class="section-title">{data.pay.heading}</h2>
+    <StatGrid items={data.pay.stats} size="small" />
+    <p class="pay__summary">{data.pay.summary}</p>
+  </section>
+
+  <ImageSlot {...data.image} />
+
+  <section class="stack" aria-labelledby="pay-by-city">
+    <h2 id="pay-by-city" class="section-title">{data.cityPay.heading}</h2>
+    <ScrollTable caption={`${profession.data.name} pay by city in ${data.state}`} columns={data.cityPay.columns} minWidth={480}>
+      {
+        data.cityPay.rows.map(([area, ...values]) => (
+          <tr>
+            <th scope="row">{area}</th>
+            {values.map((value) => <td>{value}</td>)}
+          </tr>
+        ))
+      }
+    </ScrollTable>
+  </section>
+
+  <AdSlot size="inline" id="state-content-1" />
+
+  <section class="stack licensing" aria-labelledby="licensing">
+    <h2 id="licensing" class="section-title">{data.licensing.heading}</h2>
+    <p class="muted">{data.licensing.intro}</p>
+    <ol class="steps">
+      {
+        data.licensing.steps.map((step) => (
+          <li>
+            <strong>{step.title}</strong> {step.text}
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="stack" aria-labelledby="schools">
+    <h2 id="schools" class="section-title" tabindex="-1">{data.schools.heading}</h2>
+    <ScrollTable caption={data.schools.heading} columns={data.schools.columns} minWidth={560}>
+      {
+        data.schools.rows.map((school) => (
+          <tr>
+            <th scope="row">
+              {school.href ? <a href={school.href}>{school.name}</a> : school.name}
+              {school.sponsored && <span class="sponsored">Sponsored</span>}
+            </th>
+            <td>{school.city}</td>
+            <td>{school.award}</td>
+            <td>{school.length}</td>
+          </tr>
+        ))
+      }
+    </ScrollTable>
+    <p class="note">{data.schools.note}</p>
+  </section>
+
+  <SourcesBox items={data.sources} />
+
+  <Fragment slot="aside">
+    <section class="panel panel--highlight stack" aria-labelledby="compare">
+      <h2 id="compare" class="panel-title">{data.compare.heading}</h2>
+      <p class="muted">{data.compare.text}</p>
+      <a class="button button--action" href={data.compare.button.href}>{data.compare.button.label}</a>
+      <p class="note">{data.compare.note}</p>
+    </section>
+    <AdSlot size="sidebar" id="state-side-1" />
+    <LinkPanel heading="Nearby states" links={data.nearbyStates} />
+    <LinkPanel heading="National guides" links={data.nationalGuides} />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .pay {
+    --stack-gap: 18px;
+    padding: var(--space-7);
+  }
+
+  .pay__summary {
+    line-height: 1.6;
+  }
+
+  .muted {
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .licensing {
+    --stack-gap: 14px;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-left: var(--space-6);
+    line-height: 1.6;
+  }
+
+  .sponsored {
+    display: inline-block;
+    margin-left: var(--space-2);
+    padding: 2px 8px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    color: var(--color-text);
+    background: var(--color-tint);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    vertical-align: middle;
+  }
+
+  @media (max-width: 480px) {
+    .pay {
+      padding: var(--space-5);
+    }
+  }
+</style>

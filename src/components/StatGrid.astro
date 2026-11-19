@@ -1,0 +1,54 @@
+---
+/** A row of key figures, each in its own white box. */
+interface Props {
+  items: { label: string; value: string }[];
+  size?: 'large' | 'small';
+}
+
+const { items, size = 'large' } = Astro.props;
+---
+
+<dl class:list={['stat-grid', `stat-grid--${size}`]}>
+  {
+    items.map((item) => (
+      <div class="stat-grid__item">
+        <dt>{item.label}</dt>
+        <dd>{item.value}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  .stat-grid__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: 18px;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+  }
+
+  dt {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: var(--weight-black);
+    line-height: 1.25;
+  }
+
+  .stat-grid--small dd {
+    font-size: 1.3rem;
+  }
+</style>

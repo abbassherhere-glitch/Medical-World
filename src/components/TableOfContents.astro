@@ -1,0 +1,45 @@
+---
+/** "In this article" list of links to sections on the same page. */
+interface Props {
+  items: { label: string; id: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="toc-title">
+  <h2 id="toc-title" class="toc__title">In this article</h2>
+  <ul class="toc__list">
+    {items.map((item) => <li><a href={`#${item.id}`}>{item.label}</a></li>)}
+  </ul>
+</nav>
+
+<style>
+  .toc {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: 18px 22px;
+    background: var(--color-light);
+    border-left: 4px solid var(--color-accent);
+  }
+
+  .toc__title {
+    font-size: 1.05rem;
+  }
+
+  .toc__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0 var(--space-6);
+    list-style: none;
+    padding: 0;
+  }
+
+  .toc__list a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-size: var(--text-md);
+  }
+</style>

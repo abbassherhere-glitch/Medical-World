@@ -1,0 +1,37 @@
+---
+/** A round photo of a person, or a grey placeholder circle when no photo is set. */
+interface Props {
+  src?: string | undefined;
+  name: string;
+  size?: number;
+}
+
+const { src, name, size = 40 } = Astro.props;
+---
+
+{
+  src ? (
+    <img class="person-photo" src={src} alt={name} width={size} height={size} loading="lazy" decoding="async" />
+  ) : (
+    <span class="person-photo person-photo--empty" aria-hidden="true" style={`width:${size}px;height:${size}px`}>
+      Photo
+    </span>
+  )
+}
+
+<style>
+  .person-photo {
+    flex: none;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .person-photo--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--color-text);
+    background: var(--color-border);
+  }
+</style>

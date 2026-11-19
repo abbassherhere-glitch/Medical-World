@@ -1,0 +1,53 @@
+---
+/**
+ * The outer frame of every page: the <head> tags, header and footer.
+ * Each page passes its own title and description.
+ */
+import { Font } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { settings } from '../settings';
+import { pageTitle } from '../lib/text';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Set to false for pages that should never be indexed, such as the 404 page. */
+  indexable?: boolean;
+  /** Set to false for pages without a canonical address, such as the 404 page. */
+  canonical?: boolean;
+}
+
+const { title, description, indexable = true, canonical = true } = Astro.props;
+const fullTitle = pageTitle(title, settings.siteName);
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const robots = settings.allowIndexing && indexable ? 'index, follow' : 'noindex, nofollow';
+---
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    {canonical && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta name="theme-color" content="#14232B" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <Font cssVariable="--font-lato" preload={[{ weight: '400' }, { weight: '900' }]} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <slot name="subnav" />
+    <slot />
+    <Footer />
+    <script>
+      import '../scripts/menus';
+    </script>
+  </body>
+</html>

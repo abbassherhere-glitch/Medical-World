@@ -1,0 +1,10 @@
+// Cloudflare Workers settings. The site is served as static files from ./dist.
+{
+  "name": "healthcare-careers-site",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

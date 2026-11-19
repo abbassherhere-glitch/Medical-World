@@ -1,0 +1,188 @@
+---
+import { settings } from '../settings';
+import { MAIN_MENU } from '../data/navigation';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__brand" href="/">{settings.siteName}</a>
+
+    <button
+      type="button"
+      class="menu-button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+    >
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 7h16M4 12h16M4 17h16"></path>
+      </svg>
+      Menu
+    </button>
+
+    <div class="site-header__menu" id="site-menu" data-menu>
+      <nav aria-label="Main">
+        <ul class="main-nav">
+          {
+            MAIN_MENU.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <form class="site-search" role="search" action="/search/" method="get">
+        <label for="site-search-input" class="visually-hidden">Search the site</label>
+        <input
+          id="site-search-input"
+          class="input site-search__input"
+          type="search"
+          name="q"
+          placeholder="Search guides"
+          autocomplete="off"
+        />
+        <button type="submit" class="button button--dark site-search__button">Search</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-6);
+    padding-block: 14px;
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-size: 22px;
+    font-weight: var(--weight-black);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .site-header__brand:hover {
+    color: var(--color-accent-hover);
+  }
+
+  .site-header__menu {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) 26px;
+    list-style: none;
+    padding: 0;
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+  }
+
+  .main-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .main-nav a:hover,
+  .main-nav a[aria-current='page'] {
+    color: var(--color-accent);
+  }
+
+  .site-search {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .site-search__input {
+    width: 180px;
+    min-height: var(--control-height-sm);
+    padding: 0 var(--space-3);
+    font-size: var(--text-md);
+  }
+
+  .site-search__button {
+    min-height: var(--control-height-sm);
+    padding: 0 var(--space-4);
+    font-size: var(--text-md);
+  }
+
+  .menu-button {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-size);
+    padding: 0 var(--space-4);
+    font-weight: var(--weight-bold);
+    background: var(--color-surface);
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  /* Phones and small tablets: the menu folds behind the Menu button. */
+  @media (max-width: 959px) {
+    :global(.js) .menu-button {
+      display: inline-flex;
+    }
+
+    .site-header__menu {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: var(--space-3);
+      padding-bottom: var(--space-2);
+    }
+
+    :global(.js) .site-header__menu:not([data-open]) {
+      display: none;
+    }
+
+    .main-nav {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      font-size: var(--text-base);
+    }
+
+    .main-nav li + li {
+      border-top: 1px solid var(--color-border);
+    }
+
+    .main-nav a {
+      display: flex;
+      min-height: 48px;
+    }
+
+    .site-search__input {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+    }
+  }
+</style>
