@@ -3,7 +3,7 @@
  * Profession and state picker with a "Find schools" button.
  * Leave out `professions` to show the state list only (for side panels).
  */
-import { US_STATES, slugify } from '../data/states';
+import { STATES_AND_DC, slugify } from '../data/states';
 import { isLive } from '../data/routes';
 
 interface Props {
@@ -22,7 +22,7 @@ const { id, professions, profession, layout = 'row' } = Astro.props;
 // list will need to follow the chosen profession once a second one is added.)
 const target = profession ?? professions?.[0]?.slug ?? '';
 const states = (
-  await Promise.all(US_STATES.map(async (name) => ({ name, slug: slugify(name), live: await isLive(`/${target}/${slugify(name)}/`) })))
+  await Promise.all(STATES_AND_DC.map(async (name) => ({ name, slug: slugify(name), live: await isLive(`/${target}/${slugify(name)}/`) })))
 ).filter((state) => state.live);
 ---
 

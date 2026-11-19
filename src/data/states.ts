@@ -10,6 +10,9 @@ export const US_STATES = [
   'Wisconsin', 'Wyoming',
 ] as const;
 
+/** The 50 states and the District of Columbia, in alphabetical order. */
+export const STATES_AND_DC = [...US_STATES, 'District of Columbia'].sort();
+
 /** Turns a name such as "New York" into a URL part such as "new-york". */
 export function slugify(name: string): string {
   return name

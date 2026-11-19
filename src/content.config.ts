@@ -111,12 +111,14 @@ const salaryGuides = defineCollection({
   }),
 });
 
+/**
+ * One template per profession for its state pages. "{state}" in any text is
+ * replaced with the state's name, for example "Pay in {state}".
+ */
 const stateGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/state-guides' }),
   schema: z.object({
     profession: reference('professions'),
-    state: z.string(),
-    stateSlug: z.string(),
     title: z.string(),
     description: z.string(),
     heading: z.string(),
@@ -149,8 +151,19 @@ const stateGuides = defineCollection({
     /** Sources other than the wage survey, which is added automatically. */
     otherSources: z.array(z.string()),
     compare: z.object({ heading: z.string(), text: z.string(), button: link, note: z.string() }),
-    nearbyStates: z.array(link),
     nationalGuides: z.array(link),
+  }),
+});
+
+/**
+ * Which state pages are published: one file per profession listing every
+ * state and DC with a "published" switch.
+ */
+const statePages = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/state-pages' }),
+  schema: z.object({
+    profession: reference('professions'),
+    pages: z.array(z.object({ state: z.string(), published: z.boolean() })),
   }),
 });
 
@@ -164,4 +177,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, pages };

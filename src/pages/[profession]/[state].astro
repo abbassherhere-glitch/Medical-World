@@ -14,17 +14,23 @@ import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
 import { areasInState, findState, formatAnnual, formatHourly, formatJobs, getPayData, releaseName } from '../../lib/pay';
 import { compareWithNational, placeName } from '../../lib/pay/summary';
+import { fillState } from '../../lib/publishing';
+import { getPublishedStatePages } from '../../data/state-pages';
+import { bordersOf } from '../../data/borders';
+import { slugify } from '../../data/states';
 
 export async function getStaticPaths() {
-  const guides = await getCollection('stateGuides');
-  return guides.map((guide) => ({
-    params: { profession: guide.data.profession.id, state: guide.data.stateSlug },
-    props: { guide },
-  }));
+  const [templates, pages] = await Promise.all([getCollection('stateGuides'), getPublishedStatePages()]);
+  return pages.flatMap((page) => {
+    const template = templates.find((t) => t.data.profession.id === page.profession);
+    if (!template) return [];
+    return [{ params: { profession: page.profession, state: page.slug }, props: { template: template.data, state: page.state } }];
+  });
 }
 
-const { guide } = Astro.props;
-const data = guide.data;
+const { template, state } = Astro.props;
+// The template's text with {state} filled in; "the District of Columbia" reads naturally in sentences.
+const data = { ...fillState(template, placeName(state)), state };
 const profession = await getEntry(data.profession);
 const professionSlug = data.profession.id;
 
@@ -38,6 +44,9 @@ const comparison =
   compareWithNational(data.state, local, pay.national) ??
   `The ${pay.release.referencePeriod} survey has no pay figures for ${profession.data.namePlural} in ${placeName(data.state)}.`;
 const areas = areasInState(pay, statePay.abbr);
+const nearby = bordersOf(statePay.abbr)
+  .map((abbr) => pay.states.find((s) => s.abbr === abbr)!)
+  .map((s) => ({ label: s.name, href: `/${professionSlug}/${slugify(s.name)}/` }));
 const takeaways = [`${comparison.replace(/\.$/, '')} (${release}).`, ...data.takeaways];
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
@@ -154,7 +163,7 @@ const contents = [
       <p class="note">{data.compare.note}</p>
     </section>
     <AdSlot size="sidebar" id="state-side-1" />
-    <LinkPanel heading="Nearby states" links={data.nearbyStates} />
+    {nearby.length > 0 && <LinkPanel heading="Nearby states" links={nearby} />}
     <LinkPanel heading="National guides" links={data.nationalGuides} />
   </Fragment>
 </GuideLayout>

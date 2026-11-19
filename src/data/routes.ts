@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content';
+import { getPublishedStatePages } from './state-pages';
 
 /**
  * Every public page address. This is the one list the site uses to decide
@@ -8,16 +9,16 @@ import { getCollection } from 'astro:content';
  * The 404 page is left out on purpose.
  */
 export async function getPublicRoutes(): Promise<string[]> {
-  const [salaryGuides, stateGuides, pages] = await Promise.all([
+  const [salaryGuides, statePages, pages] = await Promise.all([
     getCollection('salaryGuides'),
-    getCollection('stateGuides'),
+    getPublishedStatePages(),
     getCollection('pages'),
   ]);
 
   return [
     '/',
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
-    ...stateGuides.map((g) => `/${g.data.profession.id}/${g.data.stateSlug}/`),
+    ...statePages.map((p) => p.path),
     ...pages.map((p) => `/${p.id}/`),
   ];
 }
