@@ -15,6 +15,7 @@ import SourceLine from '../../components/SourceLine.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
+import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
 import UpNext from '../../components/UpNext.astro';
 import { upNext } from '../../data/up-next';
 import { stateQuestions } from '../../lib/pay/state-questions';
@@ -315,6 +316,7 @@ const contents = [
       text={`See pay in ${where} per hour, week, month or year, and compare it with another state.`}
       label={`Compare ${state}`}
     />
+    <UsefulOrganizations id="state" />
     <AdSlot size="sidebar" id="state-side-1" />
     {
       neighbors.length > 0 && (

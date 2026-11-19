@@ -6,6 +6,7 @@ import KeyTakeaways from '../../components/KeyTakeaways.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import StateGrid from '../../components/StateGrid.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
+import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
 import UpNext from '../../components/UpNext.astro';
 import { upNext } from '../../data/up-next';
 import AdSlot from '../../components/AdSlot.astro';
@@ -85,6 +86,7 @@ const contents = [
       <h2 id="find-state" class="panel-title">Rules in your state</h2>
       <StatePicker id="side" profession={slug} layout="column" buttonLabel="Go to state page" />
     </section>
+    <UsefulOrganizations id="become" />
     <AdSlot size="sidebar" id="become-side-1" />
     <LinkPanel heading="Related guides" links={guide.related} />
   </Fragment>

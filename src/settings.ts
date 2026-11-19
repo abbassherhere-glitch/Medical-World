@@ -25,6 +25,12 @@ export const settings = {
 
   /** Set to false to hide every advert area on the site. */
   showAdverts: true,
+
+  /**
+   * Set to false to hide the "Useful organizations" box on state pages and
+   * on "How to become one".
+   */
+  showUsefulOrganizations: true,
 } as const;
 
 /**
