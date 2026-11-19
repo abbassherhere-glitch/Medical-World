@@ -11,6 +11,9 @@ import AdSlot from '../../components/AdSlot.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
+import SourceLine from '../../components/SourceLine.astro';
+import { areasInState, findState, formatAnnual, formatHourly, formatJobs, getPayData, releaseName } from '../../lib/pay';
+import { compareWithNational, placeName } from '../../lib/pay/summary';
 
 export async function getStaticPaths() {
   const guides = await getCollection('stateGuides');
@@ -24,6 +27,19 @@ const { guide } = Astro.props;
 const data = guide.data;
 const profession = await getEntry(data.profession);
 const professionSlug = data.profession.id;
+
+// Pay for this state, worked out from the data so the template works for any state.
+const pay = getPayData(professionSlug);
+const release = releaseName(pay);
+const statePay = findState(pay, data.state);
+if (!statePay) throw new Error(`"${data.state}" is not in the pay data. Check the state name in its content file.`);
+const local = statePay.figures;
+const comparison =
+  compareWithNational(data.state, local, pay.national) ??
+  `The ${pay.release.referencePeriod} survey has no pay figures for ${profession.data.namePlural} in ${placeName(data.state)}.`;
+const areas = areasInState(pay, statePay.abbr);
+const takeaways = [`${comparison.replace(/\.$/, '')} (${release}).`, ...data.takeaways];
+const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
   { label: data.pay.heading, id: 'pay' },
@@ -46,29 +62,50 @@ const contents = [
   ]}
   byline={data.byline}
 >
-  <KeyTakeaways items={data.takeaways} />
+  <KeyTakeaways items={takeaways} />
   <TableOfContents items={contents} />
 
   <section class="panel panel--tint stack pay" aria-labelledby="pay">
     <h2 id="pay" class="section-title">{data.pay.heading}</h2>
-    <StatGrid items={data.pay.stats} size="small" />
-    <p class="pay__summary">{data.pay.summary}</p>
+    <StatGrid
+      size="small"
+      items={[
+        { label: `${data.state}, median per year`, value: formatAnnual(local?.annual.median) },
+        { label: `${data.state}, median per hour`, value: formatHourly(local?.hourly.median) },
+        { label: 'US, median per year', value: formatAnnual(pay.national.annual.median) },
+        { label: 'US, median per hour', value: formatHourly(pay.national.hourly.median) },
+      ]}
+    />
+    <p class="pay__summary">{comparison}</p>
+    <SourceLine data={pay} />
   </section>
 
   <ImageSlot {...data.image} />
 
   <section class="stack" aria-labelledby="pay-by-city">
     <h2 id="pay-by-city" class="section-title">{data.cityPay.heading}</h2>
-    <ScrollTable caption={`${profession.data.name} pay by city in ${data.state}`} columns={data.cityPay.columns} minWidth={480}>
-      {
-        data.cityPay.rows.map(([area, ...values]) => (
-          <tr>
-            <th scope="row">{area}</th>
-            {values.map((value) => <td>{value}</td>)}
-          </tr>
-        ))
-      }
-    </ScrollTable>
+    <p class="muted">{data.cityPay.intro}</p>
+    {
+      areas.length > 0 ? (
+        <ScrollTable
+          caption={`${profession.data.name} pay by area in ${placeName(data.state)}, highest median first`}
+          columns={['Area', 'Median per year', 'Median per hour', 'Jobs']}
+          minWidth={560}
+        >
+          {areas.map((area) => (
+            <tr>
+              <th scope="row">{area.name}</th>
+              <td class="strong">{formatAnnual(area.figures.annual.median)}</td>
+              <td>{formatHourly(area.figures.hourly.median)}</td>
+              <td>{formatJobs(area.figures.employment)}</td>
+            </tr>
+          ))}
+        </ScrollTable>
+      ) : (
+        <p>The {pay.release.referencePeriod} survey has no area figures for {profession.data.namePlural} in {placeName(data.state)}.</p>
+      )
+    }
+    <p class="note">Source: {pay.release.publisher}, {release}.</p>
   </section>
 
   <AdSlot size="inline" id="state-content-1" />
@@ -107,7 +144,7 @@ const contents = [
     <p class="note">{data.schools.note}</p>
   </section>
 
-  <SourcesBox items={data.sources} />
+  <SourcesBox items={sources} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="compare">
@@ -130,6 +167,10 @@ const contents = [
 
   .pay__summary {
     line-height: 1.6;
+  }
+
+  .strong {
+    font-weight: var(--weight-bold);
   }
 
   .muted {

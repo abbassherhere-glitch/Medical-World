@@ -32,8 +32,6 @@ const byline = z.object({
   sourceNote: z.string(),
 });
 
-const tableRow = z.array(z.string());
-
 const professions = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/professions' }),
   schema: z.object({
@@ -123,14 +121,11 @@ const stateGuides = defineCollection({
     description: z.string(),
     heading: z.string(),
     byline,
+    /** Takeaways not about pay. A pay takeaway worked out from the data is added first. */
     takeaways: z.array(z.string()),
-    pay: z.object({ heading: z.string(), stats: z.array(figure), summary: z.string() }),
+    pay: z.object({ heading: z.string() }),
     image,
-    cityPay: z.object({
-      heading: z.string(),
-      columns: z.array(z.string()),
-      rows: z.array(tableRow),
-    }),
+    cityPay: z.object({ heading: z.string(), intro: z.string() }),
     licensing: z.object({
       heading: z.string(),
       intro: z.string(),
@@ -151,7 +146,8 @@ const stateGuides = defineCollection({
       ),
       note: z.string(),
     }),
-    sources: z.array(z.string()),
+    /** Sources other than the wage survey, which is added automatically. */
+    otherSources: z.array(z.string()),
     compare: z.object({ heading: z.string(), text: z.string(), button: link, note: z.string() }),
     nearbyStates: z.array(link),
     nationalGuides: z.array(link),
