@@ -12,8 +12,7 @@
     "sourceNote": "Sources are listed at the end of the page."
   },
   "takeaways": [
-    "[Licensing steps in {state} in one sentence, from the state board.]",
-    "[Number of accredited programs in {state} and typical length.]"
+    "[Licensing steps in {state} in one sentence, from the state board.]"
   ],
   "pay": {
     "heading": "Pay in {state}"
@@ -53,51 +52,16 @@
     ]
   },
   "schools": {
-    "heading": "Dental hygiene schools in {state}",
-    "columns": [
-      "School",
-      "City",
-      "Award",
-      "Length"
-    ],
-    "rows": [
-      {
-        "name": "[SCHOOL NAME]",
-        "city": "[CITY]",
-        "award": "[AWARD]",
-        "length": "[LENGTH]"
-      },
-      {
-        "name": "[SCHOOL NAME]",
-        "city": "[CITY]",
-        "award": "[AWARD]",
-        "length": "[LENGTH]"
-      },
-      {
-        "name": "[SCHOOL NAME]",
-        "city": "[CITY]",
-        "award": "[AWARD]",
-        "length": "[LENGTH]",
-        "sponsored": true
-      },
-      {
-        "name": "[SCHOOL NAME]",
-        "city": "[CITY]",
-        "award": "[AWARD]",
-        "length": "[LENGTH]"
-      }
-    ],
-    "note": "Only accredited programs are listed. Any school that pays to be featured is marked \"Sponsored\"."
+    "heading": "Dental hygiene schools in {state}"
   },
   "otherSources": [
-    "[Dental board for {state}, page and date checked]",
-    "[Accrediting body's program list, date checked]"
+    "[Dental board for {state}, page and date checked]"
   ],
   "compare": {
-    "heading": "Compare programs in {state}",
-    "text": "See entry requirements and start dates for accredited schools.",
+    "heading": "Colleges in {state}",
+    "text": "See the colleges in {state} that reported dental hygiene awards, and how many each reported.",
     "button": {
-      "label": "Find schools",
+      "label": "See the colleges",
       "href": "#schools"
     },
     "note": "Schools that pay to be featured are marked \"Sponsored\"."

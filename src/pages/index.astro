@@ -12,6 +12,7 @@ import PersonPhoto from '../components/PersonPhoto.astro';
 import SmartLink from '../components/SmartLink.astro';
 import { liveLinks } from '../data/routes';
 import home from '../content/home.json';
+import { settings } from '../settings';
 
 const professions = await getCollection('professions');
 const featured = await getEntry('professions', home.featuredProfession);
@@ -35,7 +36,7 @@ const popularGuides = await liveLinks(profession.popularGuides);
               professions={professions.map((p) => ({ slug: p.id, name: p.data.name }))}
             />
           </div>
-          <p class="note">{home.hero.pickerNote}</p>
+          {settings.showSponsoredListings && <p class="note">{home.hero.pickerNote}</p>}
         </div>
         <ImageSlot class="hero__image" {...home.hero.image} eager />
       </div>

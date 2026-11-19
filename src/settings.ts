@@ -31,6 +31,13 @@ export const settings = {
    * on "How to become one".
    */
   showUsefulOrganizations: true,
+
+  /**
+   * Leave false until schools pay to be featured. While false, no
+   * "Sponsored" label and no note about paid listings appears anywhere.
+   * Turn on only when real paid listings exist (see README).
+   */
+  showSponsoredListings: false,
 } as const;
 
 /**

@@ -15,6 +15,9 @@ import SourceLine from '../../components/SourceLine.astro';
 import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
+import SchoolsSection from '../../components/SchoolsSection.astro';
+import { getSchools, schoolsInState, schoolsSourceLine, stateSchoolsSummary, withAwards, withoutAwards, totalAwards, countFormat as schoolCount } from '../../lib/schools';
+import { settings } from '../../settings';
 import OutlookSection from '../../components/OutlookSection.astro';
 import { findOutlookPlace, getOutlook, outlookSentence, projectionYears, rankByGrowth, formatCount } from '../../lib/outlook';
 import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
@@ -131,7 +134,14 @@ if (stateMedian !== undefined) {
   description = `${capitalize(plural)} in ${where}: the US median is ${formatAnnual(usMedian)} a year. Licensing steps and schools.`;
 }
 
-const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
+// Colleges that reported dental hygiene awards (IPEDS); only what the file says.
+const schoolsData = getSchools(professionSlug);
+const stateSchools = schoolsData ? schoolsInState(schoolsData, statePay.abbr) : [];
+const schoolsYear = schoolsData?.source.awardYear ?? '';
+const schoolsSummary = schoolsData ? stateSchoolsSummary(where, stateSchools, schoolsYear) : undefined;
+if (schoolsSummary) takeaways.splice(takeaways.length - data.takeaways.length, 0, schoolsSummary.replace(/\.$/, ' (US Department of Education, IPEDS).'));
+
+const sources = [`${pay.release.publisher}, ${release}`, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...data.otherSources];
 
 // Job outlook, from the state projections (a different source from the pay
 // survey; never mixed with it). Ranked among the states and DC only.
@@ -160,6 +170,27 @@ const questions = stateQuestions({
   plural,
   survey,
 }).map((q) => ({ question: q.question, answer: q.answer }));
+if (schoolsData && schoolsSummary) {
+  const active = withAwards(stateSchools);
+  const top = active.slice(0, 3);
+  const zero = withoutAwards(stateSchools).length;
+  questions.push({
+    question: `Where can I study dental hygiene in ${where}?`,
+    answer: [
+      schoolsSummary,
+      active.length > 1
+        ? `The ${top.length === active.length ? '' : `${top.length} `}colleges with the most awards were ${top
+            .map((s) => `${s.name} (${schoolCount.format(totalAwards(s))})`)
+            .join(', ')
+            .replace(/, ([^,]*)$/, ' and $1')}.`
+        : '',
+      zero ? `${zero === 1 ? 'One more college' : `${zero} more colleges`} reported the program with no awards that year.` : '',
+      "This is not a list of accredited programs: check a program's accreditation with the Commission on Dental Accreditation (CODA) and its approval with the state dental board.",
+    ]
+      .filter(Boolean)
+      .join(' '),
+  });
+}
 if (outlook && outlookPlace && outlookLine) {
   questions.push({
     question: `What is the job outlook for ${plural} in ${where}?`,
@@ -316,25 +347,11 @@ const contents = [
     </ol>
   </section>
 
-  <section class="stack" aria-labelledby="schools">
-    <h2 id="schools" class="section-title" tabindex="-1">{data.schools.heading}</h2>
-    <ScrollTable caption={data.schools.heading} columns={data.schools.columns} minWidth={560}>
-      {
-        data.schools.rows.map((school) => (
-          <tr>
-            <th scope="row">
-              {school.href ? <SmartLink href={school.href}>{school.name}</SmartLink> : school.name}
-              {school.sponsored && <span class="sponsored">Sponsored</span>}
-            </th>
-            <td>{school.city}</td>
-            <td>{school.award}</td>
-            <td>{school.length}</td>
-          </tr>
-        ))
-      }
-    </ScrollTable>
-    <p class="note">{data.schools.note}</p>
-  </section>
+  {
+    schoolsData && (
+      <SchoolsSection id="schools" heading={data.schools.heading} place={where} data={schoolsData} schools={stateSchools} />
+    )
+  }
 
   {questions.length > 0 && <FaqList id="common-questions" heading="Common questions" items={questions} />}
 
@@ -346,7 +363,7 @@ const contents = [
       <h2 id="compare" class="panel-title">{data.compare.heading}</h2>
       <p class="muted">{data.compare.text}</p>
       <a class="button button--action" href={data.compare.button.href}>{data.compare.button.label}</a>
-      <p class="note">{data.compare.note}</p>
+      {settings.showSponsoredListings && <p class="note">{data.compare.note}</p>}
     </section>
     <CalculatorLink
       profession={professionSlug}
@@ -399,19 +416,6 @@ const contents = [
     gap: var(--space-3);
     padding-left: var(--space-6);
     line-height: 1.6;
-  }
-
-  .sponsored {
-    display: inline-block;
-    margin-left: var(--space-2);
-    padding: 2px 8px;
-    font-size: var(--text-xs);
-    font-weight: var(--weight-bold);
-    color: var(--color-text);
-    background: var(--color-tint);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-pill);
-    vertical-align: middle;
   }
 
   @media (max-width: 480px) {

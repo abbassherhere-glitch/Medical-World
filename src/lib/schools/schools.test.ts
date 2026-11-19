@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { applySchoolOverrides } from './overrides.ts';
-import { levelTotals, stateSchoolsSummary, websiteHref, withAwards, withoutAwards } from './summary.ts';
+import { inSentence, levelTotals, stateSchoolsSummary, websiteHref, withAwards, withoutAwards } from './summary.ts';
 import type { School, SchoolsData } from './types.ts';
 
 // Made-up colleges, for testing only.
@@ -64,4 +64,10 @@ test('overrides hide a college or correct one detail, and a mistake stops the bu
   assert.throws(run({ profession: 'p', id: '1', field: 'tuition', value: 'x' }), /set "hide": true, or a "field"/);
   assert.throws(run({ profession: 'p', id: '1', field: 'control', value: 'Charter' }), /type must be one of/);
   assert.throws(run({ profession: 'q', id: '1', hide: true }), /unknown profession/);
+});
+
+test('award levels read naturally in a sentence', () => {
+  assert.equal(inSentence("Associate's degree"), "an associate's degree");
+  assert.equal(inSentence('Certificate, 2 to less than 4 years'), 'a certificate (2 to less than 4 years)');
+  assert.equal(inSentence('Postbaccalaureate certificate'), 'a postbaccalaureate certificate');
 });

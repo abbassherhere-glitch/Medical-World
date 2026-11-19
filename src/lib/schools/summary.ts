@@ -56,8 +56,11 @@ export function controlLabel(control: Control): string {
 }
 
 /** Lowercases the first letter of an award name for use in a sentence: "an associate's degree". */
-function inSentence(level: string): string {
-  const lower = level.charAt(0).toLowerCase() + level.slice(1);
+export function inSentence(level: string): string {
+  // "Certificate, 2 to less than 4 years" reads as "a certificate (2 to less than 4 years)".
+  const [head, ...rest] = level.split(', ');
+  const tidy = rest.length ? `${head} (${rest.join(', ')})` : level;
+  const lower = tidy.charAt(0).toLowerCase() + tidy.slice(1);
   return /^[aeiou]/i.test(lower) ? `an ${lower}` : `a ${lower}`;
 }
 
