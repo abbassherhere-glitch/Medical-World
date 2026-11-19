@@ -1,0 +1,46 @@
+---
+/** Schools: for every profession with pages, a grid of states opening each state page at its schools. */
+import { getCollection } from 'astro:content';
+import HubLayout from '../layouts/HubLayout.astro';
+import StateGrid from '../components/StateGrid.astro';
+import { professionsWithPages } from '../data/professions';
+import { liveLinks } from '../data/routes';
+import { STATES_AND_DC } from '../data/states';
+
+const topicPages = await getCollection('topicPages');
+const professions = await Promise.all(
+  (await professionsWithPages()).map(async (p) => ({
+    slug: p.id,
+    data: p.data,
+    // The first paragraph of the profession's own "Schools by state" page.
+    intro: topicPages.find((t) => t.data.profession.id === p.id)?.data.schools.intro[0],
+    links: await liveLinks([{ href: `/${p.id}/schools/`, label: `${p.data.name} schools by state` }]),
+  })),
+);
+---
+
+<HubLayout
+  title="Healthcare schools by state"
+  description={`Find accredited training programs in your state for ${professions.map((p) => p.data.namePlural).join(', ')}.`}
+  heading="Schools"
+  intro="Choose a profession and your state to see accredited programs there."
+>
+  {
+    professions.map((p) => (
+      <section class="hub-section" aria-labelledby={`schools-${p.slug}`}>
+        <h2 id={`schools-${p.slug}`} class="hub-section__title">
+          {p.data.name} schools
+        </h2>
+        {p.intro && <p>{p.intro}</p>}
+        <ul class="hub-links">
+          {p.links.map((l) => (
+            <li>
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))}
+        </ul>
+        <StateGrid profession={p.slug} states={STATES_AND_DC} section="schools" />
+      </section>
+    ))
+  }
+</HubLayout>

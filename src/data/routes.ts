@@ -21,6 +21,11 @@ export async function getPublicRoutes(): Promise<string[]> {
 
   return [
     '/',
+    // Site-wide index pages in the top menu. They list only professions with pages.
+    '/professions/',
+    '/salaries/',
+    '/schools/',
+    '/licensing/',
     ...professions.filter((p) => p.data.overview).map((p) => `/${p.id}/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
     ...becomeGuides.map((g) => `/${g.data.profession.id}/how-to-become/`),

@@ -1,0 +1,49 @@
+---
+/** Licensing: for every profession with pages, the general rule and a grid of state licensing sections. */
+import { getCollection } from 'astro:content';
+import HubLayout from '../layouts/HubLayout.astro';
+import StateGrid from '../components/StateGrid.astro';
+import { professionsWithPages } from '../data/professions';
+import { liveLinks } from '../data/routes';
+import { STATES_AND_DC } from '../data/states';
+
+const becomeGuides = await getCollection('becomeGuides');
+const professions = await Promise.all(
+  (await professionsWithPages()).map(async (p) => ({
+    slug: p.id,
+    data: p.data,
+    // The short general explanation already used on "How to become one".
+    explanation: becomeGuides.find((g) => g.data.profession.id === p.id)?.data.intro,
+    links: await liveLinks([
+      { href: `/${p.id}/licensing/`, label: `${p.data.name} licensing by state` },
+      { href: `/${p.id}/how-to-become/`, label: `How to become a ${p.data.name.toLowerCase()}` },
+    ]),
+  })),
+);
+---
+
+<HubLayout
+  title="Healthcare licensing rules by state"
+  description={`How to get licensed in every state and DC, for ${professions.map((p) => p.data.namePlural).join(', ')}. Requirements differ from state to state.`}
+  heading="Licensing"
+  intro="Choose a profession and your state to see how to get licensed there."
+>
+  {
+    professions.map((p) => (
+      <section class="hub-section" aria-labelledby={`licensing-${p.slug}`}>
+        <h2 id={`licensing-${p.slug}`} class="hub-section__title">
+          {p.data.name} licensing
+        </h2>
+        {p.explanation && <p>{p.explanation}</p>}
+        <ul class="hub-links">
+          {p.links.map((l) => (
+            <li>
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))}
+        </ul>
+        <StateGrid profession={p.slug} states={STATES_AND_DC} section="licensing" />
+      </section>
+    ))
+  }
+</HubLayout>

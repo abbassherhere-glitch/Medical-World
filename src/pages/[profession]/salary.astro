@@ -7,17 +7,14 @@ import TableOfContents from '../../components/TableOfContents.astro';
 import StatGrid from '../../components/StatGrid.astro';
 import PayRangeBar from '../../components/PayRangeBar.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
-import ScrollTable from '../../components/ScrollTable.astro';
+import PayByStateTable from '../../components/PayByStateTable.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
 import SourceLine from '../../components/SourceLine.astro';
 import StatePicker from '../../components/StatePicker.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
-import SmartLink from '../../components/SmartLink.astro';
-import { slugify } from '../../data/states';
 import {
-  byMedianDescending,
   formatAnnual,
   formatHourly,
   formatJobs,
@@ -47,8 +44,6 @@ const pay = getPayData(professionSlug);
 const national = pay.national;
 const release = releaseName(pay);
 const states = statesAndDc(pay);
-const tableRows = byMedianDescending(states);
-const unpublished = states.filter((s) => !s.published).map((s) => s.name);
 const extremes = highestAndLowest(states);
 const survey = surveyPhrase(pay);
 // The District of Columbia is listed with the states but is not one.
@@ -137,30 +132,7 @@ const contents = [
   <section class="stack" aria-labelledby="pay-by-state">
     <h2 id="pay-by-state" class="section-title">{data.payByState.heading}</h2>
     <p class="muted">{data.payByState.intro}</p>
-    <ScrollTable
-      caption={`${profession.data.name} pay by state, highest median first`}
-      columns={['State', 'Lowest 10%', 'Median', 'Top 10%', 'Jobs']}
-      minWidth={600}
-    >
-      {
-        tableRows.map((state) => (
-          <tr>
-            <th scope="row">
-              <SmartLink href={`/${professionSlug}/${slugify(state.name)}/`}>{state.name}</SmartLink>
-            </th>
-            <td>{formatAnnual(state.figures?.annual.p10)}</td>
-            <td class="strong">{formatAnnual(state.figures?.annual.median)}</td>
-            <td>{formatAnnual(state.figures?.annual.p90)}</td>
-            <td>{formatJobs(state.figures?.employment)}</td>
-          </tr>
-        ))
-      }
-    </ScrollTable>
-    <p class="note">
-      Yearly pay. "Lowest 10%" means one in ten earn less than this; "Top 10%" means one in ten earn more.
-      {unpublished.length > 0 && ` The ${pay.release.referencePeriod} survey has no figures for ${plural} in ${joinNames(unpublished)}.`}
-      {' '}Source: {pay.release.publisher}, {release}.
-    </p>
+    <PayByStateTable profession={professionSlug} name={profession.data.name} plural={plural} />
   </section>
 
   <AdSlot size="inline" id="salary-content-1" />

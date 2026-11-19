@@ -1,0 +1,50 @@
+---
+/**
+ * Pay by state for a profession: every state and DC, highest median first,
+ * with lowest 10%, median, top 10% and jobs. State names link to their pages.
+ */
+import ScrollTable from './ScrollTable.astro';
+import SmartLink from './SmartLink.astro';
+import { slugify } from '../data/states';
+import { byMedianDescending, formatAnnual, formatJobs, getPayData, releaseName, statesAndDc } from '../lib/pay';
+import { joinNames } from '../lib/pay/summary';
+
+interface Props {
+  profession: string;
+  name: string;
+  plural: string;
+}
+
+const { profession, name, plural } = Astro.props;
+const pay = getPayData(profession);
+const states = statesAndDc(pay);
+const rows = byMedianDescending(states);
+const unpublished = states.filter((s) => !s.published).map((s) => s.name);
+---
+
+<ScrollTable caption={`${name} pay by state, highest median first`} columns={['State', 'Lowest 10%', 'Median', 'Top 10%', 'Jobs']} minWidth={600}>
+  {
+    rows.map((state) => (
+      <tr>
+        <th scope="row">
+          <SmartLink href={`/${profession}/${slugify(state.name)}/`}>{state.name}</SmartLink>
+        </th>
+        <td>{formatAnnual(state.figures?.annual.p10)}</td>
+        <td class="strong">{formatAnnual(state.figures?.annual.median)}</td>
+        <td>{formatAnnual(state.figures?.annual.p90)}</td>
+        <td>{formatJobs(state.figures?.employment)}</td>
+      </tr>
+    ))
+  }
+</ScrollTable>
+<p class="note">
+  Yearly pay. "Lowest 10%" means one in ten earn less than this; "Top 10%" means one in ten earn more.
+  {unpublished.length > 0 && ` The ${pay.release.referencePeriod} survey has no figures for ${plural} in ${joinNames(unpublished)}.`}
+  {' '}Source: {pay.release.publisher}, {releaseName(pay)}.
+</p>
+
+<style>
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+</style>
