@@ -11,9 +11,22 @@ import ScrollTable from '../../components/ScrollTable.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
+import SourceLine from '../../components/SourceLine.astro';
 import StatePicker from '../../components/StatePicker.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
+import { slugify } from '../../data/states';
+import {
+  byMedianDescending,
+  formatAnnual,
+  formatHourly,
+  formatJobs,
+  getPayData,
+  releaseName,
+  statesAndDc,
+  surveyPhrase,
+} from '../../lib/pay';
+import { capitalize, highestAndLowest, joinNames, medianInWords, rankByMedian } from '../../lib/pay/summary';
 import { inlineMarkup } from '../../lib/text';
 
 export async function getStaticPaths() {
@@ -28,6 +41,60 @@ const { guide } = Astro.props;
 const data = guide.data;
 const profession = await getEntry(data.profession);
 const professionSlug = data.profession.id;
+const plural = profession.data.namePlural;
+
+const pay = getPayData(professionSlug);
+const national = pay.national;
+const release = releaseName(pay);
+const states = statesAndDc(pay);
+const tableRows = byMedianDescending(states);
+const unpublished = states.filter((s) => !s.published).map((s) => s.name);
+const extremes = highestAndLowest(states);
+const survey = surveyPhrase(pay);
+// The District of Columbia is listed with the states but is not one.
+const topState = rankByMedian(states.filter((s) => s.kind === 'state'))[0];
+
+const median = medianInWords(national);
+const summary = `${capitalize(plural)} in the US earn a median of **${median}**, according to ${survey}.`;
+
+const listRanked = (items: { name: string; median: number }[]) =>
+  `${joinNames(items.map((s) => s.name))} (${formatAnnual(items[0]!.median)})`;
+
+const takeaways = [
+  `The national median pay is ${median} (${release}).`,
+  ...(extremes
+    ? [
+        `By median yearly pay, the highest pay is in ${listRanked(extremes.highest)}${
+          topState && !extremes.highest.some((s) => s.name === topState.name)
+            ? `, and the highest of the states themselves is ${topState.name} (${formatAnnual(topState.median)})`
+            : ''
+        }. The lowest is in ${listRanked(extremes.lowest)} (${release}).`,
+      ]
+    : []),
+  ...data.outlookTakeaways,
+];
+
+const answers: Record<string, string> = {
+  'hourly-median': `The national median is ${formatHourly(national.hourly.median)} an hour, or ${formatAnnual(national.annual.median)} a year, according to ${survey}. Half of ${plural} earn more than this and half earn less.`,
+  'highest-state': extremes
+    ? [
+        `${capitalize(joinNames(extremes.highest.map((s) => s.name)))} ${extremes.highest.length > 1 ? 'have' : 'has'} the highest median pay, at ${formatAnnual(extremes.highest[0]!.median)} a year, according to ${survey}.`,
+        topState && !extremes.highest.some((s) => s.name === topState.name)
+          ? `Of the states themselves, ${topState.name} is highest, at ${formatAnnual(topState.median)}.`
+          : '',
+        `The national median is ${formatAnnual(national.annual.median)}.`,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : 'State figures are not available.',
+  'lower-pay': `The wage survey does not report starting pay. As a guide to pay at the lower end, the lowest-paid 10% of ${plural} earned less than ${formatAnnual(national.annual.p10)} a year (${formatHourly(national.hourly.p10)} an hour), and the lowest-paid 25% earned less than ${formatAnnual(national.annual.p25)} a year, according to ${survey}.`,
+};
+const faqs = data.faqs.map((faq) => ({
+  question: faq.question,
+  answer: faq.answerFrom ? answers[faq.answerFrom]! : (faq.answer ?? ''),
+}));
+
+const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
   { label: data.payByState.heading, id: 'pay-by-state' },
@@ -51,29 +118,49 @@ const contents = [
   byline={data.byline}
 >
   <section class="panel panel--tint stack summary" aria-label="Summary">
-    <p class="summary__lead" set:html={inlineMarkup(data.summary)} />
-    <StatGrid items={data.stats} />
-    <PayRangeBar {...data.payRange} />
+    <p class="summary__lead" set:html={inlineMarkup(summary)} />
+    <StatGrid
+      items={[
+        { label: 'Median per year', value: formatAnnual(national.annual.median) },
+        { label: 'Median per hour', value: formatHourly(national.hourly.median) },
+        { label: 'Jobs counted in the survey', value: formatJobs(national.employment) },
+      ]}
+    />
+    <PayRangeBar annual={national.annual} />
+    <SourceLine data={pay} />
   </section>
 
-  <KeyTakeaways items={data.takeaways} />
+  <KeyTakeaways items={takeaways} />
   <TableOfContents items={contents} />
   <ImageSlot {...data.image} />
 
   <section class="stack" aria-labelledby="pay-by-state">
     <h2 id="pay-by-state" class="section-title">{data.payByState.heading}</h2>
     <p class="muted">{data.payByState.intro}</p>
-    <ScrollTable caption={`${profession.data.name} pay by state`} columns={data.payByState.columns}>
+    <ScrollTable
+      caption={`${profession.data.name} pay by state, highest median first`}
+      columns={['State', 'Lowest 10%', 'Median', 'Top 10%', 'Jobs']}
+      minWidth={600}
+    >
       {
-        data.payByState.rows.map((row) => (
+        tableRows.map((state) => (
           <tr>
-            <th scope="row">{row.href ? <SmartLink href={row.href}>{row.state}</SmartLink> : row.state}</th>
-            {row.values.map((value) => <td>{value}</td>)}
+            <th scope="row">
+              <SmartLink href={`/${professionSlug}/${slugify(state.name)}/`}>{state.name}</SmartLink>
+            </th>
+            <td>{formatAnnual(state.figures?.annual.p10)}</td>
+            <td class="strong">{formatAnnual(state.figures?.annual.median)}</td>
+            <td>{formatAnnual(state.figures?.annual.p90)}</td>
+            <td>{formatJobs(state.figures?.employment)}</td>
           </tr>
         ))
       }
     </ScrollTable>
-    <SmartLink class="more-link" href={data.payByState.more.href}>{data.payByState.more.label}</SmartLink>
+    <p class="note">
+      Yearly pay. "Lowest 10%" means one in ten earn less than this; "Top 10%" means one in ten earn more.
+      {unpublished.length > 0 && ` The ${pay.release.referencePeriod} survey has no figures for ${plural} in ${joinNames(unpublished)}.`}
+      {' '}Source: {pay.release.publisher}, {release}.
+    </p>
   </section>
 
   <AdSlot size="inline" id="salary-content-1" />
@@ -85,8 +172,8 @@ const contents = [
     </ul>
   </section>
 
-  <FaqList id="common-questions" heading="Common questions" items={data.faqs} />
-  <SourcesBox items={data.sources} />
+  <FaqList id="common-questions" heading="Common questions" items={faqs} />
+  <SourcesBox items={sources} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="find-schools">
@@ -115,11 +202,7 @@ const contents = [
     color: var(--color-text-secondary);
   }
 
-  .more-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--tap-size);
-    font-size: var(--text-md);
+  .strong {
     font-weight: var(--weight-bold);
   }
 

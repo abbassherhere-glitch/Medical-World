@@ -73,3 +73,31 @@ test('special values are shown in words, never as a blank or zero', () => {
   assert.equal(formatAnnual(undefined), NOT_AVAILABLE);
   assert.match(formatAnnual({ symbol: '#' }), /top pay level|At least/);
 });
+
+import { compareWithNational, highestAndLowest, joinNames, rankByMedian } from './summary.ts';
+
+test('finds the highest and lowest paying states, listing ties together', () => {
+  const states = [
+    { code: '1', name: 'A', abbr: 'AA', kind: 'state' as const, published: true, figures: figures(50000) },
+    { code: '2', name: 'B', abbr: 'BB', kind: 'state' as const, published: true, figures: figures(30000) },
+    { code: '3', name: 'C', abbr: 'CC', kind: 'state' as const, published: true, figures: figures(50000) },
+    { code: '4', name: 'D', abbr: 'DD', kind: 'state' as const, published: false },
+  ];
+  const result = highestAndLowest(states)!;
+  assert.deepEqual(result.highest.map((s) => s.name), ['A', 'C']);
+  assert.deepEqual(result.lowest.map((s) => s.name), ['B']);
+  assert.equal(rankByMedian(states).length, 3, 'states without figures are left out');
+  assert.equal(joinNames(['A', 'B', 'C']), 'A, B and C');
+});
+
+test('compares a state with the national median in one sentence', () => {
+  assert.equal(
+    compareWithNational('Texas', figures(99240), figures(98100)),
+    'The median pay in Texas is $1,140 a year (1.2%) higher than the national median of $98,100.',
+  );
+  assert.equal(
+    compareWithNational('Ohio', figures(88290), figures(98100)),
+    'The median pay in Ohio is $9,810 a year (10.0%) lower than the national median of $98,100.',
+  );
+  assert.equal(compareWithNational('Kansas', undefined, figures(98100)), undefined);
+});

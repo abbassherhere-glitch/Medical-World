@@ -64,5 +64,10 @@ export function releaseName(data: PayData): string {
   return `${data.release.survey}, ${data.release.referencePeriod}`;
 }
 
+/** The survey as it reads in a sentence: "the May 2025 Occupational Employment and Wage Statistics survey". */
+export function surveyPhrase(data: PayData): string {
+  return `the ${data.release.referencePeriod} ${data.release.survey} survey`;
+}
+
 export type { PayData, StatePay, AreaPay } from './types.ts';
 export * from './format.ts';

@@ -1,20 +1,50 @@
 {
   "name": "Dental hygienist",
   "menu": [
-    { "key": "overview", "label": "Overview", "href": "/dental-hygienist/" },
-    { "key": "become", "label": "How to become one", "href": "/dental-hygienist/how-to-become/" },
-    { "key": "schools", "label": "Schools by state", "href": "/dental-hygienist/schools/" },
-    { "key": "salary", "label": "Salary", "href": "/dental-hygienist/salary/" },
-    { "key": "licensing", "label": "Licensing", "href": "/dental-hygienist/licensing/" },
-    { "key": "exam", "label": "Board exam", "href": "/dental-hygienist/board-exam/" }
+    {
+      "key": "overview",
+      "label": "Overview",
+      "href": "/dental-hygienist/"
+    },
+    {
+      "key": "become",
+      "label": "How to become one",
+      "href": "/dental-hygienist/how-to-become/"
+    },
+    {
+      "key": "schools",
+      "label": "Schools by state",
+      "href": "/dental-hygienist/schools/"
+    },
+    {
+      "key": "salary",
+      "label": "Salary",
+      "href": "/dental-hygienist/salary/"
+    },
+    {
+      "key": "licensing",
+      "label": "Licensing",
+      "href": "/dental-hygienist/licensing/"
+    },
+    {
+      "key": "exam",
+      "label": "Board exam",
+      "href": "/dental-hygienist/board-exam/"
+    }
   ],
-  "figures": [
-    { "label": "Median pay per year", "value": "$98,100" },
-    { "label": "Median pay per hour", "value": "$47.16" },
-    { "label": "Jobs in the US", "value": "225,300" },
-    { "label": "Job growth, 2025 to 2035", "value": "8%" }
-  ],
-  "figuresSource": "Source: US Bureau of Labor Statistics, 2025 figures.",
+  "namePlural": "dental hygienists",
+  "outlook": {
+    "source": "US Bureau of Labor Statistics, Occupational Outlook Handbook",
+    "jobs": {
+      "label": "Jobs in the US, 2025",
+      "value": "225,300"
+    },
+    "growth": {
+      "label": "Job growth, 2025 to 2035",
+      "value": "8%"
+    },
+    "entry": "an associate's degree"
+  },
   "featured": {
     "eyebrow": "Our first complete guide",
     "heading": "Become a dental hygienist",
@@ -54,22 +84,61 @@
     "heading": "Dental hygienist guides by state",
     "intro": "Each state page covers local pay, the licensing steps and accredited schools.",
     "states": [
-      "California", "Texas", "Florida", "New York", "Michigan", "Ohio",
-      "Georgia", "Illinois", "Arizona", "Virginia", "North Carolina"
+      "California",
+      "Texas",
+      "Florida",
+      "New York",
+      "Michigan",
+      "Ohio",
+      "Georgia",
+      "Illinois",
+      "Arizona",
+      "Virginia",
+      "North Carolina"
     ],
-    "allStates": { "label": "All 50 states", "href": "/dental-hygienist/schools/" }
+    "allStates": {
+      "label": "All 50 states",
+      "href": "/dental-hygienist/schools/"
+    }
   },
   "popularGuides": [
-    { "label": "How long does it take to become a dental hygienist?", "href": "/dental-hygienist/how-to-become/" },
-    { "label": "Dental hygiene school prerequisites", "href": "/dental-hygienist/prerequisites/" },
-    { "label": "Dental hygienist vs dental assistant", "href": "/dental-hygienist/vs-dental-assistant/" },
-    { "label": "What does a dental hygienist do?", "href": "/dental-hygienist/" },
-    { "label": "The national board exam explained", "href": "/dental-hygienist/board-exam/" }
+    {
+      "label": "How long does it take to become a dental hygienist?",
+      "href": "/dental-hygienist/how-to-become/"
+    },
+    {
+      "label": "Dental hygiene school prerequisites",
+      "href": "/dental-hygienist/prerequisites/"
+    },
+    {
+      "label": "Dental hygienist vs dental assistant",
+      "href": "/dental-hygienist/vs-dental-assistant/"
+    },
+    {
+      "label": "What does a dental hygienist do?",
+      "href": "/dental-hygienist/"
+    },
+    {
+      "label": "The national board exam explained",
+      "href": "/dental-hygienist/board-exam/"
+    }
   ],
   "footerLinks": [
-    { "label": "How to become one", "href": "/dental-hygienist/how-to-become/" },
-    { "label": "Schools by state", "href": "/dental-hygienist/schools/" },
-    { "label": "Licensing by state", "href": "/dental-hygienist/licensing/" },
-    { "label": "Salary guide", "href": "/dental-hygienist/salary/" }
+    {
+      "label": "How to become one",
+      "href": "/dental-hygienist/how-to-become/"
+    },
+    {
+      "label": "Schools by state",
+      "href": "/dental-hygienist/schools/"
+    },
+    {
+      "label": "Licensing by state",
+      "href": "/dental-hygienist/licensing/"
+    },
+    {
+      "label": "Salary guide",
+      "href": "/dental-hygienist/salary/"
+    }
   ]
 }

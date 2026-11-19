@@ -10,12 +10,25 @@ import PersonPhoto from '../components/PersonPhoto.astro';
 import SmartLink from '../components/SmartLink.astro';
 import { slugify } from '../data/states';
 import home from '../content/home.json';
+import { formatAnnual, formatHourly, getPayData, releaseName } from '../lib/pay';
 
 const professions = await getCollection('professions');
 const featured = await getEntry('professions', home.featuredProfession);
 if (!featured) throw new Error(`Featured profession "${home.featuredProfession}" was not found.`);
 const profession = featured.data;
 const professionSlug = featured.id;
+
+// Pay comes from the wage survey; jobs and growth from the Occupational
+// Outlook Handbook. Each figure carries a short label naming its source.
+const pay = getPayData(professionSlug);
+const surveyTag = `Wage survey, ${pay.release.referencePeriod}`;
+const outlookTag = 'Occupational Outlook Handbook';
+const figures = [
+  { label: 'Median pay per year', value: formatAnnual(pay.national.annual.median), source: surveyTag },
+  { label: 'Median pay per hour', value: formatHourly(pay.national.hourly.median), source: surveyTag },
+  { ...profession.outlook.jobs, source: outlookTag },
+  { ...profession.outlook.growth, source: outlookTag },
+];
 ---
 
 <BaseLayout title={home.title} description={home.description}>
@@ -49,15 +62,20 @@ const professionSlug = featured.id;
         <div class="featured__panel">
           <dl class="figures">
             {
-              profession.figures.map((figure) => (
+              figures.map((figure) => (
                 <div class="figures__item">
                   <dt>{figure.label}</dt>
-                  <dd>{figure.value}</dd>
+                  <dd>
+                    <span class="figures__value">{figure.value}</span>
+                    <span class="figures__source">{figure.source}</span>
+                  </dd>
                 </div>
               ))
             }
           </dl>
-          <p class="note">{profession.figuresSource}</p>
+          <p class="note">
+            Pay: {pay.release.publisher}, {releaseName(pay)}. Jobs and growth: {profession.outlook.source}.
+          </p>
           <ul class="cards">
             {profession.guideCards.map((card) => <li><GuideCard {...card} /></li>)}
           </ul>
@@ -230,10 +248,20 @@ const professionSlug = featured.id;
   }
 
   .figures dd {
+    display: flex;
+    flex-direction: column;
     margin: 0;
+  }
+
+  .figures__value {
     font-size: 1.9rem;
     font-weight: var(--weight-black);
     line-height: 1.2;
+  }
+
+  .figures__source {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
   }
 
   .featured__panel > .note {
