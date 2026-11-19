@@ -10,10 +10,11 @@ import { linkIsLive, switchedOffGuides } from '../lib/links';
  * The 404 page is left out on purpose.
  */
 export async function getPublicRoutes(): Promise<string[]> {
-  const [professions, salaryGuides, becomeGuides, statePages, pages] = await Promise.all([
+  const [professions, salaryGuides, becomeGuides, topicPages, statePages, pages] = await Promise.all([
     getCollection('professions'),
     getCollection('salaryGuides'),
     getCollection('becomeGuides'),
+    getCollection('topicPages'),
     getPublishedStatePages(),
     getCollection('pages'),
   ]);
@@ -23,6 +24,7 @@ export async function getPublicRoutes(): Promise<string[]> {
     ...professions.filter((p) => p.data.overview).map((p) => `/${p.id}/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
     ...becomeGuides.map((g) => `/${g.data.profession.id}/how-to-become/`),
+    ...topicPages.flatMap((t) => ['schools', 'licensing', 'board-exam'].map((page) => `/${t.data.profession.id}/${page}/`)),
     ...statePages.map((p) => p.path),
     ...pages.map((p) => `/${p.id}/`),
   ];

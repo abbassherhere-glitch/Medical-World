@@ -1,0 +1,24 @@
+---
+/** Schools by state for a profession, for example /dental-hygienist/schools/. */
+import { getCollection, getEntry } from 'astro:content';
+import TopicPage from '../../components/TopicPage.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('topicPages');
+  return pages.map((page) => ({ params: { profession: page.data.profession.id }, props: { page: page.data } }));
+}
+
+const { page } = Astro.props;
+const profession = await getEntry(page.profession);
+---
+
+<TopicPage
+  slug={page.profession.id}
+  profession={profession.data}
+  byline={page.byline}
+  activeMenu="schools"
+  topic={page.schools}
+  section="schools"
+  related={page.related}
+  pickerHeading="Schools in your state"
+/>

@@ -15,9 +15,11 @@ interface Props {
   layout?: 'row' | 'column';
   /** Button text. Default: "Find schools". */
   buttonLabel?: string;
+  /** Section of the state page to open at, for example "schools". */
+  section?: string;
 }
 
-const { id, professions, profession, layout = 'row', buttonLabel = 'Find schools' } = Astro.props;
+const { id, professions, profession, layout = 'row', buttonLabel = 'Find schools', section } = Astro.props;
 
 // Offer only states whose page is published, so the picker never leads to a
 // missing page. (With more than one profession this uses the first one; the
@@ -34,6 +36,7 @@ const states = (
   method="get"
   data-state-picker
   data-profession={profession}
+  data-section={section}
 >
   {
     professions && (

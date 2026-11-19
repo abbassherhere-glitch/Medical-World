@@ -1,0 +1,100 @@
+---
+/**
+ * Shared layout for a profession's index pages (Schools by state,
+ * Licensing, Board exam): heading, a few real sentences, any extra content,
+ * the grid of state pages and the sources.
+ */
+import GuideLayout from '../layouts/GuideLayout.astro';
+import StateGrid from './StateGrid.astro';
+import SourcesBox from './SourcesBox.astro';
+import AdSlot from './AdSlot.astro';
+import LinkPanel from './LinkPanel.astro';
+import StatePicker from './StatePicker.astro';
+import { STATES_AND_DC } from '../data/states';
+
+interface Props {
+  slug: string;
+  profession: Parameters<typeof GuideLayout>[0]['profession'];
+  byline: Parameters<typeof GuideLayout>[0]['byline'];
+  activeMenu: string;
+  topic: {
+    title: string;
+    description: string;
+    heading: string;
+    breadcrumb: string;
+    intro: string[];
+    details: string[];
+    statesHeading: string;
+    sources: string[];
+  };
+  /** Which section of each state page the grid opens at, for example "schools". */
+  section: string;
+  related: { label: string; href: string }[];
+  pickerHeading: string;
+}
+
+const { slug, profession, byline, activeMenu, topic, section, related, pickerHeading } = Astro.props;
+---
+
+<GuideLayout
+  title={topic.title}
+  description={topic.description}
+  heading={topic.heading}
+  profession={profession}
+  activeMenu={activeMenu}
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: profession.name, href: `/${slug}/` },
+    { label: topic.breadcrumb },
+  ]}
+  byline={byline}
+>
+  <div class="intro">
+    {topic.intro.map((text) => <p>{text}</p>)}
+  </div>
+
+  <slot />
+
+  {
+    topic.details.length > 0 && (
+      <div class="details">
+        {topic.details.map((text) => <p>{text}</p>)}
+      </div>
+    )
+  }
+
+  <section class="stack" aria-labelledby="state-grid">
+    <h2 id="state-grid" class="section-title" tabindex="-1">{topic.statesHeading}</h2>
+    <StateGrid profession={slug} states={STATES_AND_DC} section={section} />
+  </section>
+
+  <AdSlot size="inline" id={`${activeMenu}-content-1`} />
+
+  <SourcesBox items={topic.sources} />
+
+  <Fragment slot="aside">
+    <section class="panel panel--highlight stack" aria-labelledby="find-state">
+      <h2 id="find-state" class="panel-title">{pickerHeading}</h2>
+      <StatePicker id="side" profession={slug} layout="column" section={section} buttonLabel="Go to state page" />
+    </section>
+    <AdSlot size="sidebar" id={`${activeMenu}-side-1`} />
+    <LinkPanel heading="Related guides" links={related} />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    line-height: 1.6;
+  }
+</style>

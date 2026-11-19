@@ -10,6 +10,7 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-state-p
     const state = String(data.get('state') ?? '');
     if (!profession || !state) return;
     event.preventDefault();
-    window.location.assign(`/${profession}/${state}/`);
+    const section = form.dataset.section ? `#${form.dataset.section}` : '';
+    window.location.assign(`/${profession}/${state}/${section}`);
   });
 }

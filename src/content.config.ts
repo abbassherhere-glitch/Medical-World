@@ -181,6 +181,35 @@ const statePages = defineCollection({
   }),
 });
 
+const topic = z.object({
+  title: z.string(),
+  description: z.string(),
+  heading: z.string(),
+  breadcrumb: z.string(),
+  /** Short paragraphs of real facts, shown first. */
+  intro: z.array(z.string()),
+  /** Further details, usually marked placeholders until written. */
+  details: z.array(z.string()),
+  statesHeading: z.string(),
+  sources: z.array(z.string()),
+});
+
+/**
+ * The index pages in a profession's menu: Schools by state, Licensing and
+ * Board exam, for example /dental-hygienist/schools/.
+ */
+const topicPages = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/topic-pages' }),
+  schema: z.object({
+    profession: reference('professions'),
+    byline,
+    schools: topic,
+    licensing: topic,
+    boardExam: topic.extend({ facts: z.array(z.object({ label: z.string(), value: z.string() })) }),
+    related: z.array(link),
+  }),
+});
+
 /**
  * Guide links that can be switched on or off. A guide whose "published" is
  * false is not shown anywhere on the site, in any list or menu, until it is
@@ -232,4 +261,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, guideLinks, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, guideLinks, topicPages, pages };
