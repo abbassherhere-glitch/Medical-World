@@ -16,7 +16,7 @@ a placeholder waiting for a real value.
 
 | What | Where |
 | --- | --- |
-| Site name, address, company name, indexing switch, advert switch | `src/settings.ts` |
+| Site name, address, company name, indexing switch, advert switch, "Useful organizations" switch | `src/settings.ts` |
 | Page text | `src/content/` |
 | Which state pages are published | `src/content/state-pages/dental-hygienist.json` |
 | Text shared by every state page (with `{state}` where the name goes) | `src/content/state-guides/dental-hygienist.json` |
@@ -26,6 +26,9 @@ a placeholder waiting for a real value.
 | Which guide links are switched on | `src/content/guide-links/dental-hygienist.json` |
 | Schools by state, Licensing and Board exam page text | `src/content/topic-pages/dental-hygienist.json` |
 | Top menu items | `src/data/navigation.ts` |
+| "Up next" links at the end of each guide | `src/data/up-next.ts` |
+| How weekly and monthly pay is worked out | `src/lib/pay/periods.ts` |
+| Common questions on state pages | `src/lib/pay/state-questions.ts` |
 | Pay figures (made by the import, do not edit by hand) | `src/data/pay/` |
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
@@ -262,6 +265,45 @@ not built, so it never appears in search.
 Only the main content of each page is searched (not menus, bylines or advert
 areas). The search page itself is never indexed by search engines and is not
 in the sitemap, even after launch.
+
+## The pay calculator
+
+`/dental-hygienist/salary/calculator/` lets visitors choose a state (and an
+area in it), switch between pay per hour, week, month and year, and compare
+two places. Their choices are kept in the page address, for example
+`/dental-hygienist/salary/calculator/?state=texas&area=12420&vs=ohio&per=month`,
+so a result can be shared. State pages link to it with their state already
+chosen.
+
+It uses a small data file made at build time
+(`/dental-hygienist/salary/calculator-data.json`) from the pay data and your
+overrides, and loads it only on the calculator page. Without JavaScript the
+page still shows the national figures and links to every state.
+
+**Weekly and monthly pay.** Hourly and yearly pay are the official figures as
+published. Weekly pay is the official yearly figure divided by 52, and
+monthly pay is the official yearly figure divided by 12, each rounded to the
+nearest dollar. Wherever they appear, a note says so, and that the survey
+bases its yearly figures on full-time, year-round work. A missing figure is
+never used in a calculation; it shows "Not available".
+
+## Common questions on state pages
+
+Each state page answers up to six common questions from its own figures. A
+question the data cannot answer for a state is left out: for example Kansas,
+which has no statewide figures in the May 2025 survey, gets three.
+
+## Hiding the "Useful organizations" box
+
+State pages and "How to become one" have a small "Useful organizations" box
+with two placeholders for the state dental board and a professional
+association. To hide it on every page, open `src/settings.ts` and change
+
+```ts
+showUsefulOrganizations: true,
+```
+
+to `false`.
 
 ## Placeholders still to fill in
 

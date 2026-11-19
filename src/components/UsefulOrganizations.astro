@@ -1,0 +1,42 @@
+---
+/**
+ * "Useful organizations": official bodies to check rules with. Both entries
+ * are marked placeholders for the owner to fill in with names and official
+ * links. Hide the box everywhere with `showUsefulOrganizations` in
+ * src/settings.ts.
+ */
+import { settings } from '../settings';
+
+interface Props {
+  /** For example "Texas"; used in the heading's id only. */
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+{
+  settings.showUsefulOrganizations && (
+    <section class="panel stack orgs" aria-labelledby={`orgs-${id}`}>
+      <h2 id={`orgs-${id}`} class="panel-title">Useful organizations</h2>
+      <ul class="orgs__list">
+        <li>[STATE DENTAL BOARD NAME AND OFFICIAL LINK]</li>
+        <li>[PROFESSIONAL ASSOCIATION NAME AND OFFICIAL LINK]</li>
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .orgs {
+    padding: 22px;
+  }
+
+  .orgs__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-left: 20px;
+    font-size: var(--text-md);
+  }
+</style>

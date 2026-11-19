@@ -6,6 +6,9 @@ import KeyTakeaways from '../../components/KeyTakeaways.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import StateGrid from '../../components/StateGrid.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
+import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
+import UpNext from '../../components/UpNext.astro';
+import { upNext } from '../../data/up-next';
 import AdSlot from '../../components/AdSlot.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import StatePicker from '../../components/StatePicker.astro';
@@ -76,12 +79,14 @@ const contents = [
   </section>
 
   <SourcesBox items={guide.otherSources} />
+  <UpNext steps={upNext('become', slug, profession.data.name)} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="find-state">
       <h2 id="find-state" class="panel-title">Rules in your state</h2>
       <StatePicker id="side" profession={slug} layout="column" buttonLabel="Go to state page" />
     </section>
+    <UsefulOrganizations id="become" />
     <AdSlot size="sidebar" id="become-side-1" />
     <LinkPanel heading="Related guides" links={guide.related} />
   </Fragment>

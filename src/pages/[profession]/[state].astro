@@ -12,6 +12,13 @@ import SourcesBox from '../../components/SourcesBox.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
+import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
+import CalculatorLink from '../../components/CalculatorLink.astro';
+import FaqList from '../../components/FaqList.astro';
+import UsefulOrganizations from '../../components/UsefulOrganizations.astro';
+import UpNext from '../../components/UpNext.astro';
+import { upNext } from '../../data/up-next';
+import { stateQuestions } from '../../lib/pay/state-questions';
 import {
   areasInState,
   byMedianDescending,
@@ -124,12 +131,25 @@ if (stateMedian !== undefined) {
 
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
+// Common questions, each answered from this state's own figures.
+const questions = stateQuestions({
+  state: statePay,
+  allStates,
+  areas,
+  neighbors,
+  national,
+  plural,
+  survey,
+}).map((q) => ({ question: q.question, answer: q.answer }));
+
 const contents = [
   { label: data.pay.heading, id: 'pay' },
+  ...(local ? [{ label: 'Pay per hour, week, month and year', id: 'pay-periods' }] : []),
   { label: data.cityPay.heading, id: 'pay-by-city' },
   { label: compareHeading, id: 'nearby' },
   { label: data.licensing.heading, id: 'licensing' },
   { label: data.schools.heading, id: 'schools' },
+  { label: 'Common questions', id: 'common-questions' },
 ];
 ---
 
@@ -167,6 +187,8 @@ const contents = [
     <p class="pay__summary">{comparison} {rankSentence}</p>
     <SourceLine data={pay} />
   </section>
+
+  {local && <PayPeriodsTable id="pay-periods" place={where} figures={local} source={`${pay.release.publisher}, ${release}`} />}
 
   <ImageSlot {...data.image} />
 
@@ -275,7 +297,10 @@ const contents = [
     <p class="note">{data.schools.note}</p>
   </section>
 
+  {questions.length > 0 && <FaqList id="common-questions" heading="Common questions" items={questions} />}
+
   <SourcesBox items={sources} />
+  <UpNext steps={upNext('state', professionSlug, profession.data.name)} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="compare">
@@ -284,6 +309,14 @@ const contents = [
       <a class="button button--action" href={data.compare.button.href}>{data.compare.button.label}</a>
       <p class="note">{data.compare.note}</p>
     </section>
+    <CalculatorLink
+      profession={professionSlug}
+      state={slugify(state)}
+      heading="Pay calculator"
+      text={`See pay in ${where} per hour, week, month or year, and compare it with another state.`}
+      label={`Compare ${state}`}
+    />
+    <UsefulOrganizations id="state" />
     <AdSlot size="sidebar" id="state-side-1" />
     {
       neighbors.length > 0 && (

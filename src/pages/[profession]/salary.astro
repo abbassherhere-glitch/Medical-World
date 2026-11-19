@@ -8,6 +8,10 @@ import StatGrid from '../../components/StatGrid.astro';
 import PayRangeBar from '../../components/PayRangeBar.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
 import PayByStateTable from '../../components/PayByStateTable.astro';
+import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
+import CalculatorLink from '../../components/CalculatorLink.astro';
+import UpNext from '../../components/UpNext.astro';
+import { upNext } from '../../data/up-next';
 import AdSlot from '../../components/AdSlot.astro';
 import FaqList from '../../components/FaqList.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
@@ -92,6 +96,7 @@ const faqs = data.faqs.map((faq) => ({
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
+  { label: 'Pay per hour, week, month and year', id: 'pay-periods' },
   { label: data.payByState.heading, id: 'pay-by-state' },
   { label: data.factors.heading, id: 'what-affects-pay' },
   { label: 'Common questions', id: 'common-questions' },
@@ -126,6 +131,13 @@ const contents = [
   </section>
 
   <KeyTakeaways items={takeaways} />
+  <PayPeriodsTable id="pay-periods" place="the United States" figures={national} source={`${pay.release.publisher}, ${release}`} />
+  <CalculatorLink
+    profession={professionSlug}
+    heading="Compare pay in your state"
+    text="Choose a state or an area, see pay per hour, week, month or year, and compare two places side by side."
+    label="Open the pay calculator"
+  />
   <TableOfContents items={contents} />
   <ImageSlot {...data.image} />
 
@@ -146,6 +158,7 @@ const contents = [
 
   <FaqList id="common-questions" heading="Common questions" items={faqs} />
   <SourcesBox items={sources} />
+  <UpNext steps={upNext('salary', professionSlug, profession.data.name)} />
 
   <Fragment slot="aside">
     <section class="panel panel--highlight stack" aria-labelledby="find-schools">

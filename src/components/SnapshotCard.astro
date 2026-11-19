@@ -1,0 +1,150 @@
+---
+/**
+ * One "pay snapshot" card in the calculator. The built page fills it with
+ * the national figures; the calculator script updates the same fields in
+ * place, so the layout does not move.
+ */
+import type { Snapshot } from '../lib/pay/calculator';
+
+interface Props {
+  id: 'a' | 'b';
+  heading: string;
+  snap: Snapshot;
+  periodLabel: string;
+  /** Shown instead of figures until a place is chosen (comparison card). */
+  emptyMessage?: string;
+}
+
+const { id, heading, snap, periodLabel, emptyMessage } = Astro.props;
+---
+
+<section class="snapshot" data-snapshot={id} aria-labelledby={`snapshot-${id}-title`} data-empty={emptyMessage ? '' : undefined}>
+  <h2 id={`snapshot-${id}-title`} class="snapshot__title" data-field="name">{heading}</h2>
+  <p class="snapshot__period" data-field="period">{periodLabel}</p>
+  <p class="snapshot__empty" data-field="empty">{emptyMessage}</p>
+  <dl class="snapshot__rows">
+    {
+      snap.rows.map((row) => (
+        <div class:list={['snapshot__row', { 'snapshot__row--median': row.key === 'median' }]}>
+          <dt>{row.label}</dt>
+          <dd data-field={row.key}>{row.value}</dd>
+        </div>
+      ))
+    }
+    <div class="snapshot__row">
+      <dt>Jobs</dt>
+      <dd data-field="jobs">{snap.jobs}</dd>
+    </div>
+    <div class="snapshot__row">
+      <dt data-field="compared-label">Median compared with the US</dt>
+      <dd data-field="compared">{snap.comparedWith}</dd>
+    </div>
+  </dl>
+  <div class="snapshot__bar" aria-hidden="true" data-field="bar">
+    <span class="snapshot__band" style={snap.bar ? `left:${snap.bar.p25}%;width:${snap.bar.p75 - snap.bar.p25}%` : 'display:none'}></span>
+    <span class="snapshot__marker" style={snap.bar ? `left:${snap.bar.median}%` : 'display:none'}></span>
+  </div>
+  <p class="snapshot__bar-text note" data-field="bar-text">{snap.barText}</p>
+</section>
+
+<style>
+  .snapshot {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+    padding: var(--space-6);
+    background: var(--color-tint);
+    border-radius: var(--radius-lg);
+  }
+
+  .snapshot__title {
+    font-size: 1.3rem;
+    min-height: 2.6em;
+  }
+
+  .snapshot__period {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .snapshot__empty {
+    display: none;
+  }
+
+  .snapshot[data-empty] .snapshot__empty {
+    display: block;
+    font-weight: var(--weight-bold);
+  }
+
+  /* An empty card keeps its size, so nothing moves when a place is chosen. */
+  .snapshot[data-empty] :is(.snapshot__rows, .snapshot__bar, .snapshot__bar-text) {
+    visibility: hidden;
+  }
+
+  .snapshot__rows {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .snapshot__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .snapshot__row dt {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .snapshot__row dd {
+    margin: 0;
+    font-weight: var(--weight-bold);
+    text-align: right;
+  }
+
+  .snapshot__row--median dd {
+    font-size: 1.25rem;
+    font-weight: var(--weight-black);
+  }
+
+  .snapshot__bar {
+    position: relative;
+    height: 12px;
+    margin-top: var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-tint-strong);
+  }
+
+  .snapshot__band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--color-input-border);
+    border-radius: var(--radius-pill);
+  }
+
+  .snapshot__marker {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 20px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: var(--color-accent);
+  }
+
+  .snapshot__bar-text {
+    min-height: 4.5em;
+  }
+
+  @media (max-width: 480px) {
+    .snapshot {
+      padding: var(--space-4);
+    }
+  }
+</style>

@@ -1,0 +1,28 @@
+---
+/** A panel linking to the pay calculator, shown only if the calculator page exists. */
+import { isLive } from '../data/routes';
+
+interface Props {
+  profession: string;
+  /** Open the calculator with this state chosen, for example "texas". */
+  state?: string;
+  heading: string;
+  text: string;
+  label: string;
+}
+
+const { profession, state, heading, text, label } = Astro.props;
+const base = `/${profession}/salary/calculator/`;
+const live = await isLive(base);
+const href = state ? `${base}?state=${encodeURIComponent(state)}` : base;
+---
+
+{
+  live && (
+    <section class="panel panel--highlight stack calc-link" aria-labelledby={`calc-link-${state ?? 'all'}`} data-pagefind-ignore>
+      <h2 id={`calc-link-${state ?? 'all'}`} class="panel-title">{heading}</h2>
+      <p>{text}</p>
+      <a class="button button--action" href={href}>{label}</a>
+    </section>
+  )
+}
