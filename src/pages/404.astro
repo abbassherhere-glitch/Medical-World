@@ -1,5 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import SmartLink from '../components/SmartLink.astro';
 ---
 
 <PageLayout
@@ -13,7 +14,7 @@ import PageLayout from '../layouts/PageLayout.astro';
   <p>Sorry, we could not find that page. It may have moved, or it may not be published yet.</p>
   <ul>
     <li><a href="/">Go to the home page</a></li>
-    <li><a href="/dental-hygienist/salary/">Read the dental hygienist salary guide</a></li>
-    <li><a href="/contact/">Contact us</a> if you think something is wrong</li>
+    <li><SmartLink href="/dental-hygienist/salary/">Read the dental hygienist salary guide</SmartLink></li>
+    <li><SmartLink href="/contact/">Contact us</SmartLink> if you think something is wrong</li>
   </ul>
 </PageLayout>

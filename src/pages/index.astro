@@ -7,6 +7,7 @@ import TrustStrip from '../components/TrustStrip.astro';
 import GuideCard from '../components/GuideCard.astro';
 import AdSlot from '../components/AdSlot.astro';
 import PersonPhoto from '../components/PersonPhoto.astro';
+import SmartLink from '../components/SmartLink.astro';
 import { slugify } from '../data/states';
 import home from '../content/home.json';
 
@@ -86,14 +87,14 @@ const professionSlug = featured.id;
           {
             profession.stateGrid.states.map((state) => (
               <li>
-                <a href={`/${professionSlug}/${slugify(state)}/`}>{state}</a>
+                <SmartLink href={`/${professionSlug}/${slugify(state)}/`}>{state}</SmartLink>
               </li>
             ))
           }
           <li>
-            <a class="states__all" href={profession.stateGrid.allStates.href}>
+            <SmartLink class="states__all" href={profession.stateGrid.allStates.href}>
               {profession.stateGrid.allStates.label}
-            </a>
+            </SmartLink>
           </li>
         </ul>
       </div>
@@ -103,7 +104,7 @@ const professionSlug = featured.id;
       <section class="popular" aria-labelledby="popular-title">
         <h2 id="popular-title" class="block-title">Popular guides</h2>
         <ul class="popular__list">
-          {profession.popularGuides.map((guide) => <li><a href={guide.href}>{guide.label}</a></li>)}
+          {profession.popularGuides.map((guide) => <li><SmartLink href={guide.href}>{guide.label}</SmartLink></li>)}
         </ul>
       </section>
 
@@ -114,7 +115,7 @@ const professionSlug = featured.id;
           <PersonPhoto name={home.factCheck.reviewer} size={48} />
           <span>Reviewed by {home.factCheck.reviewer}</span>
         </div>
-        <a class="facts__link" href={home.factCheck.link.href}>{home.factCheck.link.label}</a>
+        <SmartLink class="facts__link" href={home.factCheck.link.href}>{home.factCheck.link.label}</SmartLink>
       </section>
     </div>
   </main>
@@ -320,7 +321,7 @@ const professionSlug = featured.id;
     padding: 0;
   }
 
-  .states__grid a {
+  .states__grid :is(a, .link-pending) {
     display: flex;
     align-items: center;
     min-height: 48px;
@@ -355,7 +356,7 @@ const professionSlug = featured.id;
     border-bottom: 1px solid var(--color-border);
   }
 
-  .popular__list a {
+  .popular__list :is(a, .link-pending) {
     display: block;
     padding: 14px 0;
   }

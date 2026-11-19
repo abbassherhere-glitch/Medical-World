@@ -1,0 +1,26 @@
+---
+/**
+ * A link that only becomes a link once the page it points to exists.
+ * Until then it shows the same text as plain text, so visitors never land
+ * on the "page not found" page. Pages are known from src/data/routes.ts.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import { isLive } from '../data/routes';
+
+type Props = HTMLAttributes<'a'> & { href: string };
+
+const { href, class: className, ...rest } = Astro.props;
+const live = await isLive(href);
+---
+
+{
+  live ? (
+    <a href={href} class={className} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <span class:list={[className, 'link-pending']} {...rest} aria-current={undefined}>
+      <slot />
+    </span>
+  )
+}

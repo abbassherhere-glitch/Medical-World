@@ -10,6 +10,7 @@ import ScrollTable from '../../components/ScrollTable.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import SourcesBox from '../../components/SourcesBox.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
+import SmartLink from '../../components/SmartLink.astro';
 
 export async function getStaticPaths() {
   const guides = await getCollection('stateGuides');
@@ -93,7 +94,7 @@ const contents = [
         data.schools.rows.map((school) => (
           <tr>
             <th scope="row">
-              {school.href ? <a href={school.href}>{school.name}</a> : school.name}
+              {school.href ? <SmartLink href={school.href}>{school.name}</SmartLink> : school.name}
               {school.sponsored && <span class="sponsored">Sponsored</span>}
             </th>
             <td>{school.city}</td>

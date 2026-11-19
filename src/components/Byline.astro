@@ -1,6 +1,7 @@
 ---
 /** Author and reviewer line with photo spots and the "last checked" date. */
 import PersonPhoto from './PersonPhoto.astro';
+import SmartLink from './SmartLink.astro';
 
 interface Person {
   name: string;
@@ -28,7 +29,7 @@ const people = [
       <div class="byline__person">
         <PersonPhoto src={person.photo} name={person.name} />
         <span>
-          {role} {person.href ? <a href={person.href}>{person.name}</a> : <span>{person.name}</span>}
+          {role} {person.href ? <SmartLink href={person.href}>{person.name}</SmartLink> : <span>{person.name}</span>}
         </span>
       </div>
     ))
