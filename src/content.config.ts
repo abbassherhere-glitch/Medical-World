@@ -73,6 +73,21 @@ const professions = defineCollection({
     }),
     popularGuides: z.array(link),
     footerLinks: z.array(link),
+    /** The profession's overview page, for example /dental-hygienist/. Leave out to not build one. */
+    overview: z
+      .object({
+        heading: z.string(),
+        byline,
+        intro: z.array(z.string()),
+        figuresHeading: z.string(),
+        guidesHeading: z.string(),
+        statesHeading: z.string(),
+        statesIntro: z.string(),
+        payHeading: z.string(),
+        otherSources: z.array(z.string()),
+        related: z.array(link),
+      })
+      .optional(),
   }),
 });
 
@@ -111,14 +126,15 @@ const salaryGuides = defineCollection({
   }),
 });
 
+/**
+ * One template per profession for its state pages. "{state}" in any text is
+ * replaced with the state's name, for example "Pay in {state}".
+ */
 const stateGuides = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/state-guides' }),
   schema: z.object({
     profession: reference('professions'),
-    state: z.string(),
-    stateSlug: z.string(),
-    title: z.string(),
-    description: z.string(),
+    /** Page titles and descriptions are worked out from the pay data. */
     heading: z.string(),
     byline,
     /** Takeaways not about pay. A pay takeaway worked out from the data is added first. */
@@ -149,8 +165,47 @@ const stateGuides = defineCollection({
     /** Sources other than the wage survey, which is added automatically. */
     otherSources: z.array(z.string()),
     compare: z.object({ heading: z.string(), text: z.string(), button: link, note: z.string() }),
-    nearbyStates: z.array(link),
     nationalGuides: z.array(link),
+  }),
+});
+
+/**
+ * Which state pages are published: one file per profession listing every
+ * state and DC with a "published" switch.
+ */
+const statePages = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/state-pages' }),
+  schema: z.object({
+    profession: reference('professions'),
+    pages: z.array(z.object({ state: z.string(), published: z.boolean() })),
+  }),
+});
+
+/** "How to become one" guide for a profession, for example /dental-hygienist/how-to-become/. */
+const becomeGuides = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/become-guides' }),
+  schema: z.object({
+    profession: reference('professions'),
+    title: z.string(),
+    description: z.string(),
+    heading: z.string(),
+    breadcrumb: z.string(),
+    byline,
+    intro: z.string(),
+    takeaways: z.array(z.string()),
+    steps: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        paragraphs: z.array(z.string()),
+        /** Text of the link to the state pages for this step's state rules. */
+        stateLink: z.string(),
+      }),
+    ),
+    statesHeading: z.string(),
+    statesIntro: z.string(),
+    otherSources: z.array(z.string()),
+    related: z.array(link),
   }),
 });
 
@@ -164,4 +219,4 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { professions, salaryGuides, stateGuides, pages };
+export const collections = { professions, salaryGuides, stateGuides, statePages, becomeGuides, pages };

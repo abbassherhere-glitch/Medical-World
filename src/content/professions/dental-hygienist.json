@@ -97,8 +97,8 @@
       "North Carolina"
     ],
     "allStates": {
-      "label": "All 50 states",
-      "href": "/dental-hygienist/schools/"
+      "label": "All states and DC",
+      "href": "/dental-hygienist/#states"
     }
   },
   "popularGuides": [
@@ -140,5 +140,44 @@
       "label": "Salary guide",
       "href": "/dental-hygienist/salary/"
     }
-  ]
+  ],
+  "overview": {
+    "heading": "Dental hygienist",
+    "byline": {
+      "author": {
+        "name": "[AUTHOR NAME]"
+      },
+      "reviewer": {
+        "name": "[REVIEWER NAME, QUALIFICATION]"
+      },
+      "lastChecked": "[DATE]",
+      "sourceNote": "Sources are listed at the end of the page."
+    },
+    "intro": [
+      "[TWO OR THREE SENTENCES ON WHAT A DENTAL HYGIENIST DOES, SOURCE]",
+      "The typical entry requirement is an associate's degree. Every state requires dental hygienists to be licensed, and the requirements differ from state to state (US Bureau of Labor Statistics)."
+    ],
+    "figuresHeading": "Dental hygienists in numbers",
+    "guidesHeading": "Our dental hygienist guides",
+    "statesHeading": "Dental hygienist guides by state",
+    "statesIntro": "Each state page covers local pay, how the state compares with its neighbors, the licensing steps and accredited schools.",
+    "payHeading": "What dental hygienists earn",
+    "otherSources": [
+      "US Bureau of Labor Statistics, Occupational Outlook Handbook: Dental Hygienists (job numbers, job growth, entry requirement and licensing)"
+    ],
+    "related": [
+      {
+        "label": "Dental hygienist salary in the US",
+        "href": "/dental-hygienist/salary/"
+      },
+      {
+        "label": "How to become a dental hygienist",
+        "href": "/dental-hygienist/how-to-become/"
+      },
+      {
+        "label": "The national board exam explained",
+        "href": "/dental-hygienist/board-exam/"
+      }
+    ]
+  }
 }

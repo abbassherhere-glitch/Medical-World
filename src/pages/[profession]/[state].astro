@@ -12,53 +12,137 @@ import SourcesBox from '../../components/SourcesBox.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import SmartLink from '../../components/SmartLink.astro';
 import SourceLine from '../../components/SourceLine.astro';
-import { areasInState, findState, formatAnnual, formatHourly, formatJobs, getPayData, releaseName } from '../../lib/pay';
-import { compareWithNational, placeName } from '../../lib/pay/summary';
+import {
+  areasInState,
+  byMedianDescending,
+  findState,
+  formatAnnual,
+  formatHourly,
+  formatJobs,
+  formatPercent,
+  getPayData,
+  numeric,
+  releaseName,
+  statesAndDc,
+  surveyPhrase,
+} from '../../lib/pay';
+import { areaSummary, capitalize, ordinal, compareWithNational, placeName, rankByMedian, rankInWords, rankOf } from '../../lib/pay/summary';
+import { fillState } from '../../lib/publishing';
+import { getPublishedStatePages } from '../../data/state-pages';
+import { bordersOf } from '../../data/borders';
+import { slugify } from '../../data/states';
 
 export async function getStaticPaths() {
-  const guides = await getCollection('stateGuides');
-  return guides.map((guide) => ({
-    params: { profession: guide.data.profession.id, state: guide.data.stateSlug },
-    props: { guide },
-  }));
+  const [templates, pages] = await Promise.all([getCollection('stateGuides'), getPublishedStatePages()]);
+  return pages.flatMap((page) => {
+    const template = templates.find((t) => t.data.profession.id === page.profession);
+    if (!template) return [];
+    return [{ params: { profession: page.profession, state: page.slug }, props: { template: template.data, state: page.state } }];
+  });
 }
 
-const { guide } = Astro.props;
-const data = guide.data;
+const { template, state } = Astro.props;
+// The template's text with {state} filled in; "the District of Columbia" reads naturally in sentences.
+const where = placeName(state);
+const data = fillState(template, where);
 const profession = await getEntry(data.profession);
 const professionSlug = data.profession.id;
+const plural = profession.data.namePlural;
+const stateHref = (name: string) => `/${professionSlug}/${slugify(name)}/`;
 
-// Pay for this state, worked out from the data so the template works for any state.
+// Everything below is worked out from the pay data, so each page says
+// something specific to its state.
 const pay = getPayData(professionSlug);
 const release = releaseName(pay);
-const statePay = findState(pay, data.state);
-if (!statePay) throw new Error(`"${data.state}" is not in the pay data. Check the state name in its content file.`);
+const survey = surveyPhrase(pay);
+const national = pay.national;
+const statePay = findState(pay, state);
+if (!statePay) throw new Error(`"${state}" is not in the pay data.`);
 const local = statePay.figures;
+const allStates = statesAndDc(pay);
+const rank = rankOf(allStates, state);
 const comparison =
-  compareWithNational(data.state, local, pay.national) ??
-  `The ${pay.release.referencePeriod} survey has no pay figures for ${profession.data.namePlural} in ${placeName(data.state)}.`;
+  compareWithNational(state, local, national) ??
+  `The ${pay.release.referencePeriod} survey has no statewide pay figures for ${plural} in ${where}.`;
 const areas = areasInState(pay, statePay.abbr);
-const takeaways = [`${comparison.replace(/\.$/, '')} (${release}).`, ...data.takeaways];
+const areaSentence = areaSummary(state, areas);
+const areaMedians = areas.map((a) => numeric(a.figures.annual.median)).filter((m): m is number => m !== undefined);
+
+const rankSentence = rank
+  ? `${capitalize(where)} ranks ${rankInWords(rank)} by median pay, among the states and DC with published figures.`
+  : `${capitalize(where)} is not ranked, because the survey has no statewide median for it.`;
+const jobs = numeric(local?.employment);
+const low = numeric(local?.annual.p10);
+const high = numeric(local?.annual.p90);
+const rangeSentence =
+  low !== undefined && high !== undefined
+    ? `${jobs !== undefined ? `The survey counts ${formatJobs(jobs)} ${plural} in ${where}. ` : ''}The lowest-paid 10% earn less than ${formatAnnual(low)} a year and the top 10% earn more than ${formatAnnual(high)}.`
+    : undefined;
+
+const takeaways = [
+  `${comparison.replace(/\.$/, '')} (${release}).`,
+  rankSentence,
+  ...(rangeSentence ? [rangeSentence] : []),
+  areaSentence,
+  ...data.takeaways,
+];
+
+// Nearby states: bordering states with their medians. Alaska and Hawaii
+// border no state, so they are compared with the national figure and the
+// highest paying states instead.
+const neighbors = byMedianDescending(bordersOf(statePay.abbr).map((abbr) => allStates.find((s) => s.abbr === abbr)!));
+const topStates = rankByMedian(allStates)
+  .filter((s) => s.name !== state)
+  .slice(0, 3)
+  .map((r) => allStates.find((s) => s.name === r.name)!);
+const compareRows = neighbors.length > 0 ? neighbors : topStates;
+const compareHeading = neighbors.length > 0 ? 'Pay in nearby states' : `How ${where} compares`;
+const compareIntro =
+  neighbors.length > 0
+    ? `Median pay in the states that border ${where}.`
+    : `${capitalize(where)} borders no other state, so here it is compared with the national figure and the highest paying states.`;
+
+// Title and description include the state and a real figure from the data.
+const stateMedian = numeric(local?.annual.median);
+const usMedian = numeric(national.annual.median);
+let title: string;
+let description: string;
+if (stateMedian !== undefined) {
+  const diff = usMedian !== undefined ? (stateMedian - usMedian) / usMedian : undefined;
+  title = `Dental hygienist pay in ${where}: ${formatAnnual(stateMedian)} median, license and schools`;
+  description = `${capitalize(plural)} in ${where} earn a median of ${formatAnnual(stateMedian)} a year (${formatHourly(local?.hourly.median)} an hour)${
+    diff !== undefined && diff !== 0 ? `, ${formatPercent(diff)} ${diff > 0 ? 'above' : 'below'} the US median` : ''
+  }. Pay by area, licensing steps and schools.`;
+} else if (areaMedians.length > 0) {
+  const [min, max] = [Math.min(...areaMedians), Math.max(...areaMedians)];
+  title = `Dental hygienist pay in ${where}: area medians ${formatAnnual(min)} to ${formatAnnual(max)}`;
+  description = `There is no statewide median for ${plural} in ${where} in ${survey}, but area medians run from ${formatAnnual(min)} to ${formatAnnual(max)} a year. Licensing steps and schools.`;
+} else {
+  title = `Dental hygienist pay in ${where}: license and schools`;
+  description = `${capitalize(plural)} in ${where}: the US median is ${formatAnnual(usMedian)} a year. Licensing steps and schools.`;
+}
+
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 
 const contents = [
   { label: data.pay.heading, id: 'pay' },
   { label: data.cityPay.heading, id: 'pay-by-city' },
+  { label: compareHeading, id: 'nearby' },
   { label: data.licensing.heading, id: 'licensing' },
-  { label: `Schools in ${data.state}`, id: 'schools' },
+  { label: data.schools.heading, id: 'schools' },
 ];
 ---
 
 <GuideLayout
-  title={data.title}
-  description={data.description}
+  title={title}
+  description={description}
   heading={data.heading}
   profession={profession.data}
   activeMenu="schools"
   breadcrumb={[
     { label: 'Home', href: '/' },
     { label: profession.data.name, href: `/${professionSlug}/` },
-    { label: data.state },
+    { label: state },
   ]}
   byline={data.byline}
 >
@@ -70,13 +154,17 @@ const contents = [
     <StatGrid
       size="small"
       items={[
-        { label: `${data.state}, median per year`, value: formatAnnual(local?.annual.median) },
-        { label: `${data.state}, median per hour`, value: formatHourly(local?.hourly.median) },
-        { label: 'US, median per year', value: formatAnnual(pay.national.annual.median) },
-        { label: 'US, median per hour', value: formatHourly(pay.national.hourly.median) },
+        { label: `${state}, median per year`, value: formatAnnual(local?.annual.median) },
+        { label: `${state}, median per hour`, value: formatHourly(local?.hourly.median) },
+        { label: 'US, median per year', value: formatAnnual(national.annual.median) },
+        { label: 'US, median per hour', value: formatHourly(national.hourly.median) },
+        { label: 'Rank by median pay', value: rank ? `${ordinal(rank.rank)} of ${rank.of}` : 'Not ranked' },
+        { label: `Jobs in ${state}`, value: formatJobs(local?.employment) },
+        { label: 'Lowest 10% earn less than', value: formatAnnual(local?.annual.p10) },
+        { label: 'Top 10% earn more than', value: formatAnnual(local?.annual.p90) },
       ]}
     />
-    <p class="pay__summary">{comparison}</p>
+    <p class="pay__summary">{comparison} {rankSentence}</p>
     <SourceLine data={pay} />
   </section>
 
@@ -88,7 +176,7 @@ const contents = [
     {
       areas.length > 0 ? (
         <ScrollTable
-          caption={`${profession.data.name} pay by area in ${placeName(data.state)}, highest median first`}
+          caption={`${profession.data.name} pay by area in ${where}, highest median first`}
           columns={['Area', 'Median per year', 'Median per hour', 'Jobs']}
           minWidth={560}
         >
@@ -101,11 +189,54 @@ const contents = [
             </tr>
           ))}
         </ScrollTable>
-      ) : (
-        <p>The {pay.release.referencePeriod} survey has no area figures for {profession.data.namePlural} in {placeName(data.state)}.</p>
-      )
+      ) : null
     }
+    <p>{areaSentence}</p>
     <p class="note">Source: {pay.release.publisher}, {release}.</p>
+  </section>
+
+  <section class="stack" aria-labelledby="nearby">
+    <h2 id="nearby" class="section-title">{compareHeading}</h2>
+    <p class="muted">{compareIntro}</p>
+    <ScrollTable caption={compareHeading} columns={['Place', 'Median per year', 'Median per hour', 'Compared with ' + where]} minWidth={560}>
+      <tr class="own-row">
+        <th scope="row">{state} (this page)</th>
+        <td class="strong">{formatAnnual(local?.annual.median)}</td>
+        <td>{formatHourly(local?.hourly.median)}</td>
+        <td>–</td>
+      </tr>
+      {
+        compareRows.map((other) => {
+          const theirs = numeric(other.figures?.annual.median);
+          const diff = theirs !== undefined && stateMedian !== undefined ? theirs - stateMedian : undefined;
+          return (
+            <tr>
+              <th scope="row">
+                <SmartLink href={stateHref(other.name)}>{other.name}</SmartLink>
+              </th>
+              <td>{formatAnnual(other.figures?.annual.median)}</td>
+              <td>{formatHourly(other.figures?.hourly.median)}</td>
+              <td>{diff === undefined ? 'Not available' : diff === 0 ? 'Same' : `${formatAnnual(Math.abs(diff))} ${diff > 0 ? 'higher' : 'lower'}`}</td>
+            </tr>
+          );
+        })
+      }
+      {
+        neighbors.length === 0 && (
+          <tr>
+            <th scope="row">United States</th>
+            <td>{formatAnnual(national.annual.median)}</td>
+            <td>{formatHourly(national.hourly.median)}</td>
+            <td>
+              {stateMedian !== undefined && usMedian !== undefined
+                ? `${formatAnnual(Math.abs(usMedian - stateMedian))} ${usMedian > stateMedian ? 'higher' : 'lower'}`
+                : 'Not available'}
+            </td>
+          </tr>
+        )
+      }
+    </ScrollTable>
+    <p class="note">Yearly and hourly medians. Source: {pay.release.publisher}, {release}.</p>
   </section>
 
   <AdSlot size="inline" id="state-content-1" />
@@ -154,7 +285,11 @@ const contents = [
       <p class="note">{data.compare.note}</p>
     </section>
     <AdSlot size="sidebar" id="state-side-1" />
-    <LinkPanel heading="Nearby states" links={data.nearbyStates} />
+    {
+      neighbors.length > 0 && (
+        <LinkPanel heading="Nearby states" links={neighbors.map((n) => ({ label: n.name, href: stateHref(n.name) }))} />
+      )
+    }
     <LinkPanel heading="National guides" links={data.nationalGuides} />
   </Fragment>
 </GuideLayout>
@@ -171,6 +306,10 @@ const contents = [
 
   .strong {
     font-weight: var(--weight-bold);
+  }
+
+  .own-row {
+    background: var(--color-tint);
   }
 
   .muted {

@@ -1,0 +1,84 @@
+{
+  "profession": "dental-hygienist",
+  "title": "How to become a dental hygienist: education, exams and license",
+  "description": "The steps to become a dental hygienist in the US: an accredited associate's degree program, the National Board Dental Hygiene Examination, a clinical exam and a state license.",
+  "heading": "How to become a dental hygienist",
+  "breadcrumb": "How to become one",
+  "byline": {
+    "author": { "name": "[AUTHOR NAME]" },
+    "reviewer": { "name": "[REVIEWER NAME, QUALIFICATION]" },
+    "lastChecked": "[DATE]",
+    "sourceNote": "Sources are listed at the end of the page."
+  },
+  "intro": "Every state requires dental hygienists to be licensed, and the requirements differ from state to state (US Bureau of Labor Statistics). The steps below are the usual route. Check the rules for your state on its page.",
+  "takeaways": [
+    "The typical entry requirement is an associate's degree (US Bureau of Labor Statistics).",
+    "Dental hygiene programs are accredited by the Commission on Dental Accreditation (CODA).",
+    "The national written exam is the National Board Dental Hygiene Examination (NBDHE).",
+    "Every state requires a license, and the requirements differ from state to state (US Bureau of Labor Statistics).",
+    "[TOTAL TIME FROM STARTING A PROGRAM TO A FIRST LICENSE, SOURCE]"
+  ],
+  "steps": [
+    {
+      "id": "education",
+      "title": "Complete an accredited dental hygiene program",
+      "paragraphs": [
+        "The typical entry requirement is an associate's degree (US Bureau of Labor Statistics). Dental hygiene programs are accredited by the Commission on Dental Accreditation (CODA).",
+        "[PROGRAM LENGTH, SOURCE]",
+        "[ENTRY REQUIREMENTS AND PREREQUISITES, SOURCE]",
+        "[TYPICAL COST, SOURCE]"
+      ],
+      "stateLink": "Education rules in your state"
+    },
+    {
+      "id": "national-exam",
+      "title": "Pass the national board exam",
+      "paragraphs": [
+        "The national written exam is the National Board Dental Hygiene Examination (NBDHE).",
+        "[WHEN CANDIDATES CAN TAKE THE EXAM, FORMAT AND PASS MARK, SOURCE]",
+        "[EXAM FEE, SOURCE]"
+      ],
+      "stateLink": "National exam rules in your state"
+    },
+    {
+      "id": "clinical-exam",
+      "title": "Pass a clinical exam",
+      "paragraphs": [
+        "[WHAT THE CLINICAL EXAM IS AND WHO RUNS IT, SOURCE]",
+        "[WHICH CLINICAL EXAMS STATES ACCEPT, SOURCE]"
+      ],
+      "stateLink": "Clinical exam rules in your state"
+    },
+    {
+      "id": "license",
+      "title": "Apply for a state license",
+      "paragraphs": [
+        "Every state requires dental hygienists to be licensed, and the requirements differ from state to state (US Bureau of Labor Statistics).",
+        "[WHAT A LICENSE APPLICATION USUALLY INCLUDES, SOURCE]",
+        "[APPLICATION FEES, SOURCE]"
+      ],
+      "stateLink": "License application in your state"
+    },
+    {
+      "id": "renewal",
+      "title": "Keep your license current",
+      "paragraphs": [
+        "[RENEWAL PERIOD, SOURCE]",
+        "[CONTINUING EDUCATION REQUIREMENTS, SOURCE]"
+      ],
+      "stateLink": "Renewal rules in your state"
+    }
+  ],
+  "statesHeading": "Licensing rules by state",
+  "statesIntro": "Each state page has a section on getting licensed in that state.",
+  "otherSources": [
+    "US Bureau of Labor Statistics, Occupational Outlook Handbook: Dental Hygienists (entry requirement and licensing)",
+    "[Commission on Dental Accreditation (CODA), page and date checked]",
+    "[National Board Dental Hygiene Examination (NBDHE), page and date checked]"
+  ],
+  "related": [
+    { "label": "Dental hygienist salary in the US", "href": "/dental-hygienist/salary/" },
+    { "label": "Dental hygiene school prerequisites", "href": "/dental-hygienist/prerequisites/" },
+    { "label": "The national board exam explained", "href": "/dental-hygienist/board-exam/" }
+  ]
+}

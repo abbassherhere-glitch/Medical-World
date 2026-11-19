@@ -1,0 +1,150 @@
+---
+/** "How to become one" guide for a profession, for example /dental-hygienist/how-to-become/. */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import KeyTakeaways from '../../components/KeyTakeaways.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import StateGrid from '../../components/StateGrid.astro';
+import SourcesBox from '../../components/SourcesBox.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import LinkPanel from '../../components/LinkPanel.astro';
+import StatePicker from '../../components/StatePicker.astro';
+import { STATES_AND_DC } from '../../data/states';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('becomeGuides');
+  return guides.map((guide) => ({ params: { profession: guide.data.profession.id }, props: { guide: guide.data } }));
+}
+
+const { guide } = Astro.props;
+const profession = await getEntry(guide.profession);
+const slug = guide.profession.id;
+
+const contents = [
+  ...guide.steps.map((step, i) => ({ label: `${i + 1}. ${step.title}`, id: step.id })),
+  { label: guide.statesHeading, id: 'state-rules' },
+];
+---
+
+<GuideLayout
+  title={guide.title}
+  description={guide.description}
+  heading={guide.heading}
+  profession={profession.data}
+  activeMenu="become"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: profession.data.name, href: `/${slug}/` },
+    { label: guide.breadcrumb },
+  ]}
+  byline={guide.byline}
+>
+  <p class="intro">{guide.intro}</p>
+  <KeyTakeaways items={guide.takeaways} />
+  <TableOfContents items={contents} />
+
+  <ol class="steps">
+    {
+      guide.steps.map((step, i) => (
+        <li class="step">
+          <section aria-labelledby={step.id}>
+            <h2 id={step.id} class="step__title">
+              <span class="step__number" aria-hidden="true">{i + 1}</span>
+              <span>
+                <span class="visually-hidden">Step {i + 1}: </span>
+                {step.title}
+              </span>
+            </h2>
+            <div class="step__body">
+              {step.paragraphs.map((text) => <p>{text}</p>)}
+              <a class="step__link" href="#state-rules">
+                {step.stateLink}
+              </a>
+            </div>
+          </section>
+        </li>
+      ))
+    }
+  </ol>
+
+  <AdSlot size="inline" id="become-content-1" />
+
+  <section class="stack" aria-labelledby="state-rules">
+    <h2 id="state-rules" class="section-title" tabindex="-1">{guide.statesHeading}</h2>
+    <p class="muted">{guide.statesIntro}</p>
+    <StateGrid profession={slug} states={STATES_AND_DC} section="licensing" />
+  </section>
+
+  <SourcesBox items={guide.otherSources} />
+
+  <Fragment slot="aside">
+    <section class="panel panel--highlight stack" aria-labelledby="find-state">
+      <h2 id="find-state" class="panel-title">Rules in your state</h2>
+      <StatePicker id="side" profession={slug} layout="column" buttonLabel="Go to state page" />
+    </section>
+    <AdSlot size="sidebar" id="become-side-1" />
+    <LinkPanel heading="Related guides" links={guide.related} />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .intro {
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .muted {
+    color: var(--color-text-secondary);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    list-style: none;
+    padding: 0;
+  }
+
+  .step__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 1.4rem;
+  }
+
+  .step__number {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    color: var(--color-on-dark);
+    background: var(--color-accent);
+    border-radius: 50%;
+  }
+
+  .step__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-left: 52px;
+    line-height: 1.6;
+  }
+
+  .step__link {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    min-height: var(--tap-size);
+    font-weight: var(--weight-bold);
+  }
+
+  @media (max-width: 480px) {
+    .step__body {
+      padding-left: 0;
+    }
+  }
+</style>

@@ -102,3 +102,44 @@ test('compares a state with the national median in one sentence', () => {
   );
   assert.equal(compareWithNational('Kansas', undefined, figures(98100)), undefined);
 });
+
+import { areaSummary, ordinal, rankInWords, rankOf } from './summary.ts';
+
+const st = (name: string, median?: number) =>
+  median === undefined
+    ? { code: name, name, abbr: name, kind: 'state' as const, published: false }
+    : { code: name, name, abbr: name, kind: 'state' as const, published: true, figures: figures(median) };
+
+test('ranks a state by median pay among the states with figures', () => {
+  const states = [st('A', 60000), st('B', 90000), st('C', 75000), st('D'), st('E', 75000)];
+  assert.deepEqual(rankOf(states, 'B'), { rank: 1, of: 4 });
+  assert.deepEqual(rankOf(states, 'C'), { rank: 2, of: 4 }, 'equal medians share a rank');
+  assert.deepEqual(rankOf(states, 'E'), { rank: 2, of: 4 });
+  assert.deepEqual(rankOf(states, 'A'), { rank: 4, of: 4 });
+  assert.equal(rankOf(states, 'D'), undefined, 'a state without a median is not ranked');
+  assert.equal(rankInWords({ rank: 12, of: 50 }), '12th highest of 50');
+  assert.equal(rankInWords({ rank: 1, of: 50 }), 'highest of 50');
+  assert.equal(rankInWords({ rank: 50, of: 50 }), 'lowest of 50');
+  assert.deepEqual([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 101].map(ordinal), ['1st', '2nd', '3rd', '4th', '11th', '12th', '13th', '21st', '22nd', '23rd', '101st']);
+});
+
+test('the comparison sentence handles the equal case', () => {
+  assert.equal(
+    compareWithNational('Utah', figures(98100), figures(98100)),
+    'The median pay in Utah is the same as the national median of $98,100 a year.',
+  );
+  assert.equal(
+    compareWithNational('District of Columbia', figures(137220), figures(98100)),
+    'The median pay in the District of Columbia is $39,120 a year (39.9%) higher than the national median of $98,100.',
+  );
+});
+
+test('names the highest and lowest paying areas, or says plainly none are published', () => {
+  const area = (name: string, median: number) => ({ name, figures: figures(median) });
+  assert.equal(
+    areaSummary('Texas', [area('Low, TX', 80000), area('High, TX', 105000), area('Mid, TX', 90000)]),
+    'Of the 3 areas that include Texas with published figures, the highest median pay is in High, TX ($105,000 a year) and the lowest is in Low, TX ($80,000).',
+  );
+  assert.match(areaSummary('Rhode Island', [area('Providence, RI-MA', 87000)]), /only one area that includes Rhode Island: Providence, RI-MA/);
+  assert.equal(areaSummary('Kansas', []), 'Pay figures for individual areas are not published for Kansas.');
+});

@@ -18,6 +18,11 @@ a placeholder waiting for a real value.
 | --- | --- |
 | Site name, address, company name, indexing switch, advert switch | `src/settings.ts` |
 | Page text | `src/content/` |
+| Which state pages are published | `src/content/state-pages/dental-hygienist.json` |
+| Text shared by every state page (with `{state}` where the name goes) | `src/content/state-guides/dental-hygienist.json` |
+| Overview page text | `overview` in `src/content/professions/dental-hygienist.json` |
+| "How to become one" page text | `src/content/become-guides/dental-hygienist.json` |
+| Which states border which | `src/data/borders.ts` |
 | Pay figures (made by the import, do not edit by hand) | `src/data/pay/` |
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
@@ -58,7 +63,8 @@ Then open <http://localhost:4321> in your browser. Pages reload as you edit.
 npm run build
 ```
 
-The finished site is written to the `dist/` folder. To look at the built
+The finished site is written to the `dist/` folder. The site has a page for
+every state and the District of Columbia, so expect about 60 pages. To look at the built
 version:
 
 ```bash
@@ -66,7 +72,7 @@ npm run preview
 ```
 
 To run every check that also runs on pull requests (wording, type check, lint,
-tests and build):
+tests, build and link check):
 
 ```bash
 npm run verify
@@ -176,11 +182,66 @@ is wrong, so an override is never silently ignored. Delete an entry to go
 back to the official figure. Overrides stay in place when you import a new
 release, so review them each time.
 
+## Switching a state page on or off
+
+Every state and the District of Columbia has a dental hygienist page. Which
+pages are published is set in one file:
+`src/content/state-pages/dental-hygienist.json`. It lists every state with a
+switch:
+
+```json
+{ "state": "Texas", "published": true },
+{ "state": "Utah", "published": true },
+```
+
+To take a page off the site, change its `true` to `false` and save:
+
+```json
+{ "state": "Utah", "published": false },
+```
+
+When the site is next built and deployed:
+
+- the page is not built, so its address shows the "page not found" page;
+- it is left out of `sitemap.xml`;
+- every link to it, on menus, tables, grids and other state pages, shows as
+  plain text instead.
+
+Change it back to `true` to publish the page again. Keep every state in the
+list: if a state is missing, misspelled or listed twice, the build stops and
+says which one. Territories (Puerto Rico, Guam, the US Virgin Islands) do
+not have pages; their figures stay in the data file.
+
 ## Pages that are not built yet
 
-Menus and lists mention guides that are planned but not written yet. These
-show as plain text and become links automatically once the page exists. The
-list of published pages is in `src/data/routes.ts`.
+Menus and lists mention guides that are planned but not written yet, such as
+"Schools by state", "Licensing" and "Board exam". These show as plain text
+and become links automatically once the page exists. The list of published
+pages is in `src/data/routes.ts`.
+
+To check that no link on the built site leads to a missing page or section:
+
+```bash
+npm run check-links
+```
+
+## Placeholders still to fill in
+
+Anything in square brackets, such as `[AUTHOR NAME]` or
+`[Requirement in Texas, from the state board.]`, is a placeholder. To list
+every placeholder still on the site, grouped by page, with a total and the
+most common ones:
+
+```bash
+npm run build
+```
+
+```bash
+npm run placeholders
+```
+
+This is the to-do list before launch. It only reports; it never stops the
+build.
 
 ## How deployment works
 

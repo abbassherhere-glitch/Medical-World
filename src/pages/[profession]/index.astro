@@ -1,0 +1,127 @@
+---
+/** Overview page for a profession, for example /dental-hygienist/. */
+import { getCollection } from 'astro:content';
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import NationalFigures from '../../components/NationalFigures.astro';
+import GuideCards from '../../components/GuideCards.astro';
+import StateGrid from '../../components/StateGrid.astro';
+import PayRangeBar from '../../components/PayRangeBar.astro';
+import SourceLine from '../../components/SourceLine.astro';
+import SourcesBox from '../../components/SourcesBox.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import LinkPanel from '../../components/LinkPanel.astro';
+import StatePicker from '../../components/StatePicker.astro';
+import SmartLink from '../../components/SmartLink.astro';
+import { getPublishedStatePages } from '../../data/state-pages';
+import { STATES_AND_DC } from '../../data/states';
+import { formatAnnual, getPayData, releaseName, statesAndDc, surveyPhrase } from '../../lib/pay';
+import { capitalize, highestAndLowest, joinNames, medianInWords } from '../../lib/pay/summary';
+
+export async function getStaticPaths() {
+  const professions = await getCollection('professions');
+  return professions
+    .filter((p) => p.data.overview)
+    .map((p) => ({ params: { profession: p.id }, props: { profession: p.data, slug: p.id } }));
+}
+
+const { profession, slug } = Astro.props;
+const overview = profession.overview!;
+const plural = profession.namePlural;
+const pay = getPayData(slug);
+const release = releaseName(pay);
+const extremes = highestAndLowest(statesAndDc(pay));
+const published = new Set((await getPublishedStatePages()).filter((p) => p.profession === slug).map((p) => p.state));
+// The full grid lists every state and DC; unpublished ones show as plain text.
+const states = STATES_AND_DC;
+
+const median = medianInWords(pay.national);
+const paySummary = [
+  `${capitalize(plural)} in the US earn a median of ${median}, according to ${surveyPhrase(pay)}.`,
+  extremes
+    ? `By median yearly pay, the highest pay is in ${joinNames(extremes.highest.map((s) => s.name))} (${formatAnnual(extremes.highest[0]!.median)}) and the lowest is in ${joinNames(extremes.lowest.map((s) => s.name))} (${formatAnnual(extremes.lowest[0]!.median)}).`
+    : '',
+]
+  .filter(Boolean)
+  .join(' ');
+
+const title = `${profession.name}: pay, training and license by state`;
+const description = `${capitalize(plural)} in the US earn a median of ${formatAnnual(pay.national.annual.median)} a year (${release}). How to become one, and pay and licensing in every state.`;
+const sources = [`${pay.release.publisher}, ${release}`, ...overview.otherSources];
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  heading={overview.heading}
+  profession={profession}
+  activeMenu="overview"
+  breadcrumb={[{ label: 'Home', href: '/' }, { label: profession.name }]}
+  byline={overview.byline}
+>
+  <div class="intro">
+    {overview.intro.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+
+  <section class="panel panel--tint stack" aria-labelledby="figures">
+    <h2 id="figures" class="section-title">{overview.figuresHeading}</h2>
+    <NationalFigures profession={slug} outlook={profession.outlook} />
+  </section>
+
+  <section class="stack" aria-labelledby="guides">
+    <h2 id="guides" class="section-title">{overview.guidesHeading}</h2>
+    <GuideCards cards={profession.guideCards} />
+  </section>
+
+  <section class="panel stack pay" aria-labelledby="pay">
+    <h2 id="pay" class="section-title">{overview.payHeading}</h2>
+    <p>{paySummary}</p>
+    <PayRangeBar annual={pay.national.annual} />
+    <SourceLine data={pay} />
+    <SmartLink class="more-link" href={`/${slug}/salary/`}>Read the full salary guide</SmartLink>
+  </section>
+
+  <AdSlot size="inline" id="overview-content-1" />
+
+  <section class="stack" aria-labelledby="states">
+    <h2 id="states" class="section-title" tabindex="-1">{overview.statesHeading}</h2>
+    <p class="muted">{overview.statesIntro}</p>
+    <StateGrid profession={slug} states={states} />
+    {
+      published.size < states.length && (
+        <p class="note">States shown without a link do not have a published page yet.</p>
+      )
+    }
+  </section>
+
+  <SourcesBox items={sources} />
+
+  <Fragment slot="aside">
+    <section class="panel panel--highlight stack" aria-labelledby="find-state">
+      <h2 id="find-state" class="panel-title">Pay and licensing in your state</h2>
+      <StatePicker id="side" profession={slug} layout="column" buttonLabel="Go to state page" />
+    </section>
+    <AdSlot size="sidebar" id="overview-side-1" />
+    <LinkPanel heading="Related guides" links={overview.related} />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-lead);
+    line-height: 1.55;
+  }
+
+  .muted {
+    color: var(--color-text-secondary);
+  }
+
+  .more-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    font-weight: var(--weight-bold);
+  }
+</style>
