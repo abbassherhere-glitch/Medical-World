@@ -4,6 +4,7 @@ import {
   areaQuestions,
   areaRank,
   areaRankSentence,
+  compareAll,
   compareMedian,
   nationalBenchmark,
   nextHigherAndLower,
@@ -51,7 +52,7 @@ test('comparison sentence: higher, lower, equal and missing', () => {
     compareMedian('Topeka, KS', 90000, stateBenchmark(kansas)),
     'The survey publishes no statewide median for Kansas, so there is no state figure to compare with.',
   );
-  assert.match(compareMedian('Washington, DC-VA-MD-WV', 120000, stateBenchmark(dc)), /statewide median in the District of Columbia/);
+  assert.match(compareMedian('Washington, DC-VA-MD-WV', 120000, stateBenchmark(dc)), /lower than the median for the District of Columbia \(\$137,220\)/);
   assert.match(compareMedian('None, TX', undefined, nationalBenchmark(us)), /no published median for None, TX/);
 });
 
@@ -112,4 +113,14 @@ test('common questions are answered from the area figures, and left out when mis
   assert.ok(!fewer.some((x) => x.question.startsWith('How many')));
   assert.ok(!fewer.some((x) => x.question.includes('rank')));
   assert.match(fewer.find((x) => x.question.includes('compare'))!.answer, /no statewide median for Kansas/);
+});
+
+test('a run of comparisons names the area once, then says "It is"', () => {
+  assert.deepEqual(compareAll('High, TX', 120000, [texas], us), [
+    'The median salary in High, TX is $20,760 a year (20.9%) higher than the statewide median in Texas ($99,240).',
+    'It is $21,900 a year (22.3%) higher than the US median ($98,100).',
+  ]);
+  const kansasFirst = compareAll('Topeka, KS', 90000, [kansas], us);
+  assert.match(kansasFirst[0]!, /no statewide median for Kansas/);
+  assert.match(kansasFirst[1]!, /^The median salary in Topeka, KS is \$8,100 a year \(8.3%\) lower than the US median/);
 });

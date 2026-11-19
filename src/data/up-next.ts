@@ -20,6 +20,7 @@ export function upNext(page: string, profession: string, name: string): Step[] {
 
   const order: Record<string, (keyof typeof steps)[]> = {
     state: ['salary', 'become', 'calculator', 'overview'],
+    area: ['calculator', 'salary', 'become'],
     salary: ['calculator', 'states', 'become'],
     calculator: ['salary', 'become', 'states'],
     become: ['licensing', 'schools', 'exam', 'states'],

@@ -6,21 +6,23 @@ interface Props {
   profession: string;
   /** Open the calculator with this state chosen, for example "texas". */
   state?: string;
+  /** Also choose this area, by its official code, for example "26420". */
+  area?: string;
   heading: string;
   text: string;
   label: string;
 }
 
-const { profession, state, heading, text, label } = Astro.props;
+const { profession, state, area, heading, text, label } = Astro.props;
 const base = `/${profession}/salary/calculator/`;
 const live = await isLive(base);
-const href = state ? `${base}?state=${encodeURIComponent(state)}` : base;
+const href = state ? `${base}?state=${encodeURIComponent(state)}${area ? `&area=${encodeURIComponent(area)}` : ''}` : base;
 ---
 
 {
   live && (
-    <section class="panel panel--highlight stack calc-link" aria-labelledby={`calc-link-${state ?? 'all'}`} data-pagefind-ignore>
-      <h2 id={`calc-link-${state ?? 'all'}`} class="panel-title">{heading}</h2>
+    <section class="panel panel--highlight stack calc-link" aria-labelledby={`calc-link-${area ?? state ?? 'all'}`} data-pagefind-ignore>
+      <h2 id={`calc-link-${area ?? state ?? 'all'}`} class="panel-title">{heading}</h2>
       <p>{text}</p>
       <a class="button button--action" href={href}>{label}</a>
     </section>

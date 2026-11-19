@@ -64,12 +64,14 @@ export interface Benchmark {
  * for example "The median salary in Houston, TX is $1,200 a year (1.2%)
  * higher than the statewide median in Texas ($99,240)."
  */
-export function compareMedian(place: string, here: number | undefined, other: Benchmark): string {
+export function compareMedian(place: string, here: number | undefined, other: Benchmark, again = false): string {
   if (here === undefined) return `There is no published median for ${place} to compare with ${other.label}.`;
   if (other.value === undefined) return other.missing;
   const diff = here - other.value;
-  if (diff === 0) return `The median salary in ${place} is the same as ${other.label} (${formatDollars(other.value)} a year).`;
-  return `The median salary in ${place} is ${formatDollars(Math.abs(diff))} a year (${formatPercent(diff / other.value)}) ${
+  // A second sentence in a row reads "It is …" rather than repeating the place.
+  const subject = again ? 'It' : `The median salary in ${place}`;
+  if (diff === 0) return `${subject} is the same as ${other.label} (${formatDollars(other.value)} a year).`;
+  return `${subject} is ${formatDollars(Math.abs(diff))} a year (${formatPercent(diff / other.value)}) ${
     diff > 0 ? 'higher' : 'lower'
   } than ${other.label} (${formatDollars(other.value)}).`;
 }
@@ -78,14 +80,29 @@ export function compareMedian(place: string, here: number | undefined, other: Be
 export function stateBenchmark(state: StatePay): Benchmark {
   const where = placeName(state.name);
   return {
-    label: `the statewide median in ${where}`,
+    // The District of Columbia is not a state, so its figure is not called "statewide".
+    label: state.kind === 'district' ? `the median for ${where}` : `the statewide median in ${where}`,
     value: numeric(state.figures?.annual.median),
-    missing: `The survey publishes no statewide median for ${where}, so there is no state figure to compare with.`,
+    missing: `The survey publishes no ${state.kind === 'district' ? '' : 'statewide '}median for ${where}, so there is no ${state.kind === 'district' ? '' : 'state '}figure to compare with.`,
   };
 }
 
 export function nationalBenchmark(national: PayFigures): Benchmark {
   return { label: 'the US median', value: numeric(national.annual.median), missing: 'There is no published US median to compare with.' };
+}
+
+/**
+ * The comparisons with each state and the US, in order. After the first
+ * sentence that names the area, the next ones start "It is …".
+ */
+export function compareAll(place: string, median: number | undefined, states: StatePay[], national: PayFigures): string[] {
+  const benchmarks = [...states.map(stateBenchmark), nationalBenchmark(national)];
+  let named = false;
+  return benchmarks.map((b) => {
+    const sentence = compareMedian(place, median, b, named);
+    if (sentence.startsWith('The median salary in')) named = true;
+    return sentence;
+  });
 }
 
 export interface StateRank {
@@ -176,7 +193,7 @@ export function areaQuestions(input: AreaQuestionInput): Question[] {
 
     questions.push({
       question: `How does the salary in ${place} compare with ${states.length === 1 ? placeName(states[0]!.name) : 'its states'} and the US?`,
-      answer: [...states.map((s) => compareMedian(place, median, stateBenchmark(s))), compareMedian(place, median, nationalBenchmark(national))].join(' '),
+      answer: compareAll(place, median, states, national).join(' '),
     });
 
     const rankText = areaRankSentence(place, stateRanks, nationalRank);
