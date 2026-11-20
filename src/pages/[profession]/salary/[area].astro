@@ -250,8 +250,9 @@ const calculatorState = states.find((s) => s.abbr === area.primaryState) ?? firs
   <section class="panel stack" aria-labelledby="working">
     <h2 id="working" class="section-title">{working.length === 1 ? `Working in ${working[0]!.where}` : 'Working in these states'}</h2>
     <p>
-      Price levels are published for whole states, not for metropolitan areas, so there is no salary adjusted for cost of living for {short}.
-      {working.length === 1 ? 'The state page shows the statewide figure.' : 'Each state page shows its statewide figure.'}
+      {`Price levels are published for whole states, not for metropolitan areas, so there is no salary adjusted for cost of living for ${short}. ${
+        working.length === 1 ? 'The state page shows the statewide figure.' : 'Each state page shows its statewide figure.'
+      }`}
     </p>
     {
       working.map((w) => (
