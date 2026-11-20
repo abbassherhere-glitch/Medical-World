@@ -1,0 +1,63 @@
+---
+/**
+ * "Salary and cost of living in {state}": the state's price level, its
+ * adjusted median and both ranks, with one plain sentence and the note that
+ * the adjusted figure is a calculation. Used on state pages.
+ */
+import StatGrid from './StatGrid.astro';
+import SmartLink from './SmartLink.astro';
+import { formatAnnual } from '../lib/pay';
+import { ordinal } from '../lib/pay/summary';
+import { adjustNote, priceLevelInWords, type CostOfLivingRow } from '../lib/prices';
+
+interface Props {
+  id: string;
+  /** As it reads in a sentence, for example "the District of Columbia". */
+  where: string;
+  parity: number | null | undefined;
+  /** This state's row in the cost-of-living table, if it has a salary and a price level. */
+  row: CostOfLivingRow | undefined;
+  /** How many places are ranked. */
+  of: number;
+  payPeriod: string;
+  priceYear: number;
+  sources: string;
+  guideHref: string;
+}
+
+const { id, where, parity, row, of, payPeriod, priceYear, sources, guideHref } = Astro.props;
+const capital = where.charAt(0).toUpperCase() + where.slice(1);
+const rankText = (r: number) => `${ordinal(r)} of ${of}`;
+
+let sentence: string;
+if (row) {
+  const move =
+    row.change === 0
+      ? `keeps the same rank, ${ordinal(row.rank)} of ${of}, once prices are counted`
+      : `moves ${row.change > 0 ? 'up' : 'down'} from ${ordinal(row.rank)} to ${ordinal(row.adjustedRank)} of ${of} once prices are counted`;
+  sentence = `Prices in ${where} are ${priceLevelInWords(row.parity)}, so the median salary of ${formatAnnual(row.median)} is worth an adjusted ${formatAnnual(row.adjusted)} at national average prices. ${capital} ${move}.`;
+} else if (typeof parity === 'number') {
+  sentence = `Prices in ${where} are ${priceLevelInWords(parity)}. The survey has no statewide median salary for ${where}, so no adjusted salary is worked out and ${where} is not ranked.`;
+} else {
+  sentence = `There is no published price level for ${where}, so no adjusted salary is worked out.`;
+}
+---
+
+<section class="stack" aria-labelledby={id}>
+  <h2 id={id} class="section-title">Salary and cost of living in {where}</h2>
+  <StatGrid
+    size="small"
+    items={[
+      { label: `Price level, ${priceYear} (US = 100)`, value: typeof parity === 'number' ? parity.toFixed(3) : 'Not available' },
+      { label: 'Adjusted median salary (calculated)', value: row ? formatAnnual(row.adjusted) : 'Not available' },
+      { label: 'Rank by median salary', value: row ? rankText(row.rank) : 'Not ranked' },
+      { label: 'Rank once prices are counted', value: row ? rankText(row.adjustedRank) : 'Not ranked' },
+    ]}
+  />
+  <p>{sentence}</p>
+  <p class="note">{adjustNote({ payPeriod, priceYear })} Ranks are among the {of} places with both figures.</p>
+  <p class="note">Sources: {sources}.</p>
+  <p>
+    <SmartLink class="more-link" href={guideHref}>See the salary in every state, adjusted for cost of living</SmartLink>
+  </p>
+</section>

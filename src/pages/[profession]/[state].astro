@@ -16,6 +16,8 @@ import PayPeriodsTable from '../../components/PayPeriodsTable.astro';
 import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
 import SchoolsSection from '../../components/SchoolsSection.astro';
+import CostOfLivingBlock from '../../components/CostOfLivingBlock.astro';
+import { costOfLivingTable, getPrices, priceLevelFor, priceLevelInWords } from '../../lib/prices';
 import { getSchools, schoolsInState, schoolsSourceLine, stateSchoolsSummary, withAwards, withoutAwards, totalAwards, countFormat as schoolCount } from '../../lib/schools';
 import { settings } from '../../settings';
 import OutlookSection from '../../components/OutlookSection.astro';
@@ -152,7 +154,21 @@ const schoolsYear = schoolsData?.source.awardYear ?? '';
 const schoolsSummary = schoolsData ? stateSchoolsSummary(where, stateSchools, schoolsYear) : undefined;
 if (schoolsSummary) takeaways.splice(takeaways.length - data.takeaways.length, 0, schoolsSummary.replace(/\.$/, ' (US Department of Education, IPEDS).'));
 
-const sources = [`${pay.release.publisher}, ${release}`, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...data.otherSources];
+// Salary and cost of living: the state's price level and its adjusted median (a calculation).
+const prices = getPrices();
+const colRows = costOfLivingTable(allStates, prices);
+const colRow = colRows.find((r) => r.name === state);
+const parity = priceLevelFor(prices, state);
+const colGuide = `/${professionSlug}/salary/cost-of-living/`;
+if (colRow) {
+  takeaways.splice(
+    takeaways.length - data.takeaways.length,
+    0,
+    `Once state price levels are counted, the median salary in ${where} is worth an adjusted ${formatAnnual(colRow.adjusted)}, ${ordinal(colRow.adjustedRank)} of ${colRows.length} (calculated from the ${pay.release.referencePeriod} median salary and ${prices.source.year} state price levels).`,
+  );
+}
+
+const sources = [`${pay.release.publisher}, ${release}`, prices.source.name, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...data.otherSources];
 
 // Job outlook, from the state projections (a different source from the pay
 // survey; never mixed with it). Ranked among the states and DC only.
@@ -202,6 +218,14 @@ if (schoolsData && schoolsSummary) {
       .join(' '),
   });
 }
+questions.push({
+  question: `How far does a ${profession.data.name.toLowerCase()} salary go in ${where}?`,
+  answer: colRow
+    ? `Prices in ${where} are ${priceLevelInWords(colRow.parity)} (price level ${colRow.parity.toFixed(3)} in ${prices.source.year}, where 100 is the national average). Dividing the median salary of ${formatAnnual(colRow.median)} by ${colRow.parity.toFixed(3)} ÷ 100 gives an adjusted ${formatAnnual(colRow.adjusted)}, rounded to the nearest $10. ${capitalize(where)} ranks ${ordinal(colRow.rank)} of ${colRows.length} by salary and ${ordinal(colRow.adjustedRank)} once prices are counted. Price levels are averages for the whole state.`
+    : typeof parity === 'number'
+      ? `Prices in ${where} are ${priceLevelInWords(parity)} (price level ${parity.toFixed(3)} in ${prices.source.year}). The survey has no statewide median salary for ${where}, so no adjusted salary is worked out.`
+      : `There is no published price level for ${where}, so the salary cannot be adjusted for cost of living.`,
+});
 if (outlook && outlookPlace && outlookLine) {
   questions.push({
     question: `What is the job outlook for ${plural} in ${where}?`,
@@ -212,6 +236,7 @@ if (outlook && outlookPlace && outlookLine) {
 const contents = [
   { label: data.pay.heading, id: 'pay' },
   ...(local ? [{ label: 'Pay per hour, week, month and year', id: 'pay-periods' }] : []),
+  { label: `Salary and cost of living in ${where}`, id: 'cost-of-living' },
   { label: data.cityPay.heading, id: 'pay-by-city' },
   { label: compareHeading, id: 'nearby' },
   ...(outlook ? [{ label: `Job outlook in ${where}`, id: 'outlook' }] : []),
@@ -258,6 +283,18 @@ const contents = [
   </section>
 
   {local && <PayPeriodsTable id="pay-periods" place={where} figures={local} source={`${pay.release.publisher}, ${release}`} />}
+
+  <CostOfLivingBlock
+    id="cost-of-living"
+    where={where}
+    parity={parity}
+    row={colRow}
+    of={colRows.length}
+    payPeriod={pay.release.referencePeriod}
+    priceYear={prices.source.year}
+    sources={`${pay.release.publisher}, ${release}; ${prices.source.name}`}
+    guideHref={colGuide}
+  />
 
   <ImageSlot {...data.image} />
 
