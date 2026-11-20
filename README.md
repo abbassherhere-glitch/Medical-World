@@ -35,6 +35,10 @@ a placeholder waiting for a real value.
 | Your changes to single pay figures | `src/data/pay/overrides.json` |
 | Job outlook figures (made by the import, do not edit by hand) | `src/data/outlook/` |
 | Your changes to single job outlook figures | `src/data/outlook/overrides.json` |
+| State price levels (made by the import, do not edit by hand) | `src/data/prices/regional-price-parities.json` |
+| Your changes to single price levels | `src/data/prices/overrides.json` |
+| How the adjusted salary is worked out | `src/lib/prices/adjust.ts` |
+| Structured data for search engines | `src/lib/structured-data.ts` |
 | College lists (made by the import, do not edit by hand) | `src/data/schools/` |
 | Your changes to single colleges (hide or correct) | `src/data/schools/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
@@ -387,6 +391,81 @@ npm run check-area-text
 It takes each area page's main text, replaces every name with "NAME" and
 every figure with "#", and fails if any two pages are then identical. It
 also prints the most similar pair. It runs on every pull request.
+
+## Salary and cost of living
+
+The site adjusts state median salaries for state price levels, using the US
+Bureau of Economic Analysis's Regional Price Parities by State (currently
+2024, all items, released February 19, 2026). A price level of 100 is the
+national average; 110 means prices are 10% above it.
+
+**The calculation**, in one shared helper (`src/lib/prices/adjust.ts`):
+
+> adjusted salary = official median annual salary ÷ (price level ÷ 100),
+> rounded to the nearest $10
+
+It is never worked out when the salary is missing or carries a symbol (for
+example Kansas, which has no statewide figure). Wherever an adjusted figure
+appears, a note says it is a calculation, how it is worked out, the years of
+the salary and the price levels, and that price levels are averages for a
+whole state. Price levels are published for states only, so metropolitan
+areas have no adjusted figure.
+
+It appears on `/dental-hygienist/salary/cost-of-living/`, in a block on every
+state page, in the calculator (for whole states only) and on the salary guide.
+
+**To update the price levels:**
+
+1. Put the new CSV in `data/source/`. Its name must contain "price-parities"
+   and end in `.csv`, for example `bea-regional-price-parities-2025-states.csv`.
+   It needs the columns `state_fips, area, year, regional_price_parity_all_items`,
+   with a United States row (FIPS 00).
+2. The file does not say when it was released. Update the release date in
+   `PRICE_RELEASE` in `scripts/import-pay/prices.ts`.
+3. Run:
+
+   ```bash
+   npm run import-prices
+   ```
+
+   (`npm run import-pay` also runs it.) States are matched by FIPS code.
+4. Run `npm run verify`, check the pages, and commit the changed file.
+
+To change a single price level, add an entry to `src/data/prices/overrides.json`:
+
+```json
+{ "overrides": [{ "place": "Texas", "value": 97.5, "note": "Why, and where it was checked" }] }
+```
+
+`value` is a positive number, or `"Not available"`.
+
+## Structured data
+
+Every page carries structured data (JSON-LD) for search engines, built by the
+same components that draw the page, so it always matches what is shown:
+
+| Type | Where | Built by |
+| --- | --- | --- |
+| BreadcrumbList | Every page with a breadcrumb trail | `src/components/Breadcrumb.astro` |
+| WebSite, with a SearchAction for `/search/` | Home page | `src/pages/index.astro` |
+| Article | Guides, state pages and area pages (not the calculator) | `src/layouts/GuideLayout.astro` |
+| FAQPage | Every page with "Common questions" | `src/components/FaqList.astro` |
+
+The site name and address come from `src/settings.ts`. The publisher is the
+site, by name and address only. An author and a date are added only once the
+byline has a real name and a real date; while they are `[AUTHOR NAME]` and
+`[DATE]`, they are left out. Salary figures are not marked up: Google retired
+its estimated salary feature in 2025.
+
+After a build, run:
+
+```bash
+npm run check-structured-data
+```
+
+It fails if any structured data is not valid JSON, contains a square-bracket
+placeholder, or has a question, answer or breadcrumb that is not on the page.
+It runs on every pull request.
 
 ## Switching a guide link on or off
 
