@@ -20,7 +20,8 @@
     "check-area-text": "node scripts/site/check-area-text.ts",
     "placeholders": "node scripts/site/placeholders.ts",
     "import-outlook": "node scripts/import-pay/import-outlook.ts",
-    "import-schools": "node scripts/import-pay/import-schools.ts"
+    "import-schools": "node scripts/import-pay/import-schools.ts",
+    "import-prices": "node scripts/import-pay/import-prices.ts"
   },
   "dependencies": {
     "astro": "^7.4.13"
