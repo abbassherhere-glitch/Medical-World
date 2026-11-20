@@ -32,3 +32,5 @@ jobs:
         run: npm run check-links
       - name: Area pages are not copies
         run: npm run check-area-text
+      - name: Structured data
+        run: npm run check-structured-data

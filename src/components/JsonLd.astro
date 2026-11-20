@@ -1,0 +1,12 @@
+---
+/** One block of structured data (JSON-LD). */
+import { jsonLdText, type JsonLd } from '../lib/structured-data';
+
+interface Props {
+  data: JsonLd;
+}
+
+const { data } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={jsonLdText(data)} />

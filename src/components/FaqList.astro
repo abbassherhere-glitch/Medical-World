@@ -1,5 +1,10 @@
 ---
-/** "Common questions" as expandable items. Works without JavaScript. */
+/**
+ * "Common questions" as expandable items. Works without JavaScript. The same
+ * items are given to search engines as FAQPage structured data.
+ */
+import JsonLd from './JsonLd.astro';
+import { faqPage } from '../lib/structured-data';
 interface Props {
   id: string;
   heading: string;
@@ -9,6 +14,7 @@ interface Props {
 const { id, heading, items } = Astro.props;
 ---
 
+<JsonLd data={faqPage(items)} />
 <section class="faq" aria-labelledby={id}>
   <h2 id={id} class="section-title faq__title">{heading}</h2>
   {

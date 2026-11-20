@@ -7,6 +7,9 @@ import BaseLayout from './BaseLayout.astro';
 import ProfessionNav from '../components/ProfessionNav.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import Byline from '../components/Byline.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { article } from '../lib/structured-data';
+import { settings, siteOrigin } from '../settings';
 
 interface Props {
   title: string;
@@ -14,6 +17,8 @@ interface Props {
   heading: string;
   /** Optional line directly under the heading, for example an official area name. */
   subheading?: string;
+  /** Set to false for tools, such as the calculator, which are not articles. */
+  isArticle?: boolean;
   profession: { name: string; menu: { key: string; label: string; href: string }[] };
   activeMenu: string;
   breadcrumb: { label: string; href?: string }[];
@@ -25,7 +30,17 @@ interface Props {
   };
 }
 
-const { title, description, heading, subheading, profession, activeMenu, breadcrumb, byline } = Astro.props;
+const { title, description, heading, subheading, isArticle = true, profession, activeMenu, breadcrumb, byline } = Astro.props;
+const articleData = isArticle
+  ? article({
+      headline: heading,
+      description,
+      url: new URL(Astro.url.pathname, siteOrigin()).href,
+      site: { name: settings.siteName, origin: siteOrigin() },
+      authorName: byline.author.name,
+      dateShown: byline.lastChecked,
+    })
+  : undefined;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -34,6 +49,7 @@ const { title, description, heading, subheading, profession, activeMenu, breadcr
   <div class="container guide">
     <main id="main" class="guide__main" tabindex="-1" data-pagefind-body>
       <Breadcrumb items={breadcrumb} />
+      {articleData && <JsonLd data={articleData} />}
       <header class="guide__header">
         <h1>{heading}</h1>
         {subheading && <p class="guide__subheading">{subheading}</p>}
