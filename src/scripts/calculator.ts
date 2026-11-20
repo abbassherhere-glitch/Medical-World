@@ -6,6 +6,8 @@
  */
 import {
   outlookSnapshot,
+  priceSnapshot,
+  type PriceSnapshot,
   readChoices,
   snapshot,
   unpackOutlook,
@@ -33,11 +35,18 @@ function fillCard(
   period: Period,
   comparedLabel: string,
   outlook?: { snap: OutlookSnapshot; comparedLabel: string },
+  prices?: { snap: PriceSnapshot; comparedLabel: string },
 ) {
   const set = (field: string, text: string) => {
     const el = $<HTMLElement>(`[data-field="${field}"]`, card);
     if (el) el.textContent = text;
   };
+  if (prices) {
+    set('price-level', prices.snap.priceLevel);
+    set('adjusted', prices.snap.adjusted);
+    set('adjusted-compared-label', prices.comparedLabel);
+    set('adjusted-compared', prices.snap.comparedWith);
+  }
   if (outlook) {
     set('outlook-heading', outlook.snap.heading);
     set('outlook-jobs', outlook.snap.jobs);
@@ -153,11 +162,29 @@ export async function startCalculator(): Promise<void> {
       aOut && outlookYears
         ? outlookSnapshot(aOut.figures, aOut.scope, outlookYears, choices.state ? { figures: nationalOutlook, name: 'the US', isNation: true } : undefined)
         : undefined;
-    fillCard(cardA, a.name, aSnap, choices.period, 'Median compared with the US', aOutSnap ? { snap: aOutSnap, comparedLabel: 'Growth compared with the US' } : undefined);
+    // Salary and cost of living: whole states only, never areas.
+    const priceKind = (stateSlug: string | undefined, areaCode: string | undefined) => (!stateSlug ? 'nation' : areaCode ? 'area' : 'state');
+    const parityOf = (stateSlug: string | undefined) => (stateSlug ? data.prices?.states[stateSlug] : undefined);
+    const aKind = priceKind(choices.state, choices.area);
+    // The US price level is 100 by definition, so the US median is the national benchmark.
+    const usMedian = typeof national?.annual.median === 'number' ? national.annual.median : undefined;
+    const aPrice = data.prices
+      ? priceSnapshot(aKind, a.figures, parityOf(choices.state), aKind === 'state' ? { value: usMedian, name: 'the US median' } : undefined)
+      : undefined;
+    fillCard(
+      cardA,
+      a.name,
+      aSnap,
+      choices.period,
+      'Median compared with the US',
+      aOutSnap ? { snap: aOutSnap, comparedLabel: 'Growth compared with the US' } : undefined,
+      aPrice ? { snap: aPrice, comparedLabel: 'Adjusted compared with the US' } : undefined,
+    );
 
     let message = `${a.name}: median ${aSnap.rows[2]!.value} ${PERIOD_LABELS[choices.period].toLowerCase()}.`;
     if (choices.state) message += ` ${aSnap.comparedWith}.`;
     if (aOutSnap) message += ` Projected job growth ${aOutSnap.growth}.`;
+    if (aPrice && aKind === 'state') message += ` Adjusted for state prices: ${aPrice.adjusted} a year.`;
 
     if (choices.compareState) {
       const b = place(choices.compareState, choices.compareArea);
@@ -168,6 +195,10 @@ export async function startCalculator(): Promise<void> {
         bOut && outlookYears
           ? outlookSnapshot(bOut.figures, bOut.scope, outlookYears, { figures: aOut?.figures, name: aLabel, isNation: !choices.state })
           : undefined;
+      const bKind = priceKind(choices.compareState, choices.compareArea);
+      const bPrice = data.prices
+        ? priceSnapshot(bKind, b.figures, parityOf(choices.compareState), aKind === 'state' && bKind === 'state' ? { value: aPrice?.value, name: a.name } : undefined)
+        : undefined;
       fillCard(
         cardB,
         b.name,
@@ -175,6 +206,7 @@ export async function startCalculator(): Promise<void> {
         choices.period,
         `Median compared with ${a.name}`,
         bOutSnap ? { snap: bOutSnap, comparedLabel: `Growth compared with ${aLabel}` } : undefined,
+        bPrice ? { snap: bPrice, comparedLabel: `Adjusted compared with ${a.name}` } : undefined,
       );
       message += ` ${b.name}: median ${bSnap.rows[2]!.value}, ${bSnap.comparedWith}.`;
     } else {

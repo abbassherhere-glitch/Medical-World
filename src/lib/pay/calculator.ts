@@ -7,6 +7,8 @@ import type { PayData, PayFigures, PayPercentiles, PaySymbol, PayValue } from '.
 import { exactAmount, formatPeriodAmount, PERIODS, payFor, type Period, type PeriodAmount } from './periods.ts';
 import type { OutlookData, OutlookFigures } from '../outlook/types.ts';
 import { formatCount, formatPercentChange, pace } from '../outlook/summary.ts';
+import { adjustedSalary } from '../prices/adjust.ts';
+import type { PriceData } from '../prices/types.ts';
 
 /** Figures packed into a short list: jobs, then hourly and annual 10th, 25th, median, 75th and 90th. */
 export type PackedFigures = (number | PaySymbol)[];
@@ -33,6 +35,8 @@ export interface CalculatorData {
   areas: Record<string, { name: string; figures: PackedFigures; page?: string }>;
   /** Job outlook from the state projections, if available. */
   outlook?: CalculatorOutlook;
+  /** State price levels, if available. Published for whole states only, never for areas. */
+  prices?: CalculatorPrices;
 }
 
 const packValue = (value: PayValue): number | PaySymbol => (typeof value === 'number' ? value : value.symbol);
@@ -336,4 +340,64 @@ export function outlookSnapshot(
     }
   }
   return { heading, jobs, growth: formatPercentChange(figures.percentChange), openings: formatCount(figures.openings), comparedWith };
+}
+
+/* ---------- Salary and cost of living ---------- */
+
+export interface CalculatorPrices {
+  /** The source name to show. */
+  source: string;
+  year: number;
+  /** Price level (US = 100) by state slug. States without one are absent. */
+  states: Record<string, number>;
+}
+
+export function buildCalculatorPrices(prices: PriceData, published: { name: string; slug: string }[]): CalculatorPrices {
+  const states: Record<string, number> = {};
+  for (const { name, slug } of published) {
+    const parity = prices.states.find((s) => s.name === name)?.parity;
+    if (typeof parity === 'number') states[slug] = parity;
+  }
+  return { source: prices.source.name, year: prices.source.year, states };
+}
+
+export interface PriceSnapshot {
+  priceLevel: string;
+  /** Adjusted median per year (a calculation), or why there is none. */
+  adjusted: string;
+  /** The adjusted figure compared with the first place, or "–". */
+  comparedWith: string;
+  /** The adjusted figure as a number, for comparing two places. */
+  value?: number;
+}
+
+const dollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+/**
+ * The cost-of-living rows of one snapshot card. Adjusted figures are worked
+ * out only for a whole state with a published median and price level. The
+ * US shows its price level (100) and no adjusted figure; an area shows none,
+ * because price levels are published for whole states only.
+ */
+export function priceSnapshot(
+  kind: 'nation' | 'state' | 'area',
+  figures: PayFigures | undefined,
+  parity: number | undefined,
+  base?: { value?: number; name: string },
+): PriceSnapshot {
+  if (kind === 'nation') return { priceLevel: '100.000 (US average)', adjusted: '–', comparedWith: '–' };
+  if (kind === 'area') return { priceLevel: 'Whole states only', adjusted: 'Not for areas', comparedWith: '–' };
+  const value = adjustedSalary(figures?.annual.median, parity);
+  const priceLevel = typeof parity === 'number' ? parity.toFixed(3) : 'Not available';
+  const adjusted = value === undefined ? 'Not available' : dollars.format(value);
+  let comparedWith = '–';
+  if (base) {
+    if (value === undefined || base.value === undefined) comparedWith = 'Not available';
+    else if (value === base.value) comparedWith = `The same as ${base.name}`;
+    else {
+      const diff = value - base.value;
+      comparedWith = `${dollars.format(Math.abs(diff))} (${((Math.abs(diff) / base.value) * 100).toFixed(1)}%) ${diff > 0 ? 'higher' : 'lower'} than ${base.name}`;
+    }
+  }
+  return { priceLevel, adjusted, comparedWith, ...(value !== undefined ? { value } : {}) };
 }
