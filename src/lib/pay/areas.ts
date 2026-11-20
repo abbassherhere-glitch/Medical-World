@@ -30,7 +30,7 @@ export interface AreaPageRef {
 }
 
 /** Addresses already used under /{profession}/salary/, which an area must never take. */
-export const RESERVED_SALARY_SLUGS = ['calculator', 'calculator-data.json', 'areas'];
+export const RESERVED_SALARY_SLUGS = ['calculator', 'calculator-data.json', 'areas', 'cost-of-living'];
 
 /**
  * Areas that get a page: metropolitan areas with a published annual median,

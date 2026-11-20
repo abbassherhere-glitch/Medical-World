@@ -1,0 +1,260 @@
+---
+/**
+ * Salary by state, adjusted for state price levels, for example
+ * /dental-hygienist/salary/cost-of-living/. Every adjusted figure is worked
+ * out by the shared helper in src/lib/prices/adjust.ts and labelled as a
+ * calculation.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import GuideLayout from '../../../layouts/GuideLayout.astro';
+import TableOfContents from '../../../components/TableOfContents.astro';
+import ScrollTable from '../../../components/ScrollTable.astro';
+import SmartLink from '../../../components/SmartLink.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import FaqList from '../../../components/FaqList.astro';
+import SourcesBox from '../../../components/SourcesBox.astro';
+import UpNext from '../../../components/UpNext.astro';
+import LinkPanel from '../../../components/LinkPanel.astro';
+import CalculatorLink from '../../../components/CalculatorLink.astro';
+import { upNext } from '../../../data/up-next';
+import { slugify } from '../../../data/states';
+import { formatAnnual, getPayData, releaseName, statesAndDc } from '../../../lib/pay';
+import { placeName } from '../../../lib/pay/summary';
+import { adjustNote, costOfLivingTable, getPrices, priceLevelInWords, type CostOfLivingRow } from '../../../lib/prices';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('salaryGuides');
+  return guides.map((g) => ({ params: { profession: g.data.profession.id }, props: { guide: g.data } }));
+}
+
+const { guide } = Astro.props;
+const slug = guide.profession.id;
+const profession = await getEntry(guide.profession);
+const name = profession.data.name;
+const pay = getPayData(slug);
+const prices = getPrices();
+const paySource = `${pay.release.publisher}, ${releaseName(pay)}`;
+const period = pay.release.referencePeriod;
+const year = prices.source.year;
+const note = adjustNote({ payPeriod: period, priceYear: year });
+
+const states = statesAndDc(pay);
+const rows = costOfLivingTable(states, prices);
+const left = states.filter((s) => !rows.some((r) => r.name === s.name)).map((s) => s.name);
+const top = rows[0]!;
+const bottom = rows[rows.length - 1]!;
+const furthest = rows.slice(0, 5);
+const least = rows.slice(-5).reverse();
+const rises = [...rows].sort((a, b) => b.change - a.change || a.name.localeCompare(b.name)).filter((r) => r.change > 0).slice(0, 5);
+const falls = [...rows].sort((a, b) => a.change - b.change || a.name.localeCompare(b.name)).filter((r) => r.change < 0).slice(0, 5);
+const unchanged = rows.filter((r) => r.change === 0).length;
+
+// Price levels exactly as published, to three decimal places.
+const fmtParity = (p: number) => p.toFixed(3);
+const where = (n: string) => placeName(n);
+const places = (n: number) => `${n} ${n === 1 ? 'place' : 'places'}`;
+const changeText = (r: CostOfLivingRow) => (r.change === 0 ? 'No change' : `${r.change > 0 ? 'Up' : 'Down'} ${Math.abs(r.change)}`);
+const stateHref = (n: string) => `/${slug}/${slugify(n)}/`;
+const line = (r: CostOfLivingRow) =>
+  `${r.name}: ${formatAnnual(r.median)} median, price level ${fmtParity(r.parity)}, adjusted ${formatAnnual(r.adjusted)}`;
+
+const lead = `Once state price levels are counted, the median ${name.toLowerCase()} salary goes furthest in ${where(top.name)}: ${formatAnnual(top.median)} a year is worth an adjusted ${formatAnnual(top.adjusted)} at national average prices. It goes least far in ${where(bottom.name)}, at an adjusted ${formatAnnual(bottom.adjusted)}. Adjusted figures are calculations from ${pay.release.publisher} salaries (${period}) and ${prices.source.publisher} price levels (${year}).`;
+
+const title = `${name} salary by state, adjusted for cost of living`;
+const description = `The median ${name.toLowerCase()} salary in every state and DC, adjusted for ${year} state price levels. It goes furthest in ${where(top.name)} (${formatAnnual(top.adjusted)} adjusted) and least far in ${where(bottom.name)} (${formatAnnual(bottom.adjusted)}).`;
+
+const biggestRise = rises[0];
+const biggestFall = falls[0];
+const questions = [
+  {
+    question: `Where does a ${name.toLowerCase()} salary go furthest?`,
+    answer: `In ${where(top.name)}. Its median salary is ${formatAnnual(top.median)} a year and its price level is ${fmtParity(top.parity)}, ${priceLevelInWords(top.parity)}, so the adjusted salary is ${formatAnnual(top.adjusted)}. Next come ${furthest
+      .slice(1, 3)
+      .map((r) => `${where(r.name)} (${formatAnnual(r.adjusted)})`)
+      .join(' and ')}.`,
+  },
+  {
+    question: `Where does a ${name.toLowerCase()} salary go least far?`,
+    answer: `In ${where(bottom.name)}. Its median salary is ${formatAnnual(bottom.median)} a year and its price level is ${fmtParity(bottom.parity)}, ${priceLevelInWords(bottom.parity)}, so the adjusted salary is ${formatAnnual(bottom.adjusted)}.`,
+  },
+  {
+    question: 'How is the adjusted salary worked out?',
+    answer: `The official median annual salary is divided by the state's price level divided by 100, and the result is rounded to the nearest $10. For example, ${where(top.name)}: ${formatAnnual(top.median)} ÷ (${top.parity} ÷ 100) = ${formatAnnual(top.adjusted)}. The salary is from ${period} and the price levels are for ${year}.`,
+  },
+  ...(biggestRise && biggestFall
+    ? [
+        {
+          question: 'Which states change rank the most once prices are counted?',
+          answer: `${where(biggestRise.name)} rises the most, from ${biggestRise.rank} to ${biggestRise.adjustedRank} (up ${places(biggestRise.change)}). ${where(biggestFall.name)} falls the most, from ${biggestFall.rank} to ${biggestFall.adjustedRank} (down ${places(-biggestFall.change)}). ${unchanged} ${unchanged === 1 ? 'place keeps its' : 'places keep their'} rank.`,
+        },
+      ]
+    : []),
+  {
+    question: 'Does the adjusted salary take taxes into account?',
+    answer: `No. It uses only each state's overall price level for ${year}. It does not account for taxes, for one household's own spending, or for differences between places within a state.`,
+  },
+];
+
+const contents = [
+  { label: 'Salary by state, adjusted', id: 'table' },
+  { label: 'Where pay goes furthest', id: 'furthest' },
+  { label: 'Where pay goes least far', id: 'least' },
+  { label: 'Biggest changes in rank', id: 'changes' },
+  { label: 'What a price level is', id: 'price-levels' },
+  { label: 'Common questions', id: 'common-questions' },
+];
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  heading={title}
+  profession={profession.data}
+  activeMenu="salary"
+  breadcrumb={[
+    { label: 'Home', href: '/' },
+    { label: name, href: `/${slug}/` },
+    { label: 'Salary', href: `/${slug}/salary/` },
+    { label: 'Cost of living' },
+  ]}
+  byline={guide.byline}
+>
+  <p class="lead">{lead}</p>
+  <TableOfContents items={contents} />
+
+  <section class="stack" aria-labelledby="table">
+    <h2 id="table" class="section-title">Salary by state, adjusted</h2>
+    <p class="muted">
+      Every state and DC with a statewide median, from the highest adjusted salary to the lowest. A price level of 100 is the national
+      average; 110 means prices are 10% higher.
+    </p>
+    <ScrollTable
+      caption={`${name} median salary by state, adjusted for ${year} price levels, highest adjusted salary first`}
+      columns={['State', 'Median salary', 'Price level', 'Adjusted salary', 'Rank by salary', 'Rank adjusted', 'Change in rank']}
+      minWidth={720}
+    >
+      {
+        rows.map((r) => (
+          <tr>
+            <th scope="row">
+              <SmartLink href={stateHref(r.name)}>{r.name}</SmartLink>
+            </th>
+            <td>{formatAnnual(r.median)}</td>
+            <td>{fmtParity(r.parity)}</td>
+            <td class="strong">{formatAnnual(r.adjusted)}</td>
+            <td>{r.rank}</td>
+            <td>{r.adjustedRank}</td>
+            <td>{changeText(r)}</td>
+          </tr>
+        ))
+      }
+    </ScrollTable>
+    <p class="note">{note}</p>
+    {
+      left.length > 0 && (
+        <p class="note">
+          Not in the table: {left.map(where).join(', ')}. The survey has no statewide median salary there, so no adjusted figure is worked out.
+        </p>
+      )
+    }
+    <p class="note">Sources: {paySource}; {prices.source.name}.</p>
+  </section>
+
+  <AdSlot size="inline" id="col-content-1" />
+
+  <section class="stack" aria-labelledby="furthest">
+    <h2 id="furthest" class="section-title">Where pay goes furthest</h2>
+    <p>The five places with the highest adjusted median salary:</p>
+    <ol class="ranked">{furthest.map((r) => <li>{line(r)}</li>)}</ol>
+  </section>
+
+  <section class="stack" aria-labelledby="least">
+    <h2 id="least" class="section-title">Where pay goes least far</h2>
+    <p>The five places with the lowest adjusted median salary, lowest first:</p>
+    <ol class="ranked">{least.map((r) => <li>{line(r)}</li>)}</ol>
+  </section>
+
+  <section class="stack" aria-labelledby="changes">
+    <h2 id="changes" class="section-title">Biggest changes in rank</h2>
+    <p>These places moved the most between the two rankings, out of {rows.length} places ranked:</p>
+    <h3 class="subhead">Rise the most</h3>
+    <ul>
+      {
+        rises.map((r) => (
+          <li>
+            {r.name}: from {r.rank} to {r.adjustedRank} (up {places(r.change)}), price level {fmtParity(r.parity)}
+          </li>
+        ))
+      }
+    </ul>
+    <h3 class="subhead">Fall the most</h3>
+    <ul>
+      {
+        falls.map((r) => (
+          <li>
+            {r.name}: from {r.rank} to {r.adjustedRank} (down {places(-r.change)}), price level {fmtParity(r.parity)}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="panel stack" aria-labelledby="price-levels">
+    <h2 id="price-levels" class="section-title">What a price level is</h2>
+    <p>
+      The price levels on this page are the {prices.source.publisher}'s Regional Price Parities for {year}. A price parity compares the
+      average price of goods and services in a state with the national average, which is set at 100. A value of 110 means prices are 10%
+      above the national average; 90 means they are 10% below.
+    </p>
+    <p>
+      Dividing a salary by the price level (as a fraction of 100) shows roughly what that salary would be worth at national average
+      prices. This makes it easier to compare states where prices differ.
+    </p>
+    <p>
+      It does not tell you what you would take home or spend. The adjustment does not count taxes. It uses one average for a whole state,
+      so prices in a particular city, town or neighborhood can be higher or lower. Your own costs depend on your household. The salary
+      figures are from {period} and the price levels are for {year}.
+    </p>
+  </section>
+
+  <FaqList id="common-questions" heading="Common questions" items={questions} />
+
+  <SourcesBox items={[paySource, prices.source.name]} />
+  <UpNext steps={upNext('cost-of-living', slug, name)} />
+
+  <Fragment slot="aside">
+    <CalculatorLink
+      profession={slug}
+      heading="Salary calculator"
+      text="Compare the salary in any two states, with the adjusted figure for each state."
+      label="Open the salary calculator"
+    />
+    <AdSlot size="sidebar" id="col-side-1" />
+    <LinkPanel
+      heading="Related guides"
+      links={[
+        { label: `${name} salary in the US`, href: `/${slug}/salary/` },
+        { label: 'Salary in every metropolitan area', href: `/${slug}/salary/areas/` },
+      ]}
+    />
+  </Fragment>
+</GuideLayout>
+
+<style>
+  .strong {
+    font-weight: var(--weight-bold);
+  }
+
+  .ranked,
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-left: var(--space-6);
+    margin: 0;
+  }
+
+  .subhead {
+    font-size: var(--text-lg);
+  }
+</style>
