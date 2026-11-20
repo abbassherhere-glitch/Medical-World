@@ -103,7 +103,7 @@ test('writes choices back into the page address', () => {
   assert.equal(writeChoices({ area: '12420', period: 'year' }), '', 'an area without its state is left out');
 });
 
-import { snapshot } from './calculator.ts';
+import { priceSnapshot, snapshot } from './calculator.ts';
 
 test('a snapshot shows every figure, the comparison and a text version of the range bar', () => {
   const snap = snapshot(figures(99240), figures(98100), 'the national median', 'year');
@@ -164,4 +164,22 @@ test('the outlook snapshot compares with the US, or with the first place in poin
   assert.equal(outlookSnapshot({ ...tx, percentChange: -1.7 }, 'X', years, { figures: us, name: 'the US', isNation: true }).comparedWith, 'Falling, while the US grows +7%');
   assert.equal(outlookSnapshot(undefined, 'Guam', years, { figures: us, name: 'the US', isNation: true }).growth, 'Not available');
   assert.equal(outlookSnapshot(us, '', years, undefined).comparedWith, '–');
+});
+
+test('cost-of-living rows: whole states only, never areas, never from a missing salary', () => {
+  const f = (median: number | { symbol: '*' }) =>
+    ({ employment: 1, hourly: { mean: 1, p10: 1, p25: 1, median: 1, p75: 1, p90: 1 }, annual: { mean: 1, p10: 1, p25: 1, median, p75: 1, p90: 1 } }) as PayFigures;
+  const texas = priceSnapshot('state', f(99240), 97.057);
+  assert.equal(texas.priceLevel, '97.057');
+  assert.equal(texas.adjusted, '$102,250');
+  assert.equal(texas.value, 102250);
+  const kansas = priceSnapshot('state', f({ symbol: '*' }), 90.068);
+  assert.equal(kansas.adjusted, 'Not available');
+  assert.equal(kansas.value, undefined);
+  assert.equal(priceSnapshot('area', f(99240), 97.057).adjusted, 'Not for areas');
+  assert.equal(priceSnapshot('nation', f(98100), 100).adjusted, '–');
+  const ohio = priceSnapshot('state', f(88990), 92.774, { value: texas.value, name: 'Texas' });
+  assert.equal(ohio.adjusted, '$95,920');
+  assert.equal(ohio.comparedWith, '$6,330 (6.2%) lower than Texas');
+  assert.equal(priceSnapshot('state', f(88990), 92.774, { value: undefined, name: 'Kansas' }).comparedWith, 'Not available');
 });

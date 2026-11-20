@@ -32,6 +32,7 @@ export async function getPublicRoutes(): Promise<string[]> {
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/calculator/`),
     ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/areas/`),
+    ...salaryGuides.map((g) => `/${g.data.profession.id}/salary/cost-of-living/`),
     ...becomeGuides.map((g) => `/${g.data.profession.id}/how-to-become/`),
     ...topicPages.flatMap((t) => ['schools', 'licensing', 'board-exam'].map((page) => `/${t.data.profession.id}/${page}/`)),
     ...statePages.map((p) => p.path),

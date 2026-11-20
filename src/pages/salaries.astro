@@ -17,6 +17,7 @@ const professions = await Promise.all(
       { href: `/${p.id}/salary/`, label: `Read the ${p.data.name.toLowerCase()} salary guide` },
       { href: `/${p.id}/salary/calculator/`, label: 'Open the salary calculator' },
       { href: `/${p.id}/salary/areas/`, label: 'See the salary in every metropolitan area' },
+      { href: `/${p.id}/salary/cost-of-living/`, label: 'See the salary in each state, adjusted for cost of living' },
     ]),
   })),
 );

@@ -4,7 +4,7 @@
  * the national figures; the calculator script updates the same fields in
  * place, so the layout does not move.
  */
-import type { OutlookSnapshot, Snapshot } from '../lib/pay/calculator';
+import type { OutlookSnapshot, PriceSnapshot, Snapshot } from '../lib/pay/calculator';
 
 interface Props {
   id: 'a' | 'b';
@@ -15,9 +15,11 @@ interface Props {
   emptyMessage?: string;
   /** Job outlook rows, from the state projections. */
   outlook?: OutlookSnapshot;
+  /** Cost-of-living rows, from the state price levels. */
+  prices?: { year: number; snap: PriceSnapshot };
 }
 
-const { id, heading, snap, periodLabel, emptyMessage, outlook } = Astro.props;
+const { id, heading, snap, periodLabel, emptyMessage, outlook, prices } = Astro.props;
 ---
 
 <section class="snapshot" data-snapshot={id} aria-labelledby={`snapshot-${id}-title`} data-empty={emptyMessage ? '' : undefined}>
@@ -47,6 +49,27 @@ const { id, heading, snap, periodLabel, emptyMessage, outlook } = Astro.props;
     <span class="snapshot__marker" style={snap.bar ? `left:${snap.bar.median}%` : 'display:none'}></span>
   </div>
   <p class="snapshot__bar-text note" data-field="bar-text">{snap.barText}</p>
+  {
+    prices && (
+      <div class="snapshot__outlook">
+        <h3 class="snapshot__subtitle">Salary and cost of living</h3>
+        <dl class="snapshot__rows">
+          <div class="snapshot__row">
+            <dt>Price level, {prices.year} (US = 100)</dt>
+            <dd data-field="price-level">{prices.snap.priceLevel}</dd>
+          </div>
+          <div class="snapshot__row">
+            <dt>Adjusted median per year (calculated)</dt>
+            <dd data-field="adjusted">{prices.snap.adjusted}</dd>
+          </div>
+          <div class="snapshot__row">
+            <dt data-field="adjusted-compared-label">Adjusted compared with the US</dt>
+            <dd data-field="adjusted-compared">{prices.snap.comparedWith}</dd>
+          </div>
+        </dl>
+      </div>
+    )
+  }
   {
     outlook && (
       <div class="snapshot__outlook">

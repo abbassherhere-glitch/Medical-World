@@ -20,6 +20,7 @@ import StatePicker from '../../components/StatePicker.astro';
 import LinkPanel from '../../components/LinkPanel.astro';
 import { settings } from '../../settings';
 import { getPublishedAreaPages } from '../../data/area-pages';
+import { costOfLivingTable, getPrices } from '../../lib/prices';
 import SmartLink from '../../components/SmartLink.astro';
 import {
   formatAnnual,
@@ -30,7 +31,7 @@ import {
   statesAndDc,
   surveyPhrase,
 } from '../../lib/pay';
-import { capitalize, highestAndLowest, joinNames, medianInWords, rankByMedian } from '../../lib/pay/summary';
+import { capitalize, highestAndLowest, joinNames, medianInWords, placeName, rankByMedian } from '../../lib/pay/summary';
 import { inlineMarkup } from '../../lib/text';
 import { salaryTitle } from '../../lib/pay/salary-wording';
 
@@ -101,11 +102,16 @@ const faqs = data.faqs.map((faq) => ({
 
 const sources = [`${pay.release.publisher}, ${release}`, ...data.otherSources];
 const areaCount = (await getPublishedAreaPages(professionSlug)).length;
+const prices = getPrices();
+const colRows = costOfLivingTable(states, prices);
+const colTop = colRows[0];
+const colBottom = colRows[colRows.length - 1];
 
 const contents = [
   { label: 'Pay per hour, week, month and year', id: 'pay-periods' },
   { label: data.payByState.heading, id: 'pay-by-state' },
   ...(areaCount > 0 ? [{ label: 'Salary by metropolitan area', id: 'pay-by-area' }] : []),
+  { label: 'Salary and cost of living', id: 'cost-of-living' },
   { label: data.factors.heading, id: 'what-affects-pay' },
   { label: 'Common questions', id: 'common-questions' },
   { label: 'Sources', id: 'sources' },
@@ -165,6 +171,22 @@ const contents = [
         <p>
           <SmartLink class="more-link" href={`/${professionSlug}/salary/areas/`}>
             See the salary in every metropolitan area
+          </SmartLink>
+        </p>
+      </section>
+    )
+  }
+
+  {
+    colTop && colBottom && (
+      <section class="stack" aria-labelledby="cost-of-living">
+        <h2 id="cost-of-living" class="section-title">Salary and cost of living</h2>
+        <p>
+          {`Once state price levels are counted, the median salary goes furthest in ${placeName(colTop.name)}, at an adjusted ${formatAnnual(colTop.adjusted)}, and least far in ${placeName(colBottom.name)}, at ${formatAnnual(colBottom.adjusted)}. These are calculations: the median salary divided by the state's ${prices.source.year} price level (US = 100), rounded to the nearest $10. Price levels are averages for whole states.`}
+        </p>
+        <p>
+          <SmartLink class="more-link" href={`/${professionSlug}/salary/cost-of-living/`}>
+            See the salary in every state, adjusted for cost of living
           </SmartLink>
         </p>
       </section>

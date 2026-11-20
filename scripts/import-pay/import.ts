@@ -16,6 +16,7 @@ import { SYMBOL_MEANINGS, TOP_PAY_LEVEL } from '../../src/lib/pay/symbols.ts';
 import { formatPayData } from './format.ts';
 import { importOutlook } from './import-outlook.ts';
 import { importSchools } from './import-schools.ts';
+import { importPrices } from './import-prices.ts';
 
 const codes = new Set<string>(PROFESSIONS.map((p) => p.occCode));
 const sources = await readSources(SOURCE_DIR, codes);
@@ -72,6 +73,7 @@ for (const profession of PROFESSIONS) {
   console.log(`  Symbols found: ${Object.keys(symbols).join(' ') || 'none'}`);
 }
 
-// Then the job outlook and the schools list, if their files are in data/source/.
+// Then the job outlook, the schools list and the price levels, if their files are in data/source/.
 importOutlook();
 importSchools();
+importPrices();

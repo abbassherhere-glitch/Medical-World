@@ -8,7 +8,8 @@ import { getCollection } from 'astro:content';
 import { getPublishedStatePages } from '../../../data/state-pages';
 import { getPublishedAreaPages } from '../../../data/area-pages';
 import { getPayData, releaseName } from '../../../lib/pay';
-import { buildCalculatorData, buildCalculatorOutlook } from '../../../lib/pay/calculator';
+import { buildCalculatorData, buildCalculatorOutlook, buildCalculatorPrices } from '../../../lib/pay/calculator';
+import { getPrices } from '../../../lib/prices';
 import { getOutlook } from '../../../lib/outlook';
 
 export const getStaticPaths = (async () => {
@@ -26,5 +27,6 @@ export const GET: APIRoute = async ({ params }) => {
   const data = buildCalculatorData(pay, published, releaseName(pay), areaPages);
   const outlook = getOutlook(profession);
   if (outlook) data.outlook = buildCalculatorOutlook(outlook, published);
+  data.prices = buildCalculatorPrices(getPrices(), published);
   return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 };

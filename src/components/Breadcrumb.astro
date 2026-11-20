@@ -1,6 +1,9 @@
 ---
 /** Breadcrumb trail. The last item is the current page and is not a link. */
 import { isLive } from '../data/routes';
+import JsonLd from './JsonLd.astro';
+import { breadcrumbList } from '../lib/structured-data';
+import { siteOrigin } from '../settings';
 
 interface Props {
   items: { label: string; href?: string }[];
@@ -13,6 +16,7 @@ const items = await Promise.all(
 );
 ---
 
+<JsonLd data={breadcrumbList(items.map((i) => ({ label: i.label, url: i.href ? new URL(i.href, siteOrigin()).href : undefined })))} />
 <nav aria-label="Breadcrumb" class="breadcrumb" data-pagefind-ignore>
   <ol>
     {

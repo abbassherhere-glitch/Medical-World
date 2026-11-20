@@ -12,7 +12,9 @@ import PersonPhoto from '../components/PersonPhoto.astro';
 import SmartLink from '../components/SmartLink.astro';
 import { liveLinks } from '../data/routes';
 import home from '../content/home.json';
-import { settings } from '../settings';
+import { settings, siteOrigin } from '../settings';
+import JsonLd from '../components/JsonLd.astro';
+import { website } from '../lib/structured-data';
 
 const professions = await getCollection('professions');
 const featured = await getEntry('professions', home.featuredProfession);
@@ -23,6 +25,7 @@ const popularGuides = await liveLinks(profession.popularGuides);
 ---
 
 <BaseLayout title={home.title} description={home.description}>
+  <JsonLd data={website({ name: settings.siteName, origin: siteOrigin() })} />
   <main id="main" tabindex="-1" data-pagefind-body>
     <section class="hero">
       <div class="container hero__inner">
