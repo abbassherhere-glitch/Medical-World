@@ -17,6 +17,8 @@ import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
 import SchoolsSection from '../../components/SchoolsSection.astro';
 import CostOfLivingBlock from '../../components/CostOfLivingBlock.astro';
+import LicensingSection from '../../components/LicensingSection.astro';
+import { formatChecked, licensingFor, licensingQuestions, licensingTakeaways } from '../../lib/licensing';
 import { costOfLivingTable, getPrices, priceLevelFor, priceLevelInWords } from '../../lib/prices';
 import { getSchools, schoolsInState, schoolsSourceLine, stateSchoolsSummary, withAwards, withoutAwards, totalAwards, countFormat as schoolCount } from '../../lib/schools';
 import { settings } from '../../settings';
@@ -63,6 +65,10 @@ const where = placeName(state);
 const data = fillState(template, where);
 const profession = await getEntry(data.profession);
 const professionSlug = data.profession.id;
+// Licensing facts for this state, if it is in the licensing file. Otherwise the placeholders stay.
+const licensing = licensingFor(professionSlug, state);
+// The last takeaways are about licensing: facts from the file, or the template's placeholders.
+const licensingLines = licensing ? licensingTakeaways(licensing, where) : data.takeaways;
 const plural = profession.data.namePlural;
 const stateHref = (name: string) => `/${professionSlug}/${slugify(name)}/`;
 
@@ -102,7 +108,7 @@ const takeaways = [
   rankSentence,
   ...(rangeSentence ? [rangeSentence] : []),
   areaSentence,
-  ...data.takeaways,
+  ...licensingLines,
 ];
 
 // Nearby states: bordering states with their medians. Alaska and Hawaii
@@ -152,7 +158,7 @@ const schoolsData = getSchools(professionSlug);
 const stateSchools = schoolsData ? schoolsInState(schoolsData, statePay.abbr) : [];
 const schoolsYear = schoolsData?.source.awardYear ?? '';
 const schoolsSummary = schoolsData ? stateSchoolsSummary(where, stateSchools, schoolsYear) : undefined;
-if (schoolsSummary) takeaways.splice(takeaways.length - data.takeaways.length, 0, schoolsSummary.replace(/\.$/, ' (US Department of Education, IPEDS).'));
+if (schoolsSummary) takeaways.splice(takeaways.length - licensingLines.length, 0, schoolsSummary.replace(/\.$/, ' (US Department of Education, IPEDS).'));
 
 // Salary and cost of living: the state's price level and its adjusted median (a calculation).
 const prices = getPrices();
@@ -162,13 +168,20 @@ const parity = priceLevelFor(prices, state);
 const colGuide = `/${professionSlug}/salary/cost-of-living/`;
 if (colRow) {
   takeaways.splice(
-    takeaways.length - data.takeaways.length,
+    takeaways.length - licensingLines.length,
     0,
     `Once state price levels are counted, the median salary in ${where} is worth an adjusted ${formatAnnual(colRow.adjusted)}, ${ordinal(colRow.adjustedRank)} of ${colRows.length} (calculated from the ${pay.release.referencePeriod} median salary and ${prices.source.year} state price levels).`,
   );
 }
 
-const sources = [`${pay.release.publisher}, ${release}`, prices.source.name, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...data.otherSources];
+const otherSources = licensing
+  ? [
+      ...data.otherSources.filter((source) => !source.startsWith('[Dental board for')),
+      `${licensing.board.name}, official pages listed under "${data.licensing.heading}", checked ${formatChecked(licensing.checked)}`,
+    ]
+  : data.otherSources;
+
+const sources = [`${pay.release.publisher}, ${release}`, prices.source.name, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...otherSources];
 
 // Job outlook, from the state projections (a different source from the pay
 // survey; never mixed with it). Ranked among the states and DC only.
@@ -181,7 +194,7 @@ const growthRank = growthRankEntry ? { rank: growthRankEntry.rank, of: growthRan
 const outlookLine = outlook ? outlookSentence(where, outlookPlace?.figures, outlook.national, outlookYears) : undefined;
 if (outlookLine) {
   takeaways.splice(
-    takeaways.length - data.takeaways.length,
+    takeaways.length - licensingLines.length,
     0,
     `${outlookLine.replace(/\.$/, '')} (Projections Central, state projections ${outlookYears}).`,
   );
@@ -226,6 +239,8 @@ questions.push({
       ? `Prices in ${where} are ${priceLevelInWords(parity)} (price level ${parity.toFixed(3)} in ${prices.source.year}). The survey has no statewide median salary for ${where}, so no adjusted salary is worked out.`
       : `There is no published price level for ${where}, so the salary cannot be adjusted for cost of living.`,
 });
+// Licensing questions, each answered with one value from the licensing file, word for word.
+if (licensing) questions.push(...licensingQuestions(licensing, where));
 if (outlook && outlookPlace && outlookLine) {
   questions.push({
     question: `What is the job outlook for ${plural} in ${where}?`,
@@ -384,19 +399,25 @@ const contents = [
 
   <AdSlot size="inline" id="state-content-1" />
 
-  <section class="stack licensing" aria-labelledby="licensing">
-    <h2 id="licensing" class="section-title">{data.licensing.heading}</h2>
-    <p class="muted">{data.licensing.intro}</p>
-    <ol class="steps">
-      {
-        data.licensing.steps.map((step) => (
-          <li>
-            <strong>{step.title}</strong> {step.text}
-          </li>
-        ))
-      }
-    </ol>
-  </section>
+{
+    licensing ? (
+      <LicensingSection id="licensing" heading={data.licensing.heading} where={where} entry={licensing} />
+    ) : (
+        <section class="stack licensing" aria-labelledby="licensing">
+          <h2 id="licensing" class="section-title">{data.licensing.heading}</h2>
+          <p class="muted">{data.licensing.intro}</p>
+          <ol class="steps">
+            {
+              data.licensing.steps.map((step) => (
+                <li>
+                  <strong>{step.title}</strong> {step.text}
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+    )
+  }
 
   {
     schoolsData && (
@@ -423,7 +444,7 @@ const contents = [
       text={`See the salary in ${where} per hour, week, month or year, and compare it with another state.`}
       label={`Compare ${state}`}
     />
-    <UsefulOrganizations id="state" />
+    <UsefulOrganizations id="state" board={licensing?.board} />
     <AdSlot size="sidebar" id="state-side-1" />
     {
       neighbors.length > 0 && (

@@ -1,0 +1,152 @@
+---
+/**
+ * "Getting licensed in {state}" for a state in the licensing file. Every fact
+ * is the file's own text, unchanged, marked with data-licensing-fact so a
+ * check can confirm it is in the file. A value not confirmed yet is shown as
+ * one consistent line. Nothing here is described as reviewed.
+ */
+import ExternalLink from './ExternalLink.astro';
+import { formatChecked, licensingSteps, NOT_CONFIRMED, type LicensingEntry } from '../lib/licensing';
+
+interface Props {
+  id: string;
+  heading: string;
+  /** As the state reads in a sentence, for example "the District of Columbia". */
+  where: string;
+  entry: LicensingEntry;
+}
+
+const { id, heading, where, entry } = Astro.props;
+const steps = licensingSteps(entry);
+const checked = formatChecked(entry.checked);
+---
+
+<section class="stack licensing" aria-labelledby={id}>
+  <h2 id={id} class="section-title">{heading}</h2>
+  <p class="muted">
+    The steps to a first dental hygienist license in {where}, and the rules for renewing it, from the official pages listed below.
+  </p>
+  <ol class="steps">
+    {
+      steps.map((step) => (
+        <li>
+          <strong>{step.title}</strong>{' '}
+          {step.lines.length === 1 && !step.lines[0]!.label ? (
+            step.lines[0]!.text ? (
+              <span data-licensing-fact>{step.lines[0]!.text}</span>
+            ) : (
+              <span class="missing">{NOT_CONFIRMED}</span>
+            )
+          ) : (
+            <ul class="lines">
+              {step.lines.map((line) => (
+                <li>
+                  <span class="line-label">{line.label}:</span>{' '}
+                  {line.list ? (
+                    line.list.length > 0 ? (
+                      <ul class="facts">
+                        {line.list.map((item) => (
+                          <li data-licensing-fact>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span class="missing">{NOT_CONFIRMED}</span>
+                    )
+                  ) : line.text ? (
+                    <span data-licensing-fact>{line.text}</span>
+                  ) : (
+                    <span class="missing">{NOT_CONFIRMED}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  {
+    entry.notes.length > 0 && (
+      <div class="notes">
+        <p class="line-label">Notes</p>
+        <ul class="facts">
+          {entry.notes.map((note) => (
+            <li data-licensing-fact>{note}</li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+  <p class="checked">
+    Last checked against the board's website on <time datetime={entry.checked}>{checked}</time>. Rules and fees change, so confirm every
+    requirement with <ExternalLink href={entry.board.url}>{entry.board.name}</ExternalLink> before you apply.
+  </p>
+  <div class="sources">
+    <h3 class="sources__title">Official sources</h3>
+    <ul class="sources__list">
+      {
+        entry.sources.map((url) => (
+          <li>
+            <ExternalLink href={url}>{url}</ExternalLink>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .muted {
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-left: var(--space-6);
+    line-height: 1.6;
+  }
+
+  .lines {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-left: var(--space-5);
+    margin-top: var(--space-2);
+  }
+
+  .facts {
+    padding-left: var(--space-5);
+  }
+
+  .line-label {
+    font-weight: var(--weight-bold);
+  }
+
+  .missing {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+
+  .checked {
+    line-height: 1.6;
+  }
+
+  .sources__title {
+    font-size: var(--text-lg);
+  }
+
+  .sources__list {
+    padding-left: var(--space-5);
+    font-size: var(--text-md);
+    overflow-wrap: anywhere;
+  }
+
+  .sources__list :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+</style>

@@ -6,6 +6,8 @@ import StateGrid from '../components/StateGrid.astro';
 import { professionsWithPages } from '../data/professions';
 import { liveLinks } from '../data/routes';
 import { STATES_AND_DC } from '../data/states';
+import LicensingTable from '../components/LicensingTable.astro';
+import { getLicensing } from '../lib/licensing';
 
 const becomeGuides = await getCollection('becomeGuides');
 const professions = await Promise.all(
@@ -13,6 +15,7 @@ const professions = await Promise.all(
     slug: p.id,
     data: p.data,
     // The short general explanation already used on "How to become one".
+    licensing: getLicensing(p.id),
     explanation: becomeGuides.find((g) => g.data.profession.id === p.id)?.data.intro,
     links: await liveLinks([
       { href: `/${p.id}/licensing/`, label: `${p.data.name} licensing by state` },
@@ -42,6 +45,7 @@ const professions = await Promise.all(
             </li>
           ))}
         </ul>
+        {p.licensing && <LicensingTable profession={p.slug} name={p.data.name} data={p.licensing} idPrefix={p.slug} />}
         <StateGrid profession={p.slug} states={STATES_AND_DC} section="licensing" />
       </section>
     ))

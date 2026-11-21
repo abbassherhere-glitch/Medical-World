@@ -1,0 +1,71 @@
+---
+/**
+ * The states in the licensing file, with the first-license fee, renewal
+ * period and continuing education hours in the file's own words. States not
+ * yet covered are listed plainly underneath. No ranking or comparison.
+ */
+import ScrollTable from './ScrollTable.astro';
+import SmartLink from './SmartLink.astro';
+import { slugify, STATES_AND_DC } from '../data/states';
+import { formatChecked, NOT_CONFIRMED, type LicensingData } from '../lib/licensing';
+
+interface Props {
+  profession: string;
+  /** For example "Dental hygienist". */
+  name: string;
+  data: LicensingData;
+  /** Prefix for ids, so two tables can share a page. */
+  idPrefix: string;
+}
+
+const { profession, name, data, idPrefix } = Astro.props;
+const rows = [...data.states].sort((a, b) => a.state.localeCompare(b.state));
+const covered = new Set(rows.map((r) => r.state));
+const notCovered = STATES_AND_DC.filter((s) => !covered.has(s));
+const checkedDates = [...new Set(rows.map((r) => r.checked))].sort();
+const checkedText = checkedDates.map(formatChecked).join(', ');
+---
+
+<section class="stack" aria-labelledby={`${idPrefix}-table`}>
+  <h2 id={`${idPrefix}-table`} class="section-title">Licensing facts by state</h2>
+  <p>
+    {rows.length} states have licensing facts on this site so far, from each state's official pages, last checked {checkedText}. Each
+    state's page has the full steps and the official sources. Confirm every requirement with the state's board before you apply.
+  </p>
+  <ScrollTable
+    caption={`${name} licensing facts for ${rows.length} states, in alphabetical order`}
+    columns={['State', 'First-license fee', 'Renewal period', 'Continuing education']}
+    minWidth={760}
+  >
+    {
+      rows.map((r) => (
+        <tr>
+          <th scope="row">
+            <SmartLink href={`/${profession}/${slugify(r.state)}/#licensing`}>{r.state}</SmartLink>
+          </th>
+          {[r.first_license.fee, r.renewal.period, r.continuing_education.hours].map((value) => (
+            <td>{value ? <span data-licensing-fact>{value}</span> : <span class="missing">{NOT_CONFIRMED}</span>}</td>
+          ))}
+        </tr>
+      ))
+    }
+  </ScrollTable>
+  {
+    notCovered.length > 0 && (
+      <p>
+        <strong>Not yet covered ({notCovered.length}):</strong> {notCovered.join(', ')}. Their pages do not have licensing facts yet.
+      </p>
+    )
+  }
+</section>
+
+<style>
+  td {
+    vertical-align: top;
+  }
+
+  .missing {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+</style>
