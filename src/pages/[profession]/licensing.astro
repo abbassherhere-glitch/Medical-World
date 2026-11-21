@@ -3,6 +3,8 @@
 import { getCollection, getEntry } from 'astro:content';
 import TopicPage from '../../components/TopicPage.astro';
 import { isLive } from '../../data/routes';
+import LicensingTable from '../../components/LicensingTable.astro';
+import { getLicensing } from '../../lib/licensing';
 
 export async function getStaticPaths() {
   const pages = await getCollection('topicPages');
@@ -18,6 +20,7 @@ const become = (await getCollection('becomeGuides')).find((g) => g.data.professi
 const becomeHref = `/${slug}/how-to-become/`;
 const linkSteps = become !== undefined && (await isLive(becomeHref));
 const steps = become?.data.steps ?? [];
+const licensing = getLicensing(slug);
 ---
 
 <TopicPage
@@ -43,6 +46,7 @@ const steps = become?.data.steps ?? [];
       </section>
     )
   }
+  {licensing && <LicensingTable profession={slug} name={profession.data.name} data={licensing} idPrefix="licensing" />}
 </TopicPage>
 
 <style>
