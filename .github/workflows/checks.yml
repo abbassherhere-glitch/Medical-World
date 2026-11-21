@@ -34,3 +34,5 @@ jobs:
         run: npm run check-area-text
       - name: Structured data
         run: npm run check-structured-data
+      - name: Licensing facts match the file
+        run: npm run check-licensing-text
