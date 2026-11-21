@@ -17,6 +17,8 @@ import CalculatorLink from '../../components/CalculatorLink.astro';
 import FaqList from '../../components/FaqList.astro';
 import SchoolsSection from '../../components/SchoolsSection.astro';
 import CostOfLivingBlock from '../../components/CostOfLivingBlock.astro';
+import LicensingSection from '../../components/LicensingSection.astro';
+import { formatChecked, licensingFor } from '../../lib/licensing';
 import { costOfLivingTable, getPrices, priceLevelFor, priceLevelInWords } from '../../lib/prices';
 import { getSchools, schoolsInState, schoolsSourceLine, stateSchoolsSummary, withAwards, withoutAwards, totalAwards, countFormat as schoolCount } from '../../lib/schools';
 import { settings } from '../../settings';
@@ -168,7 +170,16 @@ if (colRow) {
   );
 }
 
-const sources = [`${pay.release.publisher}, ${release}`, prices.source.name, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...data.otherSources];
+// Licensing facts for this state, if it is in the licensing file. Otherwise the placeholders stay.
+const licensing = licensingFor(professionSlug, state);
+const otherSources = licensing
+  ? [
+      ...data.otherSources.filter((source) => !source.startsWith('[Dental board for')),
+      `${licensing.board.name}, official pages listed under "${data.licensing.heading}", checked ${formatChecked(licensing.checked)}`,
+    ]
+  : data.otherSources;
+
+const sources = [`${pay.release.publisher}, ${release}`, prices.source.name, ...(schoolsData ? [schoolsSourceLine(schoolsData)] : []), ...otherSources];
 
 // Job outlook, from the state projections (a different source from the pay
 // survey; never mixed with it). Ranked among the states and DC only.
@@ -384,19 +395,25 @@ const contents = [
 
   <AdSlot size="inline" id="state-content-1" />
 
-  <section class="stack licensing" aria-labelledby="licensing">
-    <h2 id="licensing" class="section-title">{data.licensing.heading}</h2>
-    <p class="muted">{data.licensing.intro}</p>
-    <ol class="steps">
-      {
-        data.licensing.steps.map((step) => (
-          <li>
-            <strong>{step.title}</strong> {step.text}
-          </li>
-        ))
-      }
-    </ol>
-  </section>
+{
+    licensing ? (
+      <LicensingSection id="licensing" heading={data.licensing.heading} where={where} entry={licensing} />
+    ) : (
+        <section class="stack licensing" aria-labelledby="licensing">
+          <h2 id="licensing" class="section-title">{data.licensing.heading}</h2>
+          <p class="muted">{data.licensing.intro}</p>
+          <ol class="steps">
+            {
+              data.licensing.steps.map((step) => (
+                <li>
+                  <strong>{step.title}</strong> {step.text}
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+    )
+  }
 
   {
     schoolsData && (
@@ -423,7 +440,7 @@ const contents = [
       text={`See the salary in ${where} per hour, week, month or year, and compare it with another state.`}
       label={`Compare ${state}`}
     />
-    <UsefulOrganizations id="state" />
+    <UsefulOrganizations id="state" board={licensing?.board} />
     <AdSlot size="sidebar" id="state-side-1" />
     {
       neighbors.length > 0 && (

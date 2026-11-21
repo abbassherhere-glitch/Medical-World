@@ -1,18 +1,22 @@
 ---
 /**
- * "Useful organizations": official bodies to check rules with. Both entries
- * are marked placeholders for the owner to fill in with names and official
- * links. Hide the box everywhere with `showUsefulOrganizations` in
- * src/settings.ts.
+ * "Useful organizations": official bodies to check rules with. The state
+ * board comes from the licensing file where the state is in it; otherwise,
+ * and for the professional association, a marked placeholder stays for the
+ * owner to fill in. Hide the box everywhere with `showUsefulOrganizations`
+ * in src/settings.ts.
  */
 import { settings } from '../settings';
+import ExternalLink from './ExternalLink.astro';
 
 interface Props {
   /** For example "Texas"; used in the heading's id only. */
   id: string;
+  /** The state board, from the licensing file. */
+  board?: { name: string; url: string } | undefined;
 }
 
-const { id } = Astro.props;
+const { id, board } = Astro.props;
 ---
 
 {
@@ -20,7 +24,13 @@ const { id } = Astro.props;
     <section class="panel stack orgs" aria-labelledby={`orgs-${id}`}>
       <h2 id={`orgs-${id}`} class="panel-title">Useful organizations</h2>
       <ul class="orgs__list">
-        <li>[STATE DENTAL BOARD NAME AND OFFICIAL LINK]</li>
+        <li>
+          {board ? (
+            <ExternalLink href={board.url}>{board.name}</ExternalLink>
+          ) : (
+            '[STATE DENTAL BOARD NAME AND OFFICIAL LINK]'
+          )}
+        </li>
         <li>[PROFESSIONAL ASSOCIATION NAME AND OFFICIAL LINK]</li>
       </ul>
     </section>
@@ -30,6 +40,12 @@ const { id } = Astro.props;
 <style>
   .orgs {
     padding: 22px;
+  }
+
+  .orgs__list :global(a) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   .orgs__list {
