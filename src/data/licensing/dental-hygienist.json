@@ -1,0 +1,737 @@
+{
+ "about": "Dental hygienist licensing facts by state. Each fact was read from the official pages listed under sources on the date in checked. A null value means it has not been confirmed yet. Nothing here has been checked by a qualified reviewer.",
+ "profession": "dental-hygienist",
+ "states": [
+  {
+   "state": "California",
+   "board": {
+    "name": "Dental Hygiene Board of California",
+    "url": "https://www.dhbc.ca.gov"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.dhbc.ca.gov/formspubs/rdh_informational.pdf",
+    "https://www.dhbc.ca.gov/licensees/renewals.shtml",
+    "https://www.dhbc.ca.gov/licensees/ce_units_required.shtml",
+    "https://www.dhbc.ca.gov/licensees/ce_course_requirement.shtml"
+   ],
+   "first_license": {
+    "education": "Diploma from an accredited dental hygiene program.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "A clinical exam score report is required if you studied out of state or graduated more than three years ago. WREB, CRDTS and ADEX reports are accepted.",
+    "law_exam": "California Law and Ethics examination, taken after the board approves your application.",
+    "other_requirements": [
+     "Basic Life Support certification.",
+     "Fingerprints (Live Scan or hard card). A license is not issued until the background review is complete.",
+     "Out-of-state graduates need board-approved training in soft tissue curettage, local anesthesia and nitrous oxide-oxygen analgesia if not already completed."
+    ],
+    "fee": "$200.00 application fee."
+   },
+   "renewal": {
+    "period": "Every two years, by the last day of your birth month.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "25 units each two-year renewal, including the required courses.",
+    "required_topics": [
+     "A two-unit California Dental Practice Act course.",
+     "A two-unit infection control course.",
+     "Basic Life Support (up to four units). Fully online courses are not accepted."
+    ],
+    "first_renewal": "No continuing education units are required for the first renewal period."
+   },
+   "notes": []
+  },
+  {
+   "state": "Connecticut",
+   "board": {
+    "name": "Connecticut Department of Public Health",
+    "url": "https://portal.ct.gov/DPH/Practitioner-Licensing--Investigations/Dentalhygiene/Dental-Hygienist-Licensure"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://portal.ct.gov/DPH/Practitioner-Licensing--Investigations/Dentalhygiene/Dental-Hygienist-Licensure-Requirements",
+    "https://portal.ct.gov/DPH/Practitioner-Licensing--Investigations/Dentalhygiene/Dental-Hygienist-Licensure",
+    "https://portal.ct.gov/dph/practitioner-licensing--investigations/dentalhygiene/dental-hygienist-continuing-education"
+   ],
+   "first_license": {
+    "education": "Graduation from a dental hygiene program accredited by the Commission on Dental Accreditation (CODA).",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "One of: Commission on Dental Competency Assessments, Council of Interstate Testing Agencies, Southern Regional Testing Agency, Central Regional Dental Testing Service, or Western Regional Examining Board.",
+    "law_exam": null,
+    "other_requirements": [],
+    "fee": "$150.00 initial application fee."
+   },
+   "renewal": {
+    "period": null,
+    "fee": "$105.00."
+   },
+   "continuing_education": {
+    "hours": "At least 16 hours in the preceding 24 months.",
+    "required_topics": [
+     "At least one hour on infection control in a dental setting.",
+     "One contact hour on cultural competency."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Florida",
+   "board": {
+    "name": "Florida Board of Dentistry",
+    "url": "https://floridasdentistry.gov"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://floridasdentistry.gov/dental-hygienist/",
+    "https://floridasdentistry.gov/dental-hygienist-renewal/"
+   ],
+   "first_license": {
+    "education": "Graduation from a dental hygiene program accredited by the Commission on Dental Accreditation. Applicants must be at least 18.",
+    "national_exam": "Dental Hygiene National Board Examination.",
+    "clinical_exam": "ADEX Dental Hygiene Licensing Examination (scores are valid if taken on or after June 1, 2010).",
+    "law_exam": "Florida Laws and Rules Examination.",
+    "other_requirements": [
+     "Electronic fingerprinting.",
+     "Current CPR certification with AED."
+    ],
+    "fee": "$130.00 in total: $50.00 application fee and $80.00 license fee."
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on February 28 of even-numbered years.",
+    "fee": "$80.00 (active license)."
+   },
+   "continuing_education": {
+    "hours": "24 hours every two years: 22 general hours plus 2 hours on medical errors.",
+    "required_topics": [
+     "2 hours on preventing medical errors.",
+     "2 hours on domestic violence every third renewal, in addition to the 24 hours.",
+     "Current CPR certification from a live course."
+    ],
+    "first_renewal": "For the first renewal, only 2 hours on HIV/AIDS are required."
+   },
+   "notes": []
+  },
+  {
+   "state": "Pennsylvania",
+   "board": {
+    "name": "Pennsylvania State Board of Dentistry",
+    "url": "https://www.pa.gov/agencies/dos/department-and-offices/bpoa/boards-commissions/dentistry.html"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.pa.gov/agencies/dos/department-and-offices/bpoa/boards-commissions/dentistry/dental-hygienist-licensure-snapshot"
+   ],
+   "first_license": {
+    "education": "An associate's degree from a dental hygiene school accredited by CODA or a recognized regional accrediting agency.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "A clinical exam from one of ADEX, CDCA, CRDTS, CITA, SRTA or WREB.",
+    "law_exam": null,
+    "other_requirements": [
+     "3 hours of board-approved child abuse recognition and reporting training before a first license."
+    ],
+    "fee": "$154.00 (effective July 1, 2025)."
+   },
+   "renewal": {
+    "period": "Every two years. The current period runs April 1, 2025 to March 31, 2027.",
+    "fee": "$59.00."
+   },
+   "continuing_education": {
+    "hours": "20 hours each two-year renewal.",
+    "required_topics": [
+     "2 hours of board-approved child abuse recognition and reporting."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Ohio",
+   "board": {
+    "name": "Ohio State Dental Board",
+    "url": "https://dental.ohio.gov"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://dental.ohio.gov/licensing-and-renewal/002-dental-hygienist"
+   ],
+   "first_license": {
+    "education": "Graduate of a CODA-accredited dental hygiene program.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "ADEX or CRDTS-SRTA.",
+    "law_exam": null,
+    "other_requirements": [],
+    "fee": "$184.00."
+   },
+   "renewal": {
+    "period": "Every two years. A license expires two years from the date it was issued.",
+    "fee": "$144.00 ($134.00 plus $10.00 for the dental hygienist loan repayment fund)."
+   },
+   "continuing_education": {
+    "hours": "At least 20 hours each registration period.",
+    "required_topics": [
+     "Proof of Basic Life Support certification."
+    ],
+    "first_renewal": "Recent graduates are exempt during their first two-year period."
+   },
+   "notes": []
+  },
+  {
+   "state": "Washington",
+   "board": {
+    "name": "Washington State Department of Health",
+    "url": "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/dental-hygienist/licensing-requirements"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/dental-hygienist/licensing-requirements",
+    "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/dental-hygienist/continuing-education",
+    "https://doh.wa.gov/licenses-permits-and-certificates/professions-new-renew-or-update/dental-hygienist/apply-license"
+   ],
+   "first_license": {
+    "education": "Graduate of a dental hygiene program accredited by the Commission on Dental Accreditation.",
+    "national_exam": "National Board Dental Hygiene Examination.",
+    "clinical_exam": "A clinical exam from WREB, CRDTS, CDCA or the Council of Interstate Testing Agencies.",
+    "law_exam": "Washington State Drug and Law Jurisprudence Examination.",
+    "other_requirements": [
+     "A background check is processed for every applicant."
+    ],
+    "fee": "$100 application fee."
+   },
+   "renewal": {
+    "period": "Every year, on your birthday.",
+    "fee": "$70."
+   },
+   "continuing_education": {
+    "hours": "15 hours every year.",
+    "required_topics": [
+     "A current Basic Life Support card.",
+     "A one-time three-hour suicide prevention course, which counts toward the 15 hours."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Massachusetts",
+   "board": {
+    "name": "Massachusetts Board of Registration in Dentistry",
+    "url": "https://www.mass.gov/orgs/board-of-registration-in-dentistry"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.mass.gov/how-to/apply-for-a-dental-hygienist-license",
+    "https://www.mass.gov/how-to/renew-your-dental-hygienist-license-and-permits",
+    "https://www.mass.gov/info-details/continuing-education-for-dentistry"
+   ],
+   "first_license": {
+    "education": "Proof of graduation (official transcript or a signed letter from the school).",
+    "national_exam": "National Board examination, with a passing score on all sections.",
+    "clinical_exam": "A board-approved regional or state clinical exam.",
+    "law_exam": "Massachusetts Dental Ethics and Jurisprudence Exam.",
+    "other_requirements": [
+     "Current CPR/AED or Basic Life Support certification.",
+     "Criminal record (CORI) form, signed in person.",
+     "Two signatures from licensed dentists or dental hygienists."
+    ],
+    "fee": "$126."
+   },
+   "renewal": {
+    "period": "Every two years.",
+    "fee": "$60."
+   },
+   "continuing_education": {
+    "hours": "At least 20 units each two-year cycle, completed by March 31 in odd-numbered years.",
+    "required_topics": [],
+    "first_renewal": "New graduates of an accredited program are exempt for the licensing period in which they graduate."
+   },
+   "notes": []
+  },
+  {
+   "state": "Delaware",
+   "board": {
+    "name": "Delaware Board of Dentistry and Dental Hygiene",
+    "url": "https://dpr.delaware.gov/boards/dental/"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://dpr.delaware.gov/boards/dental/fees",
+    "https://dpr.delaware.gov/boards/dental/exams",
+    "https://dpr.delaware.gov/boards/dental/renewal",
+    "https://dpr.delaware.gov/boards/dental/continuing-education-and-audit-information/"
+   ],
+   "first_license": {
+    "education": null,
+    "national_exam": null,
+    "clinical_exam": "Delaware Practical Board Examination, given by the board in January and May.",
+    "law_exam": "Jurisprudence Examination (20 questions for dental hygienists, open book).",
+    "other_requirements": [],
+    "fee": "$117 application fee, plus a $100 dental hygienist exam fee."
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on May 31 of even-numbered years.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "24 hours each two-year period.",
+    "required_topics": [
+     "At least 2 hours on infection control.",
+     "A current CPR course."
+    ],
+    "first_renewal": "If this is your first renewal: licensed less than one year, no hours are required; licensed between one and two years, half the hours."
+   },
+   "notes": []
+  },
+  {
+   "state": "Michigan",
+   "board": {
+    "name": "Michigan Department of Licensing and Regulatory Affairs",
+    "url": "https://www.michigan.gov/lara/bureau-list/bpl/health/hp-lic-health-prof/dental"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.michigan.gov/lara/bureau-list/bpl/health/hp-lic-health-prof/dental"
+   ],
+   "first_license": {
+    "education": "Graduation from a CODA-accredited dental hygiene program.",
+    "national_exam": "National Board examination.",
+    "clinical_exam": "All parts of the ADEX examination. Other clinical exams are not accepted.",
+    "law_exam": null,
+    "other_requirements": [
+     "CPR, BLS or ACLS certification with a hands-on part, earned within the two years before the license.",
+     "Criminal background check.",
+     "One-time human trafficking training.",
+     "At least 2 hours of implicit bias training in the previous five years."
+    ],
+    "fee": "$98.80 (application and three-year license)."
+   },
+   "renewal": {
+    "period": "Every three years.",
+    "fee": "$78.00."
+   },
+   "continuing_education": {
+    "hours": "36 hours every three years.",
+    "required_topics": [
+     "At least 12 hours on clinical issues.",
+     "2 hours on pain and symptom management.",
+     "1 hour on dental ethics and jurisprudence.",
+     "1 hour on infection control.",
+     "At least 12 hours must be live.",
+     "1 hour of implicit bias training for each year of the license cycle."
+    ],
+    "first_renewal": null
+   },
+   "notes": [
+    "From the state's Dental Hygienist Licensing Guide, revision date January 26, 2026."
+   ]
+  },
+  {
+   "state": "Indiana",
+   "board": {
+    "name": "Indiana State Board of Dentistry",
+    "url": "https://www.in.gov/pla/professions/dentistry-home/"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.in.gov/pla/professions/dentistry-home/dentistry-licensing-information"
+   ],
+   "first_license": {
+    "education": "An associate degree in dental hygiene from an accredited school.",
+    "national_exam": "National Board examination, with passing scores in all sections.",
+    "clinical_exam": "All parts of one clinical exam (CDCA/NERB/WREB/CITA, CRDTS or SRTA), passed less than five years ago.",
+    "law_exam": "Indiana jurisprudence exam: 30 questions, 75% to pass.",
+    "other_requirements": [
+     "Criminal background check.",
+     "BLS or ACLS card."
+    ],
+    "fee": "$100.00 application fee."
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on March 1 of even-numbered years.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "19 hours each renewal period, at least half from live presentations or workshops.",
+    "required_topics": [
+     "A basic life support course (only 2 hours count toward the total).",
+     "A 2-hour course on ethics, professional responsibility and Indiana statutes and rules."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Kentucky",
+   "board": {
+    "name": "Kentucky Board of Dentistry",
+    "url": "https://dentistry.ky.gov/Pages/index.aspx"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://dentistry.ky.gov/Dental-Hygienists/Pages/Initial-Licensure.aspx",
+    "https://dentistry.ky.gov/Dental-Hygienists/Pages/default.aspx",
+    "https://dentistry.ky.gov/Continuing-Education/Pages/default.aspx",
+    "https://dentistry.ky.gov/Online-Services/Pages/Fees.aspx"
+   ],
+   "first_license": {
+    "education": "Graduation from a dental hygiene degree program approved by the Commission on Dental Accreditation.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "The ADEX or CRDTS clinical hygiene examination, passed within the last five years.",
+    "law_exam": "The board's jurisprudence exam, with a score of 80% or above.",
+    "other_requirements": [
+     "Nationwide criminal background check.",
+     "Current CPR certification."
+    ],
+    "fee": "$125 if you apply in the first year of the two-year license period, or $75 in the second year."
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on December 31 of every even-numbered year.",
+    "fee": "$110."
+   },
+   "continuing_education": {
+    "hours": "30 hours every two-year cycle. At least 10 hours must be live and at least 20 must focus on clinical skills and knowledge.",
+    "required_topics": [
+     "CPR does not count toward the 30 hours."
+    ],
+    "first_renewal": "If you were licensed in the renewal year, no extra hours are needed. If you were licensed in the non-renewal year, 15 hours are needed before renewal."
+   },
+   "notes": []
+  },
+  {
+   "state": "Alabama",
+   "board": {
+    "name": "Board of Dental Examiners of Alabama",
+    "url": "https://dentalboard.org/"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://dentalboard.org/state-licensure-applications/",
+    "https://dentalboard.org/professionals/continuing-education/",
+    "https://dentalboard.org/fee-schedule/"
+   ],
+   "first_license": {
+    "education": "A CODA-approved dental hygiene program or the Alabama Dental Hygiene Program.",
+    "national_exam": null,
+    "clinical_exam": "A regional exam passed within the last five years: CDCA, CITA, CRDTS, SRTA or WREB.",
+    "law_exam": "An online jurisprudence test after your application is approved.",
+    "other_requirements": [],
+    "fee": "$350.00 application fee (license by regional exam)."
+   },
+   "renewal": {
+    "period": "Every year (annual registration).",
+    "fee": "$70.00."
+   },
+   "continuing_education": {
+    "hours": "12 units for each 12 months of the renewal cycle.",
+    "required_topics": [
+     "At least one unit each cycle in ethics.",
+     "At least one unit each cycle in infectious disease control.",
+     "Current Basic Life Support certification."
+    ],
+    "first_renewal": null
+   },
+   "notes": [
+    "Continuing education rules effective October 15, 2026. Fee schedule revised October 2026."
+   ]
+  },
+  {
+   "state": "Texas",
+   "board": {
+    "name": "Texas State Board of Dental Examiners",
+    "url": "https://tsbde.texas.gov"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://tsbde.texas.gov/licensing/hygienists/hygienist-license-by-exam/",
+    "https://tsbde.texas.gov/78i8ljhbj/RDH-Licensure_2025.pdf",
+    "https://tsbde.texas.gov/licensing/hygienists/hygienist-continuing-education/"
+   ],
+   "first_license": {
+    "education": "Graduation from a CODA-accredited program, shown by an official transcript.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "A regional clinical exam with written and clinical parts, taken within the last seven years. The board currently validates scores from ADEX and CRDTS-SRTA.",
+    "law_exam": "TSBDE Jurisprudence Assessment, completed within one year before you apply.",
+    "other_requirements": [
+     "Fingerprinting.",
+     "Current Basic Life Support CPR certification with a hands-on skills demonstration.",
+     "A human trafficking prevention course.",
+     "A National Practitioner Data Bank self-query.",
+     "Verification of every professional license you have held."
+    ],
+    "fee": "$125 (license by examination)."
+   },
+   "renewal": {
+    "period": null,
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "24 hours every two years, starting after your first renewal. At least 16 hours must be technical or scientific.",
+    "required_topics": [
+     "An approved human trafficking prevention course, as part of the 24 hours.",
+     "The jurisprudence assessment every four years, in addition to the 24 hours."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "New York",
+   "board": {
+    "name": "New York State Education Department, Office of the Professions",
+    "url": "https://www.op.nysed.gov/professions/dental-hygienists/license-requirements"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.op.nysed.gov/professions/dental-hygienists/license-requirements",
+    "https://www.op.nysed.gov/professions/dental-hygienists/continuing-education-q-a"
+   ],
+   "first_license": {
+    "education": "A high school diploma or equivalent, plus a New York registered or CODA-accredited dental hygiene program. Applicants must be at least 17.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "The CDCA (ADEX) clinical dental hygiene examination.",
+    "law_exam": null,
+    "other_requirements": [
+     "Child abuse identification and reporting training.",
+     "Infection control and barrier precautions training."
+    ],
+    "fee": "$128 for the license and first registration."
+   },
+   "renewal": {
+    "period": "Every three years (registration period).",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "24 contact hours in each three-year registration period.",
+    "required_topics": [],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Georgia",
+   "board": {
+    "name": "Georgia Board of Dentistry",
+    "url": "https://gbd.georgia.gov"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://gbd.georgia.gov/faqs-other-information/dental-hygienist-faqs",
+    "https://gbd.georgia.gov/document/application/dental-hygienist-application-licensure-exam/download"
+   ],
+   "first_license": {
+    "education": "An A.S., B.A. or B.S. degree from an accredited school. Graduates of non-accredited schools are not eligible.",
+    "national_exam": "National Board Dental Hygiene Examination (NBDHE).",
+    "clinical_exam": "A clinical licensure examination with a score of 75 or higher in all sections.",
+    "law_exam": "Georgia jurisprudence exam: open book, 75 or higher, valid for one year.",
+    "other_requirements": [
+     "CPR certification.",
+     "A National Practitioner Data Bank self-query dated within four months.",
+     "Criminal history consent form.",
+     "Affidavit of citizenship."
+    ],
+    "fee": "$75, non-refundable."
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on December 31 of odd-numbered years.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "22 hours each two-year renewal period.",
+    "required_topics": [
+     "15 of the hours must be in clinical science."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "North Carolina",
+   "board": {
+    "name": "North Carolina State Board of Dental Examiners",
+    "url": "https://www.ncdentalboard.org"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.ncdentalboard.org/hygienist.htm",
+    "https://www.ncdentalboard.org/license_renewal.htm"
+   ],
+   "first_license": {
+    "education": null,
+    "national_exam": null,
+    "clinical_exam": "Only the ADEX Dental Hygiene exam (passed after November 21, 2015) or the CITA Dental Hygiene exam (passed within the last five years).",
+    "law_exam": "Online exams in infection control and sterilization, and in North Carolina jurisprudence.",
+    "other_requirements": [
+     "Background check, with fingerprinting for North Carolina residents."
+    ],
+    "fee": null
+   },
+   "renewal": {
+    "period": "Every year, by January 1. Licenses not renewed by March 31 become void.",
+    "fee": "$106.00 for 2026."
+   },
+   "continuing_education": {
+    "hours": null,
+    "required_topics": [],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Virginia",
+   "board": {
+    "name": "Virginia Board of Dentistry",
+    "url": "https://www.dhp.virginia.gov/Boards/Dentistry"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.dhp.virginia.gov/Boards/Dentistry/ApplicantResources/Applyforalicense/DentalHygienist/",
+    "https://www.dhp.virginia.gov/Boards/Dentistry/PractitionerResources/ContinuingEducation/DentalHygiene/"
+   ],
+   "first_license": {
+    "education": null,
+    "national_exam": null,
+    "clinical_exam": "One of the regional clinical exams.",
+    "law_exam": null,
+    "other_requirements": [],
+    "fee": null
+   },
+   "renewal": {
+    "period": "Every year.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "At least 15 hours for each annual renewal.",
+    "required_topics": [
+     "A current hands-on CPR course for health care providers.",
+     "Four hours every two years on monitoring sedation, if you monitor patients under sedation or general anesthesia."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Arizona",
+   "board": {
+    "name": "Arizona State Board of Dental Examiners",
+    "url": "https://dentalboard.az.gov/home"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://dentalboard.az.gov/contact-us/faq",
+    "https://dentalboard.az.gov/sites/default/files/2022-11/Initial_Application_Instructions_2023.pdf"
+   ],
+   "first_license": {
+    "education": "Graduate of an accredited dental hygiene school.",
+    "national_exam": "National Board examination.",
+    "clinical_exam": "A board-approved clinical examination passed within the last five years.",
+    "law_exam": "Arizona Dental Jurisprudence Examination.",
+    "other_requirements": [
+     "CPR certification.",
+     "Arizona Fingerprint Clearance Card.",
+     "Statement of citizenship."
+    ],
+    "fee": "$55 for the license through your first renewal date, plus $100 for the jurisprudence examination."
+   },
+   "renewal": {
+    "period": "Every third year, by the end of your birth month.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": null,
+    "required_topics": [],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "Tennessee",
+   "board": {
+    "name": "Tennessee Board of Dentistry",
+    "url": "https://www.tn.gov/health/licensure/den.html"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://www.tn.gov/health/licensure/den.html"
+   ],
+   "first_license": {
+    "education": null,
+    "national_exam": null,
+    "clinical_exam": "SRTA, WREB, CRDTS, CDCA (ADEX) or CITA (ADEX).",
+    "law_exam": "A jurisprudence exam, for first licensure and at every renewal.",
+    "other_requirements": [
+     "Criminal background check."
+    ],
+    "fee": null
+   },
+   "renewal": {
+    "period": "Every two years. Licenses expire on the last day of your birth month.",
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": "30 hours each two-year cycle. No more than half may be online.",
+    "required_topics": [
+     "2 of the 30 hours on chemical dependency.",
+     "A current CPR card at all times."
+    ],
+    "first_renewal": null
+   },
+   "notes": []
+  },
+  {
+   "state": "South Carolina",
+   "board": {
+    "name": "South Carolina Board of Dentistry",
+    "url": "https://llr.sc.gov/bod/pub.aspx"
+   },
+   "checked": "2026-11-20",
+   "reviewed_by_qualified_person": false,
+   "sources": [
+    "https://llr.sc.gov/bod/PDF/Hygiene-Licensure_Requirements_and_Instructions_Online_App.pdf",
+    "https://llr.sc.gov/bod/denren.aspx"
+   ],
+   "first_license": {
+    "education": "Graduate of a dental hygiene program approved by the Commission on Dental Accreditation.",
+    "national_exam": "National Board Examination.",
+    "clinical_exam": "A state or regional clinical examination.",
+    "law_exam": "SC Jurisprudence Examination, with a score of 70 or higher.",
+    "other_requirements": [
+     "Current CPR certification.",
+     "Verification of lawful presence.",
+     "Letters of reference, at least one from a dentist.",
+     "A National Practitioner Data Bank self-query report."
+    ],
+    "fee": "$150 application fee."
+   },
+   "renewal": {
+    "period": null,
+    "fee": null
+   },
+   "continuing_education": {
+    "hours": null,
+    "required_topics": [],
+    "first_renewal": null
+   },
+   "notes": []
+  }
+ ]
+}

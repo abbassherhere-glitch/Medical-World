@@ -39,6 +39,8 @@ a placeholder waiting for a real value.
 | Your changes to single price levels | `src/data/prices/overrides.json` |
 | How the adjusted salary is worked out | `src/lib/prices/adjust.ts` |
 | Structured data for search engines | `src/lib/structured-data.ts` |
+| Licensing facts by state (collected by hand, edit with care) | `src/data/licensing/dental-hygienist.json` |
+| Your changes to single licensing facts | `src/data/licensing/overrides.json` |
 | College lists (made by the import, do not edit by hand) | `src/data/schools/` |
 | Your changes to single colleges (hide or correct) | `src/data/schools/overrides.json` |
 | The pay import script | `scripts/import-pay/` |
@@ -466,6 +468,66 @@ npm run check-structured-data
 It fails if any structured data is not valid JSON, contains a square-bracket
 placeholder, or has a question, answer or breadcrumb that is not on the page.
 It runs on every pull request.
+
+## Licensing facts by state
+
+The licensing facts on state pages come from one hand-collected file,
+`src/data/licensing/dental-hygienist.json`. Unlike the other data files, it is
+committed. Each state has its board (name and website), the date the facts
+were checked, the official sources, and the first-license, renewal and
+continuing education facts. A `null` value or an empty list means the fact
+has not been confirmed yet.
+
+**What the site shows.** For a state in the file, "Getting licensed in
+{state}" keeps its five steps and shows the file's own text, unchanged:
+
+| Step | What it shows |
+| --- | --- |
+| Education | `first_license.education` |
+| National board exam | `first_license.national_exam` |
+| Clinical exam | `first_license.clinical_exam` |
+| Application and fees | `first_license.law_exam`, `first_license.other_requirements` and `first_license.fee` |
+| Renewal | `renewal.period`, `renewal.fee`, `continuing_education.hours`, `continuing_education.required_topics` and `continuing_education.first_renewal` |
+
+A missing value reads "Not confirmed yet. Check with the board." Under the
+steps: the date last checked, a link to the board, the official sources and
+any notes. The board also appears in the "Useful organizations" box. Key
+takeaways and common questions use the fee, renewal period, clinical exam and
+continuing education hours, word for word, and leave out any the file cannot
+answer. The licensing pages have a table of the states in the file. States
+not in the file keep their placeholders. Nothing is described as reviewed.
+
+**Adding or updating a state.** Edit the file, keeping the same shape, and
+set `checked` to the date you read the official pages (YYYY-MM-DD). The build
+stops if a state name does not match a state on the site, a state appears
+twice, or a source or board website is not an `https` address.
+
+**Changing one fact** without editing the file:
+
+```json
+{ "overrides": [{ "profession": "dental-hygienist", "state": "Texas", "field": "renewal.fee", "value": "$...", "note": "Why, and where it was checked" }] }
+```
+
+`field` is one of the fields listed in the table above, `board.name`,
+`board.url` or `notes`. Use `null` for "not confirmed yet", and a list for
+`other_requirements`, `required_topics` and `notes`.
+
+**Checks and reports.**
+
+```bash
+npm run check-licensing-text
+```
+
+After a build, this fails if any licensing fact on the site is not, word for
+word, a value in the file, if a state in the file still shows a licensing
+placeholder, or if a state not in the file has lost its placeholders. It
+runs on every pull request.
+
+```bash
+npm run licensing-gaps
+```
+
+This lists, by state, every value that is still `null` or empty.
 
 ## Switching a guide link on or off
 
